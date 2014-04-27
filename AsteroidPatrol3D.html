@@ -17,19 +17,23 @@
 <body>
 	<div id="container"> </div>
 	
-	<div id="help" style="position:fixed; left:40%; top:4%; color:grey;">
+	<div id="help" style="position:fixed; left:40%; top:3%; color:grey;">
 		Asteroid Patrol 3D
 	</div>
 
-	<div id="debug1" style="position:fixed; left:5%; top:4%; color:grey;">
+	<div id="debug1" style="position:fixed; left:5%; top:3%; color:grey;">
 		Debug Info
 	</div>
 
-	<div id="debug2" style="position:fixed; left:5%; top:8%; color:grey;">
+	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
 		Debug Info
 	</div>
 
-	<div id="debug3" style="position:fixed; left:5%; top:12%; color:grey;">
+	<div id="debug3" style="position:fixed; left:5%; top:9%; color:grey;">
+		Debug Info
+	</div>
+	
+	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
 		Debug Info
 	</div>
 
@@ -37,8 +41,8 @@
 	<script src="js/threex.texturecube.js"></script>
 	<script src="js/threex.skymap.js"></script>
 	<script src="js/threex.keyboardstate.js"></script>
-	<script src="js/virtualButtonJoystick.js"></script>
 	<script src="js/threex.FirstPersonControls.js"></script>
+  	<script src="js/virtualButtonJoystick.js"></script>
 	<script src="js/threex.GameTimer.js"></script>
 	<script src="js/threex.geometricglowmesh.js"></script>
 	<script src="js/webaudioxGameSounds.js"></script>
@@ -65,6 +69,7 @@
 			ship.position.z = 100;
 			//put the camera right where the ship is
 			camera.position.copy(ship.position);
+              		//camera.rotation.y = Math.PI / 4;
 			//setup controls parameters
 			//controls.movementSpeed = 100;
 
@@ -78,14 +83,40 @@
 			//store how much time has passed since the last animation frame
 			frameTime = clock.getDelta();
 			
+			if (keyboard.pressed("M")){
+				
+				mouseControl = true;
+				
+				if(canPressM){
+					//joystick.oldLon = controls.lon;
+					//joystick.oldLat = controls.lat;
+					joystick.savedMousePosX = joystick.mousePosX;
+					joystick.savedMousePosY = joystick.mousePosY;
+					joystick._onDown(joystick.mousePosX, joystick.mousePosY);
+					joystick.mouseDeltaX = 0;
+					joystick.mouseDeltaY = 0;
+					canPressM = false;
+				}
+				
+			}else canPressM = true;
+				
+			if (mouseControl)
+				joystick._pressed = true;
+			
 			//check if joystick Stick is being moved
 			if (joystick._pressed) {
-				//joystick left and right will turn the camera in that direction
-				controls.lon += joystick.deltaX() * frameTime;
-				//joystick up and down will tilt the camera up and down
-				//controls.lat -= joystick.deltaY() * frameTime;	
+				
+				if(mouseControl){
+					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 2);
+					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
+				} else {
+					//joystick left and right will turn the camera in that direction
+					controls.lon = joystick.oldLon + (joystick.deltaX() / 3);// - 90
+					//joystick up and down will tilt the camera up and down
+					controls.lat = joystick.oldLat - (joystick.deltaY() / 4);// 0 -
+				}
+				
 			}
-			
 			//if firebutton is NOT pressed, reset it so we can fire again
 			if ( !joystick.button1Pressed ) {
 				canShoot = true;
@@ -134,9 +165,10 @@
 			renderer.render(scene, camera);
 
 			//helpful real-time debug text, so we can monitor game variables
-			debugText1.innerHTML = "bulletSpherePos.x: " + bulletSphere.position.x.toFixed(1);
-			debugText2.innerHTML = "bulletSpherePos.z: " + bulletSphere.position.z.toFixed(1);
-			debugText3.innerHTML = "bulletSpherePos.y: " + bulletSphere.position.y.toFixed(1);
+			debugText1.innerHTML = "mousePosX: " + joystick.mousePosX;
+			debugText2.innerHTML = "mousePosY: " + joystick.mousePosY;
+			debugText3.innerHTML = "savedMousePosX: " + joystick.savedMousePosX;
+			debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
 
 		} //end function animate()
 
