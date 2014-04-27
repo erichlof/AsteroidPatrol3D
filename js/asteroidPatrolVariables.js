@@ -8,16 +8,19 @@ var joystick = new VirtualJoystick({
 	container: document.getElementById("container"),
 	mouseSupport: true,
 	add2Buttons: true,
-	stationaryBase: true,
-	baseX: 100,
-	baseY: 250,
+	//stationaryBase: true,
+	hideJoystick: true,
+	//baseX: 100,
+	//baseY: 250,
 	button1X: 320,
 	button1Y: 250,
 	button2X: 220,
-	button2Y: 250,
-	limitStickTravel: true,
-	stickRadius: 50	
+	button2Y: 250
+	//limitStickTravel: true,
+	//stickRadius: 50	
 });
+var mouseControl = false;
+var canPressM = true;
 var controls = new THREEx.FirstPersonControls(camera);
 var lookVector = new THREE.Vector3();
 var renderer = new THREE.WebGLRenderer({
@@ -80,5 +83,6 @@ var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
+var debugText4 = document.getElementById("debug4");
 
 // END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
