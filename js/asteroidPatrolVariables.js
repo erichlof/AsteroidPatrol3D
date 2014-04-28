@@ -4,12 +4,18 @@ var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHei
 var clock = new THREE.Clock();
 
 var keyboard = new THREEx.KeyboardState();
+var touchScreenAvailable = function() {
+	return 'createTouch' in document ? true : false;
+};
+var hideButtons = true;
+if (touchScreenAvailable()) hideButtons = false;
 var joystick = new VirtualJoystick({
 	container: document.getElementById("container"),
 	mouseSupport: true,
 	add2Buttons: true,
 	//stationaryBase: true,
 	hideJoystick: true,
+	hideButtons: hideButtons,
 	//baseX: 100,
 	//baseY: 250,
 	button1X: 320,
