@@ -5,7 +5,8 @@ var VirtualJoystick = function(opts) {
 	this._stickEl = opts.stickElement || this._buildJoystickStick();
 	this._baseEl = opts.baseElement || this._buildJoystickBase();
 	this._hideJoystick = opts.hideJoystick || false;
-	this._hideButtons = opts.hideButtons || false;
+	this._hideButtons = opts.hideButtons || true;
+	if('createTouch' in document) this._hideButtons = false;
 	this._mouseSupport = opts.mouseSupport !== undefined ? opts.mouseSupport : false;
 	this._stationaryBase = opts.stationaryBase || false;
 	this._add1Button = opts.add1Button || false;
