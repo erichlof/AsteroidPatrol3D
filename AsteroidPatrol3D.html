@@ -15,8 +15,8 @@
 </head>
 
 <body>
-	<div id="container"> </div>
-	
+	<div id="container"></div>
+
 	<div id="help" style="position:fixed; left:40%; top:3%; color:grey;">
 		Asteroid Patrol 3D
 	</div>
@@ -32,7 +32,7 @@
 	<div id="debug3" style="position:fixed; left:5%; top:9%; color:grey;">
 		Debug Info
 	</div>
-	
+
 	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
 		Debug Info
 	</div>
@@ -42,24 +42,24 @@
 	<script src="js/threex.skymap.js"></script>
 	<script src="js/threex.keyboardstate.js"></script>
 	<script src="js/threex.FirstPersonControls.js"></script>
-  	<script src="js/virtualButtonJoystick.js"></script>
+	
+	<script src="js/virtualButtonJoystick.js"></script>
 	<script src="js/threex.GameTimer.js"></script>
 	<script src="js/threex.geometricglowmesh.js"></script>
 	<script src="js/webaudioxGameSounds.js"></script>
 	<script src="js/asteroidPatrolVariables.js"></script>
-	
+
 	<script>
-		
 		setup();
 		animate();
 
 
 		function setup() {
-			
+
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.getElementById("container").appendChild(renderer.domElement);
 			window.addEventListener('resize', onWindowResize, false);
-			
+
 			light.position.set(50, 50, 50);
 			sphere.position = light.position;
 			ship.position.x = 0;
@@ -69,7 +69,7 @@
 			ship.position.z = 100;
 			//put the camera right where the ship is
 			camera.position.copy(ship.position);
-              		//camera.rotation.y = Math.PI / 4;
+			//camera.rotation.y = Math.PI / 4;
 			//setup controls parameters
 			//controls.movementSpeed = 100;
 
@@ -82,12 +82,12 @@
 			requestAnimationFrame(animate);
 			//store how much time has passed since the last animation frame
 			frameTime = clock.getDelta();
-			
-			if (keyboard.pressed("M")){
-				
+
+			if (keyboard.pressed("M")) {
+
 				mouseControl = true;
-				
-				if(canPressM){
+
+				if (canPressM) {
 					//joystick.oldLon = controls.lon;
 					//joystick.oldLat = controls.lat;
 					joystick.savedMousePosX = joystick.mousePosX;
@@ -97,28 +97,28 @@
 					joystick.mouseDeltaY = 0;
 					canPressM = false;
 				}
-				
-			}else canPressM = true;
-				
+
+			} else canPressM = true;
+
 			if (mouseControl)
 				joystick._pressed = true;
-			
+
 			//check if joystick Stick is being moved
 			if (joystick._pressed) {
-				
-				if(mouseControl){
+
+				if (mouseControl) {
 					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 2);
 					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
 				} else {
 					//joystick left and right will turn the camera in that direction
-					controls.lon = joystick.oldLon + (joystick.deltaX() / 3);// - 90
+					controls.lon = joystick.oldLon + (joystick.deltaX() / 3); // - 90
 					//joystick up and down will tilt the camera up and down
-					controls.lat = joystick.oldLat - (joystick.deltaY() / 4);// 0 -
+					controls.lat = joystick.oldLat - (joystick.deltaY() / 4); // 0 -
 				}
-				
+
 			}
 			//if firebutton is NOT pressed, reset it so we can fire again
-			if ( !joystick.button1Pressed ) {
+			if (!joystick.button1Pressed) {
 				canShoot = true;
 			}
 			//if firebutton IS pressed, check to see if we can shoot
@@ -130,7 +130,7 @@
 				}
 			}
 			//if thrust button is pressed, apply thrust force to ship in the same direction that the camera is facing
-			if ( joystick.button2Pressed || keyboard.pressed('space') ) {
+			if (joystick.button2Pressed || keyboard.pressed('space')) {
 				//reset the thrustVector to unit length of 1 to avoid accumulation
 				thrustVector.set(0, 0, -1);
 				//rotate thrustVector by our camera's rotation quaternion
@@ -146,19 +146,19 @@
 				normalizedShipDirection.copy(shipVelocity);
 				//the following clamps this vector to a unit length of 1
 				normalizedShipDirection.normalize();
-					
+
 			}
-			
+
 			//if bullet is alive, update it
 			if (bulletAlive)
 				moveBullet();
-			
+
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
 			//because we're in space, the following is always called and the ship will move forever in the player's intended direction
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
 			//set camera position from ship position
 			camera.position.copy(ship.position);
-			
+
 			//update the controls
 			controls.update(frameTime);
 			//render the scene with our camera
@@ -173,7 +173,7 @@
 		} //end function animate()
 
 		function shootBullet() {
-			
+
 			//set bullet to alive
 			bulletAlive = true;
 			//spawn bullet at player's location
@@ -185,14 +185,14 @@
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
 			bulletSphere.translateOnAxis(bulletDirection, 15);
-			
+
 		}
 
 		function moveBullet() {
-			
+
 			//move bullet along bulletDirection vector, at the rate of bulletSpeed times the framerate
 			bulletSphere.translateOnAxis(bulletDirection, bulletSpeed * frameTime);
-			
+
 		}
 
 		function onWindowResize() {
@@ -203,7 +203,6 @@
 			controls.handleResize();
 
 		}
-		
 	</script>
 </body>
 
