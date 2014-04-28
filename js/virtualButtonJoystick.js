@@ -5,12 +5,12 @@ var VirtualJoystick = function(opts) {
 	this._stickEl = opts.stickElement || this._buildJoystickStick();
 	this._baseEl = opts.baseElement || this._buildJoystickBase();
 	this._hideJoystick = opts.hideJoystick || false;
+	this._hideButtons = opts.hideButtons || false;
 	this._mouseSupport = opts.mouseSupport !== undefined ? opts.mouseSupport : false;
 	this._stationaryBase = opts.stationaryBase || false;
 	this._add1Button = opts.add1Button || false;
 	this._add2Buttons = opts.add2Buttons || false;
-	if (this._add2Buttons) this._add1Button = false; 
-	
+	if (this._add2Buttons) this._add1Button = false;
 	this._baseX = this._stickX = opts.baseX || 200;
 	this._baseY = this._stickY = opts.baseY || 300;
 	if (this._add1Button) {
@@ -21,10 +21,14 @@ var VirtualJoystick = function(opts) {
 		this._button1Y = this._baseY;
 		this._button1X = opts.button1X || this._button1X;
 		this._button1Y = opts.button1Y || this._button1Y;
-		this.button1Pressed = false;
-		this._container.appendChild(this._button1El);
+			
+		if (!this._hideButtons) {
+			this._container.appendChild(this._button1El);	
+		}
 		this._button1El.style.position = "absolute";
 		this._button1El.style.display = "none";
+		this.button1Pressed = false;
+		
 	}
 	if (this._add2Buttons) {
 		this._strokeStyleButton1 = opts.strokeStyleButton1 || 'orange';
@@ -34,10 +38,13 @@ var VirtualJoystick = function(opts) {
 		this._button1Y = this._baseY;
 		this._button1X = opts.button1X || this._button1X;
 		this._button1Y = opts.button1Y || this._button1Y;
-		this.button1Pressed = false;
-		this._container.appendChild(this._button1El);
+
+		if (!this._hideButtons) {
+			this._container.appendChild(this._button1El);	
+		}
 		this._button1El.style.position = "absolute";
 		this._button1El.style.display = "none";
+		this.button1Pressed = false;
 		
 		this._strokeStyleButton2 = opts.strokeStyleButton2 || 'magenta';
 		this._button2El = opts.button2Element || this._buildButton2();
@@ -46,10 +53,14 @@ var VirtualJoystick = function(opts) {
 		this._button2Y = this._baseY;
 		this._button2X = opts.button2X || this._button2X;
 		this._button2Y = opts.button2Y || this._button2Y;
-		this.button2Pressed = false;
-		this._container.appendChild(this._button2El);
+		
+		if (!this._hideButtons) {
+			this._container.appendChild(this._button2El);
+		}
 		this._button2El.style.position = "absolute";
 		this._button2El.style.display = "none";
+		this.button2Pressed = false;
+		
 	}
 	
 	if(this._hideJoystick)
