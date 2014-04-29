@@ -463,22 +463,20 @@ VirtualJoystick.prototype._onTouchStart = function(event) {
 	if (testTouch.target == this._button1El) {
 		return this._onButton1Down();
 	}
-	if (testTouch.target == this._button2El) {
+	else if (testTouch.target == this._button2El) {
 		return this._onButton2Down();
 	}
 
 	var touches = event.touches;
-	if (touches.length > 1) {
-		if (touches[0].target == this._button1El) {
-			x = touches[1].pageX;
-			y = touches[1].pageY;
-			return this._onDown(x, y);
-		}
-		if (touches[1].target == this._button1El) {
-			x = touches[0].pageX;
-			y = touches[0].pageY;
-			return this._onDown(x, y);	
-		}
+	if (touches.length == 2) {
+		x = touches[1].pageX;
+		y = touches[1].pageY;
+		return this._onDown(x, y);
+	}
+	else if (touches.length >= 3) {
+		x = touches[2].pageX;
+		y = touches[2].pageY;
+		return this._onDown(x, y);
 	}
 	else {
 		x = touches[0].pageX;
@@ -489,14 +487,14 @@ VirtualJoystick.prototype._onTouchStart = function(event) {
 
 VirtualJoystick.prototype._onTouchEnd = function(event) {
   
-	this.oldLon = controls.lon;
-	this.oldLat = controls.lat;
-
 	touch = event.changedTouches[0];
 	if (touch.target == this._button1El) 
 		return this._onButton1Up();
 	if (touch.target == this._button2El) 
 		return this._onButton2Up();
+	
+	this.oldLon = controls.lon;
+	this.oldLat = controls.lat;
 
 	return this._onUp();
 };
