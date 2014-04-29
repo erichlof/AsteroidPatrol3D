@@ -33,4 +33,4 @@ To Do
 April 29, 2014 Progress Note
 ----------------------------
 
-Mobile controls (cell phone, tablet, etc..) are now working properly, allowing for any combination of multiple button presses and simultaneous joystick movements.  I'm really happy with how the mobile interface is turning out!  When you slow-swipe with your finger, the camera looks around your environment in 3D , just like id software's Quake-mouselook!
+Mobile controls (cell phone, tablet, etc..) are now working properly, allowing for any combination of multiple button presses and simultaneous joystick movements.  I'm really happy with how the mobile interface is turning out!  When you slow-swipe with your finger, the camera looks around your environment in 3D, just like id software's Quake-mouselook!
