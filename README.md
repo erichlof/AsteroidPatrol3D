@@ -3,7 +3,7 @@ AsteroidPatrol3D
 
 A First-Person 3D version of the classic game Asteroids <br>
 
-[play SpacePong3D](http://erichlof.github.io/AsteroidPatrol3D/AsteroidPatrol3D.html)
+[play AsteroidPatrol3D](http://erichlof.github.io/AsteroidPatrol3D/AsteroidPatrol3D.html)
 \ [[view main source](https://github.com/erichlof/AsteroidPatrol3D/blob/gh-pages/AsteroidPatrol3D.html)\]
 
 <h5>Quick instructions:</h5>
