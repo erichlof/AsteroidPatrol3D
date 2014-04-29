@@ -27,10 +27,10 @@ To Do
 * Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
 * Implement basic collision detection between your/UFO's missiles and Asteroids/UFO 
 * Add ability for Asteroids to collide with each other, UFO, and of course your ship
-* possibly add physics simulated collision-response, so asteroids can bounce off each other at correct angles
+* possibly add physics simulated collision-response, so asteroids can bounce off of each other at correct angles
 
 
 April 29, 2014 Progress Note
 ----------------------------
 
-Mobile controls (cell phone, tablet, etc..) are now working properly, allowing for any combination of multiple button presses and simultaneous joystick movements.  I'm really happy how the mobile interface is turning out!  When you slow-swipe with your finger, the camera looks around your environment in 3D , just like id software's Quake-mouselook!
+Mobile controls (cell phone, tablet, etc..) are now working properly, allowing for any combination of multiple button presses and simultaneous joystick movements.  I'm really happy with how the mobile interface is turning out!  When you slow-swipe with your finger, the camera looks around your environment in 3D , just like id software's Quake-mouselook!
