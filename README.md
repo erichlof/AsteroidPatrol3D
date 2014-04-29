@@ -6,7 +6,7 @@ A First-Person 3D version of the classic game Asteroids <br>
 [play AsteroidPatrol3D](http://erichlof.github.io/AsteroidPatrol3D/AsteroidPatrol3D.html)
 \ [[view main source](https://github.com/erichlof/AsteroidPatrol3D/blob/gh-pages/AsteroidPatrol3D.html)\]
 
-<h5>Quick instructions:</h5>
+<h5>Quick instructions for AsteroidPatrol3D:</h5>
 <h6>Desktop:</h6> 
 Press 'M' to rotate your ship with Mouse <br>
 Press 'LeftMouseButton' to Fire <br>
@@ -16,6 +16,9 @@ Press 'SPACE' to apply Thrusters <br>
 slow Swipe to control ship rotation <br>
 Press Orange joystick-button1 to Fire <br>
 Press Purple joystick-button2 to apply Thrusters <br>
+
+Be sure to check out my other 3D games!:
+* [SpacePong3D](https://github.com/erichlof/SpacePong3D)
 
 To Do
 -----
