@@ -469,9 +469,16 @@ VirtualJoystick.prototype._onTouchStart = function(event) {
 
 	var touches = event.touches;
 	if (touches.length == 2) {
-		x = touches[1].pageX;
-		y = touches[1].pageY;
-		return this._onDown(x, y);
+		if (touches[0].target != this._button1El && touches[0].target != this._button2El) {
+			x = touches[0].pageX;
+			y = touches[0].pageY;
+			return this._onDown(x, y);
+		} 
+		else {
+			x = touches[1].pageX;
+			y = touches[1].pageY;
+			return this._onDown(x, y);
+		}
 	}
 	else if (touches.length >= 3) {
 		x = touches[2].pageX;
