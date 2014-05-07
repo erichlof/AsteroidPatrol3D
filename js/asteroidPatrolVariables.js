@@ -1,6 +1,7 @@
 // GLOBAL VARIABLES ////////////////////////////////////////////////////////////////////////////
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2000);
+scene.add(camera);
 var clock = new THREE.Clock();
 
 var keyboard = new THREEx.KeyboardState();
@@ -66,7 +67,18 @@ floor.position.y = -10;
 floor.rotation.x = Math.PI / 2;
 scene.add(floor);
 
+// HUD SPRITES
+var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
+var crossHairsMaterial = new THREE.SpriteMaterial( { map: crossHairsTexture, depthTest: false } );
+crossHairsSprite = new THREE.Sprite(crossHairsMaterial);
+//move crossHairsSprite back a little so we can see it
+crossHairsSprite.position.set(0, 0, -9);
+//add crossHairsSprite as a child of our camera object, so it will stay in camera's view
+camera.add(crossHairsSprite);
+
+
 var frameTime = 0;
+var spriteAngle = 0;
 var groundNormal = new THREE.Vector3(0, 1, 0);
 var bulletSpeed = 200;
 var bulletDirection = new THREE.Vector3(0, 0, -1);
