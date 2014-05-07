@@ -166,7 +166,12 @@
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
 			//set camera position from ship position
 			camera.position.copy(ship.position);
-
+			
+			//test code for moving sprites
+			//spriteAngle += frameTime;
+			//if (spriteAngle >= 360) spriteAngle = 0;
+			//crossHairsSprite.position.z = Math.sin(spriteAngle) * 100 - 200;
+			
 			//update the controls
 			controls.update(frameTime);
 			//render the scene with our camera
