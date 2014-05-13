@@ -68,19 +68,15 @@
 			document.getElementById("container").appendChild(renderer.domElement);
 			window.addEventListener('resize', onWindowResize, false);
 
-			light.position.set(50, 50, 50);
-			sphere.position = light.position;
-			ship.position.x = 0;
-			//move player up a little
-			ship.position.y = 10;
-			//move player back
-			ship.position.z = 100;
+			light.position.set(50, 50, -100);
+			sphere.position.copy(light.position);
+			//put the ship position at the origin
+			ship.position.set(0, 0, 0);
 			//put the camera right where the ship is
 			camera.position.copy(ship.position);
-			//camera.rotation.y = Math.PI / 4;
 			//setup controls parameters
 			//controls.movementSpeed = 100;
-
+			box.position.set(0,0,-150);
 			box.rotation.y = 0.6;
 
 		} //end function setup()
@@ -100,7 +96,7 @@
 					//joystick.oldLat = controls.lat;
 					joystick.savedMousePosX = joystick.mousePosX;
 					joystick.savedMousePosY = joystick.mousePosY;
-					joystick._onDown(joystick.mousePosX, joystick.mousePosY);
+					//joystick._onDown(joystick.mousePosX, joystick.mousePosY);
 					joystick.mouseDeltaX = 0;
 					joystick.mouseDeltaY = 0;
 					canPressM = false;
@@ -158,8 +154,19 @@
 			}
 
 			//if bullet is alive, update it
-			if (bulletAlive)
+			if (bulletAlive){
+				
 				moveBullet();
+				
+				bulletRayCollisionPoint = bulletRay.intersectBoundingSphere(sphere);
+				if(bulletRayCollisionPoint){
+					if(bulletRayCollisionPoint.distanceTo(bulletSphere.position) < 20){
+						bulletAlive = false;
+						bulletSphere.position.copy(bulletRayCollisionPoint);
+					}
+				}
+			
+			}
 
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
 			//because we're in space, the following is always called and the ship will move forever in the player's intended direction
@@ -167,10 +174,8 @@
 			//set camera position from ship position
 			camera.position.copy(ship.position);
 			
-			//test code for moving sprites
-			//spriteAngle += frameTime;
-			//if (spriteAngle >= 360) spriteAngle = 0;
-			//crossHairsSprite.position.z = Math.sin(spriteAngle) * 100 - 200;
+			//test code for rotating sprites
+			crossHairsSprite.material.rotation += 2 * frameTime;
 			
 			//update the controls
 			controls.update(frameTime);
@@ -178,10 +183,12 @@
 			renderer.render(scene, camera);
 
 			//helpful real-time debug text, so we can monitor game variables
-			debugText1.innerHTML = "mousePosX: " + joystick.mousePosX;
-			debugText2.innerHTML = "mousePosY: " + joystick.mousePosY;
-			debugText3.innerHTML = "savedMousePosX: " + joystick.savedMousePosX;
-			debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
+			if(bulletRayCollisionPoint){
+				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x;
+				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y;
+				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z;
+				//debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
+			}
 
 		} //end function animate()
 
@@ -202,9 +209,11 @@
 		}
 
 		function moveBullet() {
-
+			
+			bulletRay.set(bulletSphere.position, bulletDirection);
 			//move bullet along bulletDirection vector, at the rate of bulletSpeed times the framerate
 			bulletSphere.translateOnAxis(bulletDirection, bulletSpeed * frameTime);
+			
 
 		}
 
@@ -214,6 +223,10 @@
 			camera.updateProjectionMatrix();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			controls.handleResize();
+			
+			//crossHairsSprite.position.x = spritePositionX * camera.aspect;
+			//crossHairsSprite.position.y = spritePositionY;
+			
 
 		}
 	</script>
