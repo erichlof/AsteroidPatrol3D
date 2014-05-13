@@ -36,7 +36,7 @@ var boxMaterial = new THREE.MeshLambertMaterial({
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
 
-var sphereGeometry = new THREE.SphereGeometry(5);
+var sphereGeometry = new THREE.SphereGeometry(10);
 var sphereMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(255,255,0)'
 });
@@ -72,10 +72,11 @@ var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
 var crossHairsMaterial = new THREE.SpriteMaterial( { map: crossHairsTexture, depthTest: false } );
 crossHairsSprite = new THREE.Sprite(crossHairsMaterial);
 //move crossHairsSprite back a little so we can see it
-crossHairsSprite.position.set(0, 0, -9);
+crossHairsSprite.position.set(0, 0, -1.5);
+//scale the crossHairsSprite
+crossHairsSprite.scale.set(0.5, 0.5, 0.5);
 //add crossHairsSprite as a child of our camera object, so it will stay in camera's view
 camera.add(crossHairsSprite);
-
 
 var frameTime = 0;
 var spriteAngle = 0;
@@ -97,5 +98,47 @@ var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
+
+THREE.Ray.prototype.intersectBoundingSphere = function ( mesh, optionalTarget ) {
+
+	// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
+	var L = new THREE.Vector3();
+	var radius = mesh.geometry.boundingSphere.radius;
+	var radius2 = radius * radius;
+	
+	L.subVectors( mesh.position, this.origin );
+	
+	var tca = L.dot( this.direction );
+	
+	if ( tca < 0 ) {
+		
+		return null;
+		
+	}
+	
+	var d2 = L.dot( L ) - tca * tca;
+	
+	if ( d2 > radius2 ) {
+		
+		return null;
+		
+	}
+	
+	var thc = Math.sqrt( radius2 - d2 );
+	// t0 = first collision point entrance on front of sphere
+	var t0 = tca - thc;
+	
+	// t1 = exit point on back of sphere.  Rarely needed, so it is commented out
+	// var t1 = tca + thc; 
+	
+	// Now return the THREE.Vector3() location (collision point) of this Ray,
+	//   scaled by amount t0 along Ray.direction  
+	// This collision point will always be located somewhere on the mesh's boundingSphere
+	return this.at( t0, optionalTarget );
+	
+};
+
+var bulletRay = new THREE.Ray();
+var bulletRayCollisionPoint = new THREE.Vector3();
 
 // END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
