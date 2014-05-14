@@ -159,13 +159,21 @@
 				moveBullet();
 				
 				bulletRayCollisionPoint = bulletRay.intersectBoundingSphere(sphere);
-				if(bulletRayCollisionPoint){
-					if(bulletRayCollisionPoint.distanceTo(bulletSphere.position) < 20){
+				if (bulletRayCollisionPoint) {
+					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
+						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+						//the following will freeze the projectile
 						bulletAlive = false;
 						bulletSphere.position.copy(bulletRayCollisionPoint);
+						//get the collisionNormal so we can bounce the projectile off the sphere
+						collisionNormal.subVectors(sphere.position, bulletRayCollisionPoint);
+						collisionNormal.normalize();
+						// the following will send the projectile on its new path
+						//bulletDirection.reflect(collisionNormal);
+						//bulletAlive = true;
 					}
 				}
-			
+				
 			}
 
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
@@ -175,7 +183,7 @@
 			camera.position.copy(ship.position);
 			
 			//test code for rotating sprites
-			crossHairsSprite.material.rotation += 2 * frameTime;
+			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
 			//update the controls
 			controls.update(frameTime);
@@ -183,10 +191,10 @@
 			renderer.render(scene, camera);
 
 			//helpful real-time debug text, so we can monitor game variables
-			if(bulletRayCollisionPoint){
-				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x;
-				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y;
-				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z;
+			if(!bulletAlive){
+				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
+				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
 				//debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
 			}
 
@@ -211,9 +219,12 @@
 		function moveBullet() {
 			
 			bulletRay.set(bulletSphere.position, bulletDirection);
+			//record the current bullet location
+			oldBulletSpherePos.copy(bulletSphere.position);
 			//move bullet along bulletDirection vector, at the rate of bulletSpeed times the framerate
 			bulletSphere.translateOnAxis(bulletDirection, bulletSpeed * frameTime);
-			
+			//now that we have moved it, record the new bullet location
+			newBulletSpherePos.copy(bulletSphere.position);
 
 		}
 
@@ -227,7 +238,6 @@
 			//crossHairsSprite.position.x = spritePositionX * camera.aspect;
 			//crossHairsSprite.position.y = spritePositionY;
 			
-
 		}
 	</script>
 </body>
