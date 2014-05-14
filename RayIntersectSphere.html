@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>RayIntersectSphere Demo</title>
+	<style>
+		body {
+			background-color: rgb(0, 0, 0);
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container"></div>
+
+	<div id="help" style="position:fixed; left:40%; top:3%; color:grey;">
+		Ray.intersectBoundingSphere(mesh) DEMO
+	</div>
+	
+	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:10px; color:grey;">
+		Desktop: Press 'M': MouseLook / LMouseButton: Fire / 'SPACE': Thrusters
+	</div>
+
+	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
+		Mobile: Swipe to rotate / OrangeButton: Fire / PurpleButton: Thrusters
+	</div>
+
+	<div id="debug1" style="position:fixed; left:5%; top:3%; color:grey;">
+		Debug Info
+	</div>
+
+	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
+		Debug Info
+	</div>
+
+	<div id="debug3" style="position:fixed; left:5%; top:9%; color:grey;">
+		Debug Info
+	</div>
+
+	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
+		Debug Info
+	</div>
+
+	<script src="js/three.min.js"></script>
+	<script src="js/threex.keyboardstate.js"></script>
+	<script src="js/threex.FirstPersonControls.js"></script>
+	<script src="js/virtualButtonJoystick.js"></script>
+	<script src="js/threex.GameTimer.js"></script>
+	<script src="js/RayIntersectSphereVariables.js"></script>
+
+	<script>
+		setup();
+		animate();
+
+
+		function setup() {
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.getElementById("container").appendChild(renderer.domElement);
+			window.addEventListener('resize', onWindowResize, false);
+
+			light.position.set(50, 50, -100);
+			sphere.position.copy(light.position);
+			//put the ship position at the origin
+			ship.position.set(0, 0, 0);
+			//put the camera right where the ship is
+			camera.position.copy(ship.position);
+			//setup controls parameters
+			//controls.movementSpeed = 100;
+			box.position.set(0,0,-150);
+			box.rotation.y = 0.6;
+
+		} //end function setup()
+
+		function animate() {
+			//keep looping through animate()
+			requestAnimationFrame(animate);
+			//store how much time has passed since the last animation frame
+			frameTime = clock.getDelta();
+
+			if (keyboard.pressed("M")) {
+
+				mouseControl = true;
+
+				if (canPressM) {
+					//joystick.oldLon = controls.lon;
+					//joystick.oldLat = controls.lat;
+					joystick.savedMousePosX = joystick.mousePosX;
+					joystick.savedMousePosY = joystick.mousePosY;
+					//joystick._onDown(joystick.mousePosX, joystick.mousePosY);
+					joystick.mouseDeltaX = 0;
+					joystick.mouseDeltaY = 0;
+					canPressM = false;
+				}
+
+			} else canPressM = true;
+
+			if (mouseControl)
+				joystick._pressed = true;
+
+			//check if joystick Stick is being moved
+			if (joystick._pressed) {
+
+				if (mouseControl) {
+					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 2);
+					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
+				} else {
+					//joystick left and right will turn the camera in that direction
+					controls.lon = joystick.oldLon + (joystick.deltaX() / 3); // - 90
+					//joystick up and down will tilt the camera up and down
+					controls.lat = joystick.oldLat - (joystick.deltaY() / 4); // 0 -
+				}
+
+			}
+			//if firebutton is NOT pressed, reset it so we can fire again
+			if (!joystick.button1Pressed) {
+				canShoot = true;
+			}
+			//if firebutton IS pressed, check to see if we can shoot
+			if (joystick.button1Pressed) {
+				if (canShoot) {
+					shootBullet();
+					//turn off shooting so we don't rapid fire
+					canShoot = false;
+				}
+			}
+			//if thrust button is pressed, apply thrust force to ship in the same direction that the camera is facing
+			if (joystick.button2Pressed || keyboard.pressed('space')) {
+				//reset the thrustVector to unit length of 1 to avoid accumulation
+				thrustVector.set(0, 0, -1);
+				//rotate thrustVector by our camera's rotation quaternion
+				thrustVector.applyQuaternion(camera.quaternion);
+				//now thrustVector has the right direction, but it needs magnitude also...
+				//10 is the 'power' of the thruster; this is multiplied by framerate so it will run consistently on different systems
+				thrustVector.multiplyScalar(10 * frameTime);
+				//add this new thrust to the ship's ongoing velocity
+				shipVelocity.add(thrustVector);
+				//record the current speed of the ship, which equals the length of its velocity vector
+				shipSpeed = shipVelocity.length();
+				//now record just the direction and save it as a unit length vector (length of 1)
+				normalizedShipDirection.copy(shipVelocity);
+				//the following clamps this vector to a unit length of 1
+				normalizedShipDirection.normalize();
+
+			}
+
+			//if bullet is alive, update it
+			if (bulletAlive){
+				
+				moveBullet();
+				
+				bulletRayCollisionPoint = bulletRay.intersectBoundingSphere(sphere);
+				if (bulletRayCollisionPoint) {
+					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
+						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+						//the following will freeze the projectile
+						bulletAlive = false;
+						bulletSphere.position.copy(bulletRayCollisionPoint);
+						//get the collisionNormal so we can bounce the projectile off the sphere
+						collisionNormal.subVectors(sphere.position, bulletRayCollisionPoint);
+						collisionNormal.normalize();
+						// the following will send the projectile on its new path
+						//bulletDirection.reflect(collisionNormal);
+						//bulletAlive = true;
+					}
+				}
+				
+			}
+
+			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
+			//because we're in space, the following is always called and the ship will move forever in the player's intended direction
+			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
+			//set camera position from ship position
+			camera.position.copy(ship.position);
+			
+			//test code for rotating sprites
+			//crossHairsSprite.material.rotation += 2 * frameTime;
+			
+			//update the controls
+			controls.update(frameTime);
+			//render the scene with our camera
+			renderer.render(scene, camera);
+
+			//helpful real-time debug text, so we can monitor game variables
+			if(!bulletAlive){
+				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
+				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
+				//debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
+			}
+
+		} //end function animate()
+
+		function shootBullet() {
+
+			//set bullet to alive
+			bulletAlive = true;
+			//spawn bullet at player's location
+			bulletSphere.position.copy(ship.position);
+			//reset the bulletDirection vector to unit length of 1 to avoid accumulation
+			bulletDirection.set(0, 0, -1);
+			//rotate the vector by our camera's rotation quaternion
+			bulletDirection.applyQuaternion(camera.quaternion);
+			//now the bullet is pointing in the right direction, move it out away from the ship a little,
+			//so it doesn't start right inside the ship
+			bulletSphere.translateOnAxis(bulletDirection, 15);
+
+		}
+
+		function moveBullet() {
+			
+			bulletRay.set(bulletSphere.position, bulletDirection);
+			//record the current bullet location
+			oldBulletSpherePos.copy(bulletSphere.position);
+			//move bullet along bulletDirection vector, at the rate of bulletSpeed times the framerate
+			bulletSphere.translateOnAxis(bulletDirection, bulletSpeed * frameTime);
+			//now that we have moved it, record the new bullet location
+			newBulletSpherePos.copy(bulletSphere.position);
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			controls.handleResize();
+			
+			//crossHairsSprite.position.x = spritePositionX * camera.aspect;
+			//crossHairsSprite.position.y = spritePositionY;
+			
+		}
+	</script>
+</body>
+
+</html>
