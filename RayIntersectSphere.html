@@ -17,15 +17,15 @@
 <body>
 	<div id="container"></div>
 
-	<div id="help" style="position:fixed; left:40%; top:3%; color:grey;">
-		Ray.intersectBoundingSphere(mesh) DEMO - Shoot at the Yellow Sphere
+	<div id="help" style="position:fixed; left:35%; top:3%; color:grey;">
+		Ray.intersectSphere(sphere) DEMO: Press 'M', then Shoot at the Yellow Sphere
 	</div>
 	
-	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:12px; color:grey;">
+	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:10px; color:grey;">
 		Desktop: Press 'M': MouseLook / LMouseButton: Fire / 'SPACE': Thrusters
 	</div>
 
-	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:12px; color:grey;">
+	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
 		Mobile: Swipe to rotate / OrangeButton: Fire / PurpleButton: Thrusters
 	</div>
 
@@ -65,6 +65,11 @@
 
 			light.position.set(50, 50, -100);
 			sphere.position.copy(light.position);
+			
+			//this moves the sphere mesh's boundingSphere to its position in world coordinates
+			//if sphereMesh is moved during animation, the following will be needed whenever it is moved,
+			//to keep it current.  This boundingSphere will be used for collision calculations.
+			sphere.geometry.boundingSphere.center.copy(sphere.position);
 			//put the ship position at the origin
 			ship.position.set(0, 0, 0);
 			//put the camera right where the ship is
@@ -153,20 +158,26 @@
 				
 				moveBullet();
 				
-				bulletRayCollisionPoint = bulletRay.intersectBoundingSphere(sphere);
+				bulletRayCollisionPoint = bulletRay.intersectSphere(sphere.geometry.boundingSphere);
+				
 				if (bulletRayCollisionPoint) {
+					
 					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
 						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+						
 						//the following will freeze the projectile
 						bulletAlive = false;
 						bulletSphere.position.copy(bulletRayCollisionPoint);
 						//get the collisionNormal so we can bounce the projectile off the sphere
 						collisionNormal.subVectors(sphere.position, bulletRayCollisionPoint);
 						collisionNormal.normalize();
+						
 						// the following will send the projectile on its new path
 						//bulletDirection.reflect(collisionNormal);
 						//bulletAlive = true;
+						
 					}
+					
 				}
 				
 			}
@@ -229,9 +240,6 @@
 			camera.updateProjectionMatrix();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			controls.handleResize();
-			
-			//crossHairsSprite.position.x = spritePositionX * camera.aspect;
-			//crossHairsSprite.position.y = spritePositionY;
 			
 		}
 	</script>
