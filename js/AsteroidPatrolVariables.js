@@ -43,7 +43,7 @@ var sphereMaterial = new THREE.MeshBasicMaterial({
 var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 scene.add(sphere);
 
-var bulletGeometry = new THREE.SphereGeometry(5);
+var bulletGeometry = new THREE.SphereGeometry(3);
 var bulletMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(255,0,0)'
 });
@@ -128,11 +128,11 @@ THREE.Ray.prototype.intersectBoundingSphere = function ( mesh, optionalTarget ) 
 	// t0 = first collision point entrance on front of sphere
 	var t0 = tca - thc;
 	
-	// t1 = exit point on back of sphere.  Rarely needed, so it is commented out
+	// t1 = exit point on back of sphere.  Rarely needed, so it is commented out
 	// var t1 = tca + thc; 
 	
 	// Now return the THREE.Vector3() location (collision point) of this Ray,
-	//   scaled by amount t0 along Ray.direction  
+	//   scaled by amount t0 along Ray.direction  
 	// This collision point will always be located somewhere on the mesh's boundingSphere
 	return this.at( t0, optionalTarget );
 	
@@ -140,5 +140,8 @@ THREE.Ray.prototype.intersectBoundingSphere = function ( mesh, optionalTarget ) 
 
 var bulletRay = new THREE.Ray();
 var bulletRayCollisionPoint = new THREE.Vector3();
+var oldBulletSpherePos = new THREE.Vector3();
+var newBulletSpherePos = new THREE.Vector3();
+var collisionNormal = new THREE.Vector3();
 
 // END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
