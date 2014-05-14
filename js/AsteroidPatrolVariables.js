@@ -99,14 +99,14 @@ var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
 
-THREE.Ray.prototype.intersectBoundingSphere = function ( mesh, optionalTarget ) {
+THREE.Ray.prototype.intersectSphere = function ( sphere, optionalTarget ) {
 
 	// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
 	var L = new THREE.Vector3();
-	var radius = mesh.geometry.boundingSphere.radius;
+	var radius = sphere.radius;
 	var radius2 = radius * radius;
 	
-	L.subVectors( mesh.position, this.origin );
+	L.subVectors( sphere.center, this.origin );
 	
 	var tca = L.dot( this.direction );
 	
