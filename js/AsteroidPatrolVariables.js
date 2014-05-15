@@ -138,6 +138,7 @@ THREE.Ray.prototype.intersectSphere = function ( sphere, optionalTarget ) {
 	
 };
 
+var collisionSphere = new THREE.Sphere();
 var bulletRay = new THREE.Ray();
 var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
