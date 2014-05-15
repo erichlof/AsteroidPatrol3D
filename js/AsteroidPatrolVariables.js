@@ -36,12 +36,13 @@ var boxMaterial = new THREE.MeshLambertMaterial({
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
 
-var sphereGeometry = new THREE.SphereGeometry(10);
-var sphereMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(255,255,0)'
+var asteroidGeometry = new THREE.SphereGeometry(20, 6, 5);
+var asteroidMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(139,69,19)',
+	shading: THREE.FlatShading
 });
-var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-scene.add(sphere);
+var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+scene.add(asteroid);
 
 var bulletGeometry = new THREE.SphereGeometry(3);
 var bulletMaterial = new THREE.MeshBasicMaterial({
@@ -50,8 +51,9 @@ var bulletMaterial = new THREE.MeshBasicMaterial({
 var bulletSphere = new THREE.Mesh(bulletGeometry, bulletMaterial);
 scene.add(bulletSphere);
 
-var light = new THREE.PointLight('rgb(255,255,255)', 1, 0);
-scene.add(light);
+var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
+sunLight.position.set(1, 1, 0);
+scene.add(sunLight);
 
 // FLOOR
 var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
