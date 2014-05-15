@@ -66,10 +66,15 @@
 			light.position.set(50, 50, -100);
 			sphere.position.copy(light.position);
 			
-			//this moves the sphere mesh's boundingSphere to its position in world coordinates
-			//if sphereMesh is moved during animation, the following will be needed whenever it is moved,
-			//to keep it current.  This boundingSphere will be used for collision calculations.
-			sphere.geometry.boundingSphere.center.copy(sphere.position);
+			//collisionSphere is a copy of the sphere mesh's (or any mesh's) boundingSphere.
+			//this will essentially copy the size (radius) of the original boundingSphere
+			collisionSphere.copy(sphere.geometry.boundingSphere);
+			//now move collisionSphere's center to sphere mesh's world location,
+			//so it can be used for collision detection.
+			//Note: if the sphere mesh moves at all, the following line will need to 
+			//accompany it every animation frame, to keep the collisionSphere properly updated
+			collisionSphere.center.copy(sphere.position);
+			
 			//put the ship position at the origin
 			ship.position.set(0, 0, 0);
 			//put the camera right where the ship is
@@ -157,22 +162,27 @@
 			if (bulletAlive){
 				
 				moveBullet();
-				
-				bulletRayCollisionPoint = bulletRay.intersectSphere(sphere.geometry.boundingSphere);
-				
+				//now we test for a collision between bullet and sphere
+				bulletRayCollisionPoint = bulletRay.intersectSphere(collisionSphere);
+				//if bulletRayCollisionPoint !== null
 				if (bulletRayCollisionPoint) {
-					
+					//compare the distance between collision point and bullet object, vs. where the
+					//bullet is now and where the bullet will end up the next frame, and if the first 
+					//length is less, we have a collision.  Else, the collision point is too far away still.
 					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
 						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 						
 						//the following will freeze the projectile
 						bulletAlive = false;
+						//place it right where the collision occurred
 						bulletSphere.position.copy(bulletRayCollisionPoint);
-						//get the collisionNormal so we can bounce the projectile off the sphere
+						//the following is optional:
+						//get the collisionNormal so we can bounce the bullet off the sphere
 						collisionNormal.subVectors(sphere.position, bulletRayCollisionPoint);
 						collisionNormal.normalize();
 						
-						// the following will send the projectile on its new path
+						// the following will send the bullet projectile on its new path
+						//uncomment the following 2 lines to see the bullet bounce off the sphere
 						//bulletDirection.reflect(collisionNormal);
 						//bulletAlive = true;
 						
