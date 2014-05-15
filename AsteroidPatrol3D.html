@@ -68,17 +68,16 @@
 			document.getElementById("container").appendChild(renderer.domElement);
 			window.addEventListener('resize', onWindowResize, false);
 
-			light.position.set(50, 50, -100);
-			sphere.position.copy(light.position);
+			asteroid.position.set(10, 50, -100);
 			
-			//collisionSphere is a copy of the sphere mesh's (or any mesh's) boundingSphere.
+			//collisionSphere is a copy of the asteroid mesh's (or any mesh's) boundingSphere.
 			//this will essentially copy the size (radius) of the original boundingSphere
-			collisionSphere.copy(sphere.geometry.boundingSphere);
-			//now move collisionSphere's center to sphere mesh's world location,
+			collisionSphere.copy(asteroid.geometry.boundingSphere);
+			//now move collisionSphere's center to asteroid mesh's world location,
 			//so it can be used for collision detection.
-			//Note: if the sphere mesh moves at all, the following line will need to 
+			//Note: if the asteroid mesh moves at all, the following line will need to 
 			//accompany it every animation frame, to keep the collisionSphere properly updated
-			collisionSphere.center.copy(sphere.position);
+			collisionSphere.center.copy(asteroid.position);
 			
 			//put the ship position at the origin
 			ship.position.set(0, 0, 0);
@@ -183,7 +182,7 @@
 						bulletSphere.position.copy(bulletRayCollisionPoint);
 						//the following is optional:
 						//get the collisionNormal so we can bounce the bullet off the sphere
-						collisionNormal.subVectors(sphere.position, bulletRayCollisionPoint);
+						collisionNormal.subVectors(asteroid.position, bulletRayCollisionPoint);
 						collisionNormal.normalize();
 						
 						// the following will send the bullet projectile on its new path
@@ -205,6 +204,9 @@
 			
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
+			
+			//rotate the asteroid
+			asteroid.rotation.y += 2 * frameTime;
 			
 			//update the controls
 			controls.update(frameTime);
@@ -252,6 +254,7 @@
 		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
+			//camera.fov = 1000 * (camera.aspect * 0.01);
 			camera.updateProjectionMatrix();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			controls.handleResize();
