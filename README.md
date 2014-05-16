@@ -25,14 +25,17 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Add transparent cross-hairs to the middle of the player's screen
 * Add large containing laser-grid-cube around game arena, that serves as the game boundaries
 * If you cross one of these laser-boundaries, you get instantly teleported to the opposite boundary, just like screen-wrap of the original Asteroids game.
 * Add asteroids and UFO saucer that can be shot at (and UFO can shoot back!)
 * Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
-* Implement basic collision detection between your/UFO's missiles and Asteroids/UFO 
 * Add ability for Asteroids to collide with each other, UFO, and of course your ship
-* possibly add physics simulated collision-response, so asteroids can bounce off of each other at correct angles
+* Add 3D spatial sound FX to surround the player from all angles
+
+May 16, 2014 Progress Note
+----------------------------
+
+Implemented collision detection between player missle and asteroid (ported a C++ ray-sphere mathematical algorithm to JavaScript to be added to the core three.js library).  Created low-poly retro-looking asteroid shape that can be randomly scaled/stretched each time the game is started.  Also all asteroids will have their own randomly-picked rotation axis and rotation speed.  Bigger asteroids will rotate slower - smaller asteroids will rotate faster.
 
 
 April 29, 2014 Progress Note
