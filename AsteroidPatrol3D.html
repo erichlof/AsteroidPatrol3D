@@ -205,8 +205,8 @@
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
-			//rotate the asteroid
-			asteroid.rotation.y += 2 * frameTime;
+			//rotate the asteroid on its randomly-picked initial axis, by the randomly-picked initial amount
+			asteroid.rotateOnAxis(asteroidRotationAxis, asteroidRotationAmount * frameTime);
 			
 			//update the controls
 			controls.update(frameTime);
@@ -218,7 +218,7 @@
 				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
-				//debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
+				debugText4.innerHTML = "asteroidRotationAngle: " + asteroidRotationAmount.toFixed(1);
 			}
 
 		} //end function animate()
