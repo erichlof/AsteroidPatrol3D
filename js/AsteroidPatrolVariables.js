@@ -36,12 +36,14 @@ var boxMaterial = new THREE.MeshLambertMaterial({
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
 
-var asteroidGeometry = new THREE.SphereGeometry(20, 6, 5);
+//var asteroidGeometry = new THREE.SphereGeometry(20, 6, 5);
+var asteroidGeometry = new THREE.IcosahedronGeometry(20, 0);
 var asteroidMaterial = new THREE.MeshLambertMaterial({
 	color: 'rgb(139,69,19)',
 	shading: THREE.FlatShading
 });
 var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+asteroid.scale.set(1,0.7,0.7);
 scene.add(asteroid);
 
 var bulletGeometry = new THREE.SphereGeometry(3);
@@ -146,5 +148,10 @@ var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var collisionNormal = new THREE.Vector3();
+var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+asteroidRotationAxis.normalize();
+var asteroidRotationAmount = Math.random() * 6 - 3;
+var PI_Doubled = Math.PI * 2;
+var PI = Math.PI;
 
 // END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
