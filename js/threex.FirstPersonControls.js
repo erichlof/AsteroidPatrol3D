@@ -5,6 +5,9 @@
  * adapted for THREEx by erichlof
  */
 
+/** @namespace */
+var THREEx = THREEx || {};
+
 THREEx.FirstPersonControls = function ( object, domElement ) {
 
 	this.object = object;
