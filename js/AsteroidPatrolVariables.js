@@ -35,16 +35,33 @@ var boxMaterial = new THREE.MeshLambertMaterial({
 });
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
+var helper = new THREE.BoxHelper(box);
+scene.add(helper);
 
-//var asteroidGeometry = new THREE.SphereGeometry(20, 6, 5);
-var asteroidGeometry = new THREE.IcosahedronGeometry(20, 0);
+
+var asteroidGeometry = new THREE.IcosahedronGeometry(20, 1);//0
 var asteroidMaterial = new THREE.MeshLambertMaterial({
 	color: 'rgb(139,69,19)',
+	//transparent: true,
+	//opacity: 0,
 	shading: THREE.FlatShading
 });
 var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
-asteroid.scale.set(1,0.7,0.7);
+asteroid.scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
+for ( var i = 0, l = asteroid.geometry.vertices.length; i < l; i ++ ) {
+
+	asteroid.geometry.vertices[i].add( new THREE.Vector3( Math.random() * 5 - 2, Math.random() * 5 - 2, Math.random() * 5 - 2 ) );
+
+}
+asteroid.geometry.computeFaceNormals();
+asteroid.geometry.computeVertexNormals();
+asteroid.geometry.verticesNeedUpdate = true;
+asteroid.geometry.normalsNeedUpdate = true;
+THREE.GeometryUtils.center( asteroid.geometry );
+asteroid.geometry.computeBoundingSphere();
 scene.add(asteroid);
+//var wireframe = new THREE.WireframeHelper(asteroid);
+//scene.add(wireframe);
 
 var bulletGeometry = new THREE.SphereGeometry(3);
 var bulletMaterial = new THREE.MeshBasicMaterial({
@@ -150,7 +167,7 @@ var newBulletSpherePos = new THREE.Vector3();
 var collisionNormal = new THREE.Vector3();
 var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 asteroidRotationAxis.normalize();
-var asteroidRotationAmount = Math.random() * 6 - 3;
+var asteroidRotationAmount = Math.random() * 4 - 2;
 var PI_Doubled = Math.PI * 2;
 var PI = Math.PI;
 
