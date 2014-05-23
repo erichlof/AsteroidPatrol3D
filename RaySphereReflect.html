@@ -21,11 +21,11 @@
 		Ray.intersectSphere(sphere)/reflect DEMO: Press 'M', then LMButton to Shoot, SPACE to thrust
 	</div>
 	
-	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:10px; color:grey;">
+	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:11px; color:grey;">
 		Desktop: Press 'M': MouseLook / LMouseButton: Fire / 'SPACE': Thrusters
 	</div>
 
-	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
+	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:11px; color:grey;">
 		Mobile: Swipe to rotate / OrangeButton: Fire / PurpleButton: Thrusters
 	</div>
 
@@ -94,11 +94,8 @@
 				mouseControl = true;
 
 				if (canPressM) {
-					//joystick.oldLon = controls.lon;
-					//joystick.oldLat = controls.lat;
 					joystick.savedMousePosX = joystick.mousePosX;
 					joystick.savedMousePosY = joystick.mousePosY;
-					//joystick._onDown(joystick.mousePosX, joystick.mousePosY);
 					joystick.mouseDeltaX = 0;
 					joystick.mouseDeltaY = 0;
 					canPressM = false;
@@ -189,6 +186,7 @@
 						
 						//save the collision point for debug output
 						savedCollisionPoint.copy(bulletRayCollisionPoint);
+						numberOfCollisions += 1;
 						
 					}// end if (bulletRayCollisionPoint.distanceToSquared
 					
@@ -212,6 +210,7 @@
 						moveBullet();
 						
 						savedCollisionPoint.copy(bulletRayCollisionPoint);
+						numberOfCollisions += 1;
 						
 					}// end if (bulletRayCollisionPoint.distanceToSquared
 					
@@ -237,7 +236,7 @@
 			debugText1.innerHTML = "collisionPointX: " + savedCollisionPoint.x.toFixed(1);
 			debugText2.innerHTML = "collisionPointY: " + savedCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + savedCollisionPoint.z.toFixed(1);
-			//debugText4.innerHTML = "savedMousePosY: " + joystick.savedMousePosY;
+			debugText4.innerHTML = "numberOfCollisions: " + numberOfCollisions;
 			
 
 		} //end function animate()
@@ -260,6 +259,7 @@
 
 		function moveBullet() {
 			
+			//make a ray from the bullet's position and direction that will be used for collision detection
 			bulletRay.set(bulletSphere.position, bulletDirection);
 			//record the current bullet location
 			oldBulletSpherePos.copy(bulletSphere.position);
