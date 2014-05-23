@@ -120,6 +120,7 @@ var savedCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var collisionNormal = new THREE.Vector3();
+var numberOfCollisions = 0;
 
 THREE.Ray.prototype.intersectSphere = function () {
 
