@@ -79,18 +79,35 @@ scene.add(sunLight);
 
 // grid
 var gridGeometry = new THREE.PlaneGeometry(500, 500);
-var gridTexture = new THREE.ImageUtils.loadTexture('images/laserGrid1.png');
+var gridTexture = new THREE.ImageUtils.loadTexture('images/laserGrid2.png');
 gridTexture.wrapS = gridTexture.wrapT = THREE.RepeatWrapping;
 gridTexture.repeat.set(20, 20);
+//gridTexture.minFilter = THREE.NearestMipMapLinearFilter;
+//red grid
 var gridRedMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	//depthWrite: false,
 	//depthTest: false,
-	//opacity: 1.0,
+	opacity: 5.0,
 	color: 'rgb(255,0,0)',
-	side: THREE.DoubleSide,
+	//side: THREE.DoubleSide,
 	map: gridTexture	
 });
+//green grid
+var gridGreenMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 5.0,
+	color: 'rgb(0,255,0)',
+	map: gridTexture	
+});
+//blue grid
+var gridBlueMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 5.0,
+	color: 'rgb(0,0,255)',
+	map: gridTexture	
+});
+//6 grid-walls of the arena
 var wallBottom = new THREE.Mesh(gridGeometry, gridRedMaterial);
 wallBottom.position.y = -250;
 wallBottom.rotation.x = -Math.PI / 2;
@@ -99,6 +116,22 @@ var wallTop = new THREE.Mesh(gridGeometry, gridRedMaterial);
 wallTop.position.y = 250;
 wallTop.rotation.x = Math.PI / 2;
 scene.add(wallTop);
+var wallFront = new THREE.Mesh(gridGeometry, gridGreenMaterial);
+wallFront.position.z = -250;
+//wallBottom.rotation.x = 0;
+scene.add(wallFront);
+var wallBack = new THREE.Mesh(gridGeometry, gridGreenMaterial);
+wallBack.position.z = 250;
+wallBack.rotation.x = Math.PI;
+scene.add(wallBack);
+var wallRight = new THREE.Mesh(gridGeometry, gridBlueMaterial);
+wallRight.position.x = 250;
+wallRight.rotation.y = -Math.PI / 2;
+scene.add(wallRight);
+var wallLeft = new THREE.Mesh(gridGeometry, gridBlueMaterial);
+wallLeft.position.x = -250;
+wallLeft.rotation.y = Math.PI / 2;
+scene.add(wallLeft);
 
 
 // HUD SPRITES
