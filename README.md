@@ -25,12 +25,17 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Add large containing laser-grid-cube around game arena, that serves as the game boundaries
-* If you cross one of these laser-boundaries, you get instantly teleported to the opposite boundary, just like screen-wrap of the original Asteroids game.
-* Add asteroids and UFO saucer that can be shot at (and UFO can shoot back!)
+* If you cross one of the laser-grid boundaries, you get instantly teleported to the opposite boundary, just like screen-wrap of the original Asteroids game.
+* Add UFO saucer that can be shot at (and UFO can shoot back!)
 * Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
 * Add ability for Asteroids to collide with each other, UFO, and of course your ship
+* Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
+
+May 29, 2014 Progress Note
+----------------------------
+
+Added friction to gradually slow the ship down.  I know - there is no friction in space, but adding this makes the ship easier to handle.  It now handles a lot like the player ship in the original Atari-arcade Asteroids.  Also, I added a laser-grid containing arena for the game to be played in.  Soon, I will have the player ship warp/teleport to the opposite side of the cube if the ship goes past one of the grid boundaries.    
 
 May 16, 2014 Progress Note
 ----------------------------
