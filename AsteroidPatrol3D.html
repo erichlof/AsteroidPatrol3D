@@ -149,8 +149,8 @@
 				//rotate thrustVector by our camera's rotation quaternion
 				thrustVector.applyQuaternion(camera.quaternion);
 				//now thrustVector has the right direction, but it needs magnitude also...
-				//10 is the 'power' of the thruster; this is multiplied by framerate so it will run consistently on different systems
-				thrustVector.multiplyScalar(10 * frameTime);
+				//20 is the 'strength' of the thruster; this is multiplied by framerate so it will run consistently on different systems
+				thrustVector.multiplyScalar(20 * frameTime);
 				//add this new thrust to the ship's ongoing velocity
 				shipVelocity.add(thrustVector);
 				//record the current speed of the ship, which equals the length of its velocity vector
@@ -160,6 +160,21 @@
 				//the following clamps this vector to a unit length of 1
 				normalizedShipDirection.normalize();
 
+			}
+			else{ //no thrust is being applied, so slow the ship down gradually
+				//Although no friction exists in space, this makes handling the ship easier
+				if (shipSpeed > 0) {
+					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
+					//in order to point in the opposing direction
+					frictionVector.copy(shipVelocity).negate().normalize();
+					//10 is the amount of friction to apply
+					frictionVector.multiplyScalar(10 * frameTime);
+					//add the friction back in to the ship's ongoing velocity
+					shipVelocity.add(frictionVector);
+					//record the current speed of the ship, which equals the length of its velocity vector
+					shipSpeed = shipVelocity.length();
+				}
+				else shipSpeed = 0;
 			}
 
 			//if bullet is alive, update it
@@ -220,7 +235,7 @@
 				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
-				debugText4.innerHTML = "asteroidRotationAngle: " + asteroidRotationAmount.toFixed(1);
+				debugText4.innerHTML = "shipSpeed: " + shipSpeed.toFixed(1);
 			}
 
 		} //end function animate()
