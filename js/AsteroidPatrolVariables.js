@@ -156,6 +156,7 @@ var canShoot = true;
 
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
+var frictionVector = new THREE.Vector3();
 var ship = new THREE.Object3D();
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
