@@ -191,7 +191,7 @@ var bulletAlive = false;
 var canShoot = true;
 var playingWarpAnimation = false;
 var fovIncrementAmount = 500;
-var aspectIncrementAmount = 11;//11
+var aspectIncrementAmount = 10;//10
 
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
