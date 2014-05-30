@@ -30,32 +30,38 @@ var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 
-var topGrid = new THREE.GridHelper(401, 50.125);
+var arenaHalfSize = 400;
+var gridLineSpacing = 50;
+//calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
+//even when 2 grid plane sizes may differ slightly from one another.
+var gridLineOffset = 1 / (arenaHalfSize / gridLineSpacing);
+//offset size by 1 to eliminate z-fighting between arena-cube's edge lines overlapping
+var topGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
 topGrid.setColors(0x660000, 0x660000);
-topGrid.position.y = 400;
+topGrid.position.y = arenaHalfSize;
 scene.add(topGrid);
-var bottomGrid = new THREE.GridHelper(401, 50.125);
+var bottomGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
 bottomGrid.setColors(0x660000, 0x660000);
-bottomGrid.position.y = -400;
+bottomGrid.position.y = -arenaHalfSize;
 scene.add(bottomGrid);
-var frontGrid = new THREE.GridHelper(400, 50);
+var frontGrid = new THREE.GridHelper(arenaHalfSize, gridLineSpacing);
 frontGrid.setColors(0x006600, 0x006600);
-frontGrid.position.z = -400;
+frontGrid.position.z = -arenaHalfSize;
 frontGrid.rotation.x = Math.PI / 2;
 scene.add(frontGrid);
-var backGrid = new THREE.GridHelper(400, 50);
+var backGrid = new THREE.GridHelper(arenaHalfSize, gridLineSpacing);
 backGrid.setColors(0x006600, 0x006600);
-backGrid.position.z = 400;
+backGrid.position.z = arenaHalfSize;
 backGrid.rotation.x = Math.PI / 2;
 scene.add(backGrid);
-var rightGrid = new THREE.GridHelper(401, 50.125);
+var rightGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
 rightGrid.setColors(0x000066, 0x000066);
-rightGrid.position.x = 400;
+rightGrid.position.x = arenaHalfSize;
 rightGrid.rotation.z = Math.PI / 2;
 scene.add(rightGrid);
-var leftGrid = new THREE.GridHelper(401, 50.125);
+var leftGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
 leftGrid.setColors(0x000066, 0x000066);
-leftGrid.position.x = -400;
+leftGrid.position.x = -arenaHalfSize;
 leftGrid.rotation.z = Math.PI / 2;
 scene.add(leftGrid);
 
@@ -183,6 +189,9 @@ var bulletDirection = new THREE.Vector3(0, 0, -1);
 var bulletAlive = false;
 //var bulletCounter = 0;
 var canShoot = true;
+var playingWarpAnimation = false;
+var fovIncrementAmount = 500;
+var aspectIncrementAmount = 11;//11
 
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
