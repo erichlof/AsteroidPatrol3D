@@ -30,6 +30,35 @@ var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 
+var topGrid = new THREE.GridHelper(401, 50.125);
+topGrid.setColors(0x660000, 0x660000);
+topGrid.position.y = 400;
+scene.add(topGrid);
+var bottomGrid = new THREE.GridHelper(401, 50.125);
+bottomGrid.setColors(0x660000, 0x660000);
+bottomGrid.position.y = -400;
+scene.add(bottomGrid);
+var frontGrid = new THREE.GridHelper(400, 50);
+frontGrid.setColors(0x006600, 0x006600);
+frontGrid.position.z = -400;
+frontGrid.rotation.x = Math.PI / 2;
+scene.add(frontGrid);
+var backGrid = new THREE.GridHelper(400, 50);
+backGrid.setColors(0x006600, 0x006600);
+backGrid.position.z = 400;
+backGrid.rotation.x = Math.PI / 2;
+scene.add(backGrid);
+var rightGrid = new THREE.GridHelper(401, 50.125);
+rightGrid.setColors(0x000066, 0x000066);
+rightGrid.position.x = 400;
+rightGrid.rotation.z = Math.PI / 2;
+scene.add(rightGrid);
+var leftGrid = new THREE.GridHelper(401, 50.125);
+leftGrid.setColors(0x000066, 0x000066);
+leftGrid.position.x = -400;
+leftGrid.rotation.z = Math.PI / 2;
+scene.add(leftGrid);
+
 var boxGeometry = new THREE.BoxGeometry(20, 20, 20);
 var boxMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
@@ -76,7 +105,7 @@ var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
 sunLight.position.set(1, 1, 0);
 scene.add(sunLight);
 
-
+/*
 // grid
 var gridGeometry = new THREE.PlaneGeometry(500, 500);
 var gridTexture = new THREE.ImageUtils.loadTexture('images/laserGrid2.png');
@@ -108,6 +137,7 @@ var gridBlueMaterial = new THREE.MeshBasicMaterial({
 	map: gridTexture	
 });
 //6 grid-walls of the arena
+
 var wallBottom = new THREE.Mesh(gridGeometry, gridRedMaterial);
 wallBottom.position.y = -250;
 wallBottom.rotation.x = -Math.PI / 2;
@@ -132,7 +162,7 @@ var wallLeft = new THREE.Mesh(gridGeometry, gridBlueMaterial);
 wallLeft.position.x = -250;
 wallLeft.rotation.y = Math.PI / 2;
 scene.add(wallLeft);
-
+*/
 
 // HUD SPRITES
 var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
