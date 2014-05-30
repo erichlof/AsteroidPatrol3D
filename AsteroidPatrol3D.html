@@ -101,8 +101,6 @@
 				mouseControl = true;
 
 				if (canPressM) {
-					//joystick.oldLon = controls.lon;
-					//joystick.oldLat = controls.lat;
 					joystick.savedMousePosX = joystick.mousePosX;
 					joystick.savedMousePosY = joystick.mousePosY;
 					//joystick._onDown(joystick.mousePosX, joystick.mousePosY);
@@ -163,7 +161,7 @@
 			}
 			else{ //no thrust is being applied, so slow the ship down gradually
 				//Although no friction exists in space, this makes handling the ship easier
-				if (shipSpeed > 0) {
+				if (shipSpeed > 0.1) {
 					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
 					//in order to point in the opposing direction
 					frictionVector.copy(shipVelocity).negate().normalize();
@@ -187,7 +185,7 @@
 				if (bulletRayCollisionPoint) {
 					//compare the distance between collision point and bullet object, vs. where the
 					//bullet is now and where the bullet will end up the next frame, and if the first 
-					//length is less, we have a collision.  Else, the collision point is too far away still.
+					//length is less, we have a collision.  Else, the collision point is too far away still.
 					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
 						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 						
@@ -212,7 +210,6 @@
 			}
 
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
-			//because we're in space, the following is always called and the ship will move forever in the player's intended direction
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
 			//set camera position from ship position
 			camera.position.copy(ship.position);
@@ -235,8 +232,8 @@
 				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
-				debugText4.innerHTML = "shipSpeed: " + shipSpeed.toFixed(1);
 			}
+			debugText4.innerHTML = "shipSpeed: " + shipSpeed.toFixed(1);
 
 		} //end function animate()
 
@@ -258,6 +255,8 @@
 
 		function moveBullet() {
 			
+			//keep updating the bullet ray to equal the bulletSphere's position and direction vectors,
+			//so this ray can be used for ray-boundingSphere collision detection.
 			bulletRay.set(bulletSphere.position, bulletDirection);
 			//record the current bullet location
 			oldBulletSpherePos.copy(bulletSphere.position);
