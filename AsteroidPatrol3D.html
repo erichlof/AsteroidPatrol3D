@@ -211,8 +211,56 @@
 
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
+			//if player ship leaves the boundaries of the game arena,
+			//warp the ship to opposite side of arena, like old Asteroids 'screen-wrap'
+			if (ship.position.x > arenaHalfSize){
+				ship.position.x = -arenaHalfSize;
+				playingWarpAnimation = true;
+			}
+			if (ship.position.x < -arenaHalfSize){
+				ship.position.x = arenaHalfSize;
+				playingWarpAnimation = true;
+			}
+			if (ship.position.y > arenaHalfSize){
+				ship.position.y = -arenaHalfSize;
+				playingWarpAnimation = true;
+			}
+			if (ship.position.y < -arenaHalfSize){
+				ship.position.y = arenaHalfSize;
+				playingWarpAnimation = true;
+			}
+			if (ship.position.z > arenaHalfSize){
+				ship.position.z = -arenaHalfSize;
+				playingWarpAnimation = true;
+			}
+			if (ship.position.z < -arenaHalfSize){
+				ship.position.z = arenaHalfSize;
+				playingWarpAnimation = true;
+			}
 			//set camera position from ship position
 			camera.position.copy(ship.position);
+			
+			if (playingWarpAnimation){
+				
+				camera.fov += fovIncrementAmount * frameTime;
+				camera.aspect -= aspectIncrementAmount * frameTime;
+				
+				if(camera.fov > 179){
+					camera.fov = 179;
+					fovIncrementAmount = -fovIncrementAmount;
+					aspectIncrementAmount = -aspectIncrementAmount;
+				}
+				if(camera.fov < 65){
+					camera.fov = 65;
+					camera.aspect = window.innerWidth / window.innerHeight;
+					fovIncrementAmount = -fovIncrementAmount;
+					aspectIncrementAmount = -aspectIncrementAmount;
+					playingWarpAnimation = false;
+				}
+				
+				camera.updateProjectionMatrix();
+				
+			}
 			
 			box.rotation.y += frameTime;
 			
