@@ -111,65 +111,6 @@ var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
 sunLight.position.set(1, 1, 0);
 scene.add(sunLight);
 
-/*
-// grid
-var gridGeometry = new THREE.PlaneGeometry(500, 500);
-var gridTexture = new THREE.ImageUtils.loadTexture('images/laserGrid2.png');
-gridTexture.wrapS = gridTexture.wrapT = THREE.RepeatWrapping;
-gridTexture.repeat.set(20, 20);
-//gridTexture.minFilter = THREE.NearestMipMapLinearFilter;
-//red grid
-var gridRedMaterial = new THREE.MeshBasicMaterial({
-	transparent: true,
-	//depthWrite: false,
-	//depthTest: false,
-	opacity: 5.0,
-	color: 'rgb(255,0,0)',
-	//side: THREE.DoubleSide,
-	map: gridTexture	
-});
-//green grid
-var gridGreenMaterial = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 5.0,
-	color: 'rgb(0,255,0)',
-	map: gridTexture	
-});
-//blue grid
-var gridBlueMaterial = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 5.0,
-	color: 'rgb(0,0,255)',
-	map: gridTexture	
-});
-//6 grid-walls of the arena
-
-var wallBottom = new THREE.Mesh(gridGeometry, gridRedMaterial);
-wallBottom.position.y = -250;
-wallBottom.rotation.x = -Math.PI / 2;
-scene.add(wallBottom);
-var wallTop = new THREE.Mesh(gridGeometry, gridRedMaterial);
-wallTop.position.y = 250;
-wallTop.rotation.x = Math.PI / 2;
-scene.add(wallTop);
-var wallFront = new THREE.Mesh(gridGeometry, gridGreenMaterial);
-wallFront.position.z = -250;
-//wallBottom.rotation.x = 0;
-scene.add(wallFront);
-var wallBack = new THREE.Mesh(gridGeometry, gridGreenMaterial);
-wallBack.position.z = 250;
-wallBack.rotation.x = Math.PI;
-scene.add(wallBack);
-var wallRight = new THREE.Mesh(gridGeometry, gridBlueMaterial);
-wallRight.position.x = 250;
-wallRight.rotation.y = -Math.PI / 2;
-scene.add(wallRight);
-var wallLeft = new THREE.Mesh(gridGeometry, gridBlueMaterial);
-wallLeft.position.x = -250;
-wallLeft.rotation.y = Math.PI / 2;
-scene.add(wallLeft);
-*/
-
 // HUD SPRITES
 var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
 var crossHairsMaterial = new THREE.SpriteMaterial( { map: crossHairsTexture, depthTest: false } );
@@ -190,8 +131,8 @@ var bulletAlive = false;
 //var bulletCounter = 0;
 var canShoot = true;
 var playingWarpAnimation = false;
-var fovIncrementAmount = 500;
-var aspectIncrementAmount = 8;
+var fovIncrementAmount = 600;
+var aspectIncrementAmount = -8;
 
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
@@ -200,6 +141,18 @@ var ship = new THREE.Object3D();
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
+
+var collisionSphere = new THREE.Sphere();
+var bulletRay = new THREE.Ray();
+var bulletRayCollisionPoint = new THREE.Vector3();
+var oldBulletSpherePos = new THREE.Vector3();
+var newBulletSpherePos = new THREE.Vector3();
+var collisionNormal = new THREE.Vector3();
+var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+asteroidRotationAxis.normalize();
+var asteroidRotationAmount = Math.random() * 4 - 2;
+var PI_Doubled = Math.PI * 2;
+var PI = Math.PI;
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
@@ -246,19 +199,5 @@ THREE.Ray.prototype.intersectSphere = function () {
 	};
 	
 }();
-
-var collisionSphere = new THREE.Sphere();
-var bulletRay = new THREE.Ray();
-var bulletRayCollisionPoint = new THREE.Vector3();
-var oldBulletSpherePos = new THREE.Vector3();
-var newBulletSpherePos = new THREE.Vector3();
-var collisionNormal = new THREE.Vector3();
-var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-asteroidRotationAxis.normalize();
-var asteroidRotationAmount = Math.random() * 4 - 2;
-var PI_Doubled = Math.PI * 2;
-var PI = Math.PI;
-
-
 
 // END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
