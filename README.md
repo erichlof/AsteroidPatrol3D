@@ -25,10 +25,11 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Add multiple asteroids that break apart when shot, and also teleport if they cross arena boundaries
+* Add multiple asteroids that break apart when shot
+* Make explosion effect when asteroids are shot
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
-* Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
-* Add ability for Asteroids to collide with each other, UFO, and of course your ship
+* Asteroids must collide with each other, UFO saucer, and of course your ship
+* * Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
 
@@ -36,7 +37,7 @@ To Do
 May 30, 2014 Progress Note
 ----------------------------
 
-Now when the player's ship crosses an arena boundary, a cool 'warp' effect animation is played, and the ship is instantly teleported to the opposite wall of the arena.  This keeps the action tight inside the game arena and feels a lot like the original 2D Asteroids. :)  Eventually when sound effects are added to this game, I will choose a quick 'reverse-cymbal' type sound to accompany this effect.  
+Now when the player's ship crosses an arena boundary, a cool 'warp' effect animation is played, and the ship is instantly teleported to the opposite wall of the arena.  This keeps the action tight inside the game arena and feels a lot like the original 2D Asteroids. :)  Eventually when sound effects are added to this game, I will choose a quick 'reverse-cymbal' type sound to accompany this effect.  June 1st: added randomly-chosen rotation axis, speed, and direction of travel for asteroids. When leaving the arena boundaries, asteroids now warp to the other side.
 
 
 May 29, 2014 Progress Note
