@@ -29,7 +29,7 @@ To Do
 * Make explosion effect when asteroids are shot
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
 * Asteroids must collide with each other, UFO saucer, and of course your ship
-* * Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
+* Add Space-themed background SkyBox (maybe just off-Earth or off-Mars, so we can see a planet in the distance)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
 
