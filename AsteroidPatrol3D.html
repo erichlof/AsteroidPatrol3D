@@ -267,8 +267,42 @@
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
-			//rotate the asteroid on its randomly-picked initial axis, by the randomly-picked initial amount
+			asteroid.localToWorld(asteroid.position);
+			//move asteroid along its initial randomly-picked path
+			asteroid.translateOnAxis(asteroidDirection, asteroidSpeed * frameTime);
+			
+			asteroid.worldToLocal(asteroid.position);
+			
+			//rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
 			asteroid.rotateOnAxis(asteroidRotationAxis, asteroidRotationAmount * frameTime);
+			
+			if (asteroid.position.x > arenaHalfSize + 40){
+				asteroid.position.x = -arenaHalfSize - 40;
+				
+			}
+			if (asteroid.position.x < -arenaHalfSize - 40){
+				asteroid.position.x = arenaHalfSize + 40;
+				
+			}
+			if (asteroid.position.y > arenaHalfSize + 40){
+				asteroid.position.y = -arenaHalfSize - 40;
+				
+			}
+			if (asteroid.position.y < -arenaHalfSize - 40){
+				asteroid.position.y = arenaHalfSize + 40;
+				
+			}
+			if (asteroid.position.z > arenaHalfSize + 40){
+				asteroid.position.z = -arenaHalfSize - 40;
+				
+			}
+			if (asteroid.position.z < -arenaHalfSize - 40){
+				asteroid.position.z = arenaHalfSize + 40;
+				
+			}
+			
+			//update the collisionSphere to match the asteroid's new position
+			collisionSphere.center.copy(asteroid.position);
 			
 			//update the controls
 			controls.update(frameTime);
