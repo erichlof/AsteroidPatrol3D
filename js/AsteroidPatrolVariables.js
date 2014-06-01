@@ -76,11 +76,11 @@ scene.add(box);
 var helper = new THREE.BoxHelper(box);
 scene.add(helper);
 
-var asteroidGeometry = new THREE.IcosahedronGeometry(20, 1);//0 for small asteroids
+var asteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
 var asteroidMaterial = new THREE.MeshLambertMaterial({
-	color: 'rgb(139,69,19)',
-	//transparent: true,
-	//opacity: 0,
+	color: 'rgb(55,25,5)',
+	//ambient: 'rgb(55,25,5)',
+	emissive: 'rgb(20,9,2)',
 	shading: THREE.FlatShading
 });
 var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
@@ -125,7 +125,7 @@ camera.add(crossHairsSprite);
 var frameTime = 0;
 var spriteAngle = 0;
 var groundNormal = new THREE.Vector3(0, 1, 0);
-var bulletSpeed = 200;
+var bulletSpeed = 400;
 var bulletDirection = new THREE.Vector3(0, 0, -1);
 var bulletAlive = false;
 //var bulletCounter = 0;
@@ -150,7 +150,10 @@ var newBulletSpherePos = new THREE.Vector3();
 var collisionNormal = new THREE.Vector3();
 var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 asteroidRotationAxis.normalize();
-var asteroidRotationAmount = Math.random() * 4 - 2;
+var asteroidRotationAmount = Math.random() + 0.5;
+var asteroidDirection = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+asteroidDirection.normalize();
+var asteroidSpeed = Math.random() * 20 + 10;
 var PI_Doubled = Math.PI * 2;
 var PI = Math.PI;
 
