@@ -1,7 +1,7 @@
 // GLOBAL VARIABLES ////////////////////////////////////////////////////////////////////////////
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2000);
+var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 3000);
 scene.add(camera);
 var clock = new THREE.Clock();
 
@@ -30,6 +30,37 @@ var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 
+// SkyBox
+var imagePrefix = "images/skybox/nebula-";
+var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var imageSuffix = ".png";
+var skyGeometry = new THREE.BoxGeometry( 2900, 2900, 2900 );	
+
+var materialArray = [];
+for (var i = 0; i < 6; i++)
+	materialArray.push( new THREE.MeshBasicMaterial({
+		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+		side: THREE.BackSide
+	}));
+var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+scene.add( skyBox );
+
+// Planet
+var planetTexture = new THREE.ImageUtils.loadTexture('images/mars.png');
+var planetMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 1.0,
+	map: planetTexture
+});
+var planetGeometry = new THREE.PlaneGeometry(1200, 1200);
+var planet = new THREE.Mesh(planetGeometry, planetMaterial);
+planet.position.x = camera.position.x - 900;
+planet.position.y = camera.position.y - 900;
+planet.position.z = camera.position.z - 900;
+planet.lookAt(camera.position);
+scene.add(planet);
+
 var arenaHalfSize = 400;
 var gridLineSpacing = 50;
 //calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
@@ -37,33 +68,48 @@ var gridLineSpacing = 50;
 var gridLineOffset = 1 / (arenaHalfSize / gridLineSpacing);
 //offset size by 1 to eliminate z-fighting between arena-cube's edge lines overlapping
 var topGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
-topGrid.setColors(0x660000, 0x660000);
+topGrid.setColors(0x990000, 0x990000);
 topGrid.position.y = arenaHalfSize;
 scene.add(topGrid);
 var bottomGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
-bottomGrid.setColors(0x660000, 0x660000);
+bottomGrid.setColors(0x990000, 0x990000);
 bottomGrid.position.y = -arenaHalfSize;
 scene.add(bottomGrid);
 var frontGrid = new THREE.GridHelper(arenaHalfSize, gridLineSpacing);
-frontGrid.setColors(0x006600, 0x006600);
+frontGrid.setColors(0x009900, 0x009900);
 frontGrid.position.z = -arenaHalfSize;
 frontGrid.rotation.x = Math.PI / 2;
 scene.add(frontGrid);
 var backGrid = new THREE.GridHelper(arenaHalfSize, gridLineSpacing);
-backGrid.setColors(0x006600, 0x006600);
+backGrid.setColors(0x009900, 0x009900);
 backGrid.position.z = arenaHalfSize;
 backGrid.rotation.x = Math.PI / 2;
 scene.add(backGrid);
 var rightGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
-rightGrid.setColors(0x000066, 0x000066);
+rightGrid.setColors(0x000099, 0x000099);
 rightGrid.position.x = arenaHalfSize;
 rightGrid.rotation.z = Math.PI / 2;
 scene.add(rightGrid);
 var leftGrid = new THREE.GridHelper(arenaHalfSize + 1, gridLineSpacing + gridLineOffset);
-leftGrid.setColors(0x000066, 0x000066);
+leftGrid.setColors(0x000099, 0x000099);
 leftGrid.position.x = -arenaHalfSize;
 leftGrid.rotation.z = Math.PI / 2;
 scene.add(leftGrid);
+
+var pyramidGeometry = new THREE.TetrahedronGeometry(10, 0);
+var pyramidMaterial = new THREE.MeshPhongMaterial({
+	metal: true,
+	shading: THREE.FlatShading,
+	color: 'rgb(70,70,70)',
+	specular: 'rgb(255,255,255)',
+	//emissive: 'rgb(10,10,10)',
+	shininess: 5	
+});
+var pyramid = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+pyramid.position.set(0,10,-50);
+scene.add(pyramid);
+//var wireframe = new THREE.WireframeHelper(pyramid, 0x000000);
+//scene.add(wireframe);
 
 var boxGeometry = new THREE.BoxGeometry(20, 20, 20);
 var boxMaterial = new THREE.MeshBasicMaterial({
@@ -78,9 +124,9 @@ scene.add(helper);
 
 var asteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
 var asteroidMaterial = new THREE.MeshLambertMaterial({
-	color: 'rgb(55,25,5)',
+	color: 'rgb(75,45,15)',
 	//ambient: 'rgb(55,25,5)',
-	emissive: 'rgb(20,9,2)',
+	emissive: 'rgb(30,15,5)',
 	shading: THREE.FlatShading
 });
 var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
@@ -107,8 +153,9 @@ var bulletMaterial = new THREE.MeshBasicMaterial({
 var bulletSphere = new THREE.Mesh(bulletGeometry, bulletMaterial);
 scene.add(bulletSphere);
 
+// Sunlight
 var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
-sunLight.position.set(1, 1, 0);
+sunLight.position.set(-1, 1, 1);
 scene.add(sunLight);
 
 // HUD SPRITES
@@ -154,8 +201,6 @@ var asteroidRotationAmount = Math.random() + 0.5;
 var asteroidDirection = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 asteroidDirection.normalize();
 var asteroidSpeed = Math.random() * 20 + 10;
-var PI_Doubled = Math.PI * 2;
-var PI = Math.PI;
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
