@@ -239,6 +239,11 @@
 			}
 			//set camera position from ship position
 			camera.position.copy(ship.position);
+			skyBox.position.copy(camera.position);
+			
+			planet.position.x = camera.position.x - 900;
+			planet.position.y = camera.position.y - 900;
+			planet.position.z = camera.position.z - 900;
 			
 			if (playingWarpAnimation){
 				
@@ -263,6 +268,8 @@
 			}
 			
 			box.rotation.y += frameTime;
+			pyramid.rotation.x += frameTime;
+			pyramid.rotation.y += frameTime;
 			
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
