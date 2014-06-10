@@ -30,6 +30,7 @@ var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 
+
 // Planet
 var planetTexture = new THREE.ImageUtils.loadTexture('images/mars.png');
 var planetMaterial = new THREE.MeshBasicMaterial({
@@ -47,14 +48,14 @@ scene.add(planet);
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
-var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 var imageSuffix = ".jpg";
 var skyGeometry = new THREE.BoxGeometry( 2900, 2900, 2900 );	
 
 var materialArray = [];
 for (var i = 0; i < 6; i++) {
 	materialArray.push( new THREE.MeshBasicMaterial({
-		color: 'rgb(170,170,200)',
+		color: 'rgb(230,230,255)',
 		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
 		side: THREE.BackSide
 	}));
@@ -62,7 +63,6 @@ for (var i = 0; i < 6; i++) {
 var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 scene.add( skyBox );
-
 
 
 var arenaHalfSize = 400;
@@ -101,28 +101,118 @@ leftGrid.rotation.z = Math.PI / 2;
 scene.add(leftGrid);
 
 // Grid Generator Pyramids
-var pyramidGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
-pyramidGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2) );
-pyramidGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( Math.PI ) );
+var pyramidTowardsGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+var pyramidAwayGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+var pyramidLeftGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+var pyramidRightGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+var pyramidDownGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+var pyramidUpGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+//facing towards us
+pyramidTowardsGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
+pyramidTowardsGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI ) );
+pyramidTowardsGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( Math.PI / 2 ) );
+//facing away from us
+pyramidAwayGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
+pyramidAwayGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( -Math.PI / 2) );
+//facing left
+pyramidLeftGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI ) );
+pyramidLeftGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( -Math.PI / 2) );
+//facing right
+pyramidRightGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
+pyramidRightGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( -Math.PI / 2 ) );
+pyramidRightGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
+//facing down
+pyramidDownGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI ) );
+pyramidDownGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
+//facing up
+pyramidUpGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
+
 var pyramidMaterial = new THREE.MeshPhongMaterial({
 	metal: true,
-	shading: THREE.FlatShading,
-	color: 'rgb(70,70,70)',
-	specular: 'rgb(255,255,255)',
-	emissive: 'rgb(10,10,10)',
-	shininess: 5	
+	//shading: THREE.FlatShading,
+	color: 'rgb(30,30,70)',
+	shininess: 10,
+	specular: 'rgb(155,155,155)',
+	emissive: 'rgb(20,20,20)'	
 });
-//left rear wall generators facing backwards
+
 var pyramid = [];
+//left back wall generators facing right
 for (var i = 0; i < 17; i++) {
-	pyramid[i] = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
-	pyramid[i].position.set(-arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), -arenaHalfSize - 12);
+	pyramid[i] = new THREE.Mesh(pyramidRightGeometry, pyramidMaterial);
+	pyramid[i].position.set(-arenaHalfSize - 12, (-arenaHalfSize) + i * (gridLineSpacing), -arenaHalfSize);
 	scene.add(pyramid[i]);
 }
-//right rear wall generators facing backwards
+//left front wall generators facing away from us
 for (var i = 0; i < 17; i++) {
-	pyramid[i] = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+	pyramid[i] = new THREE.Mesh(pyramidAwayGeometry, pyramidMaterial);
+	pyramid[i].position.set(-arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), arenaHalfSize + 12);
+	scene.add(pyramid[i]);
+}
+//right back wall generators facing towards us
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidTowardsGeometry, pyramidMaterial);
 	pyramid[i].position.set(arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), -arenaHalfSize - 12);
+	scene.add(pyramid[i]);
+}
+//right front wall generators facing left
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidLeftGeometry, pyramidMaterial);
+	pyramid[i].position.set(arenaHalfSize + 12, (-arenaHalfSize) + i * (gridLineSpacing), arenaHalfSize);
+	scene.add(pyramid[i]);
+}
+//left bottom wall generators facing right
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidRightGeometry, pyramidMaterial);
+	pyramid[i].position.set(-arenaHalfSize - 12, -arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
+	pyramid[i].rotateX(-Math.PI / 2);
+	scene.add(pyramid[i]);
+}
+//right bottom wall generators facing up
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidUpGeometry, pyramidMaterial);
+	pyramid[i].position.set(arenaHalfSize, -arenaHalfSize - 12, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
+	scene.add(pyramid[i]);
+}
+//right top wall generators facing left
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidLeftGeometry, pyramidMaterial);
+	pyramid[i].position.set(arenaHalfSize + 12, arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
+	pyramid[i].rotateX(-Math.PI / 2);
+	scene.add(pyramid[i]);
+}
+//left top wall generators facing down
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidDownGeometry, pyramidMaterial);
+	pyramid[i].position.set(-arenaHalfSize, arenaHalfSize + 12, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
+	scene.add(pyramid[i]);
+}
+//top back wall generators facing down
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidDownGeometry, pyramidMaterial);
+	pyramid[i].position.set( (-arenaHalfSize) + i * (gridLineSpacing), arenaHalfSize + 12, -arenaHalfSize );
+	pyramid[i].rotateY(-Math.PI / 2);
+	scene.add(pyramid[i]);
+}
+//bottom back wall generators facing towards us
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidTowardsGeometry, pyramidMaterial);
+	pyramid[i].position.set( (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), -arenaHalfSize , -arenaHalfSize - 12);
+	pyramid[i].rotateZ(-Math.PI / 2);
+	scene.add(pyramid[i]);
+}
+//bottom front wall generators facing up
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidUpGeometry, pyramidMaterial);
+	pyramid[i].position.set( (-arenaHalfSize) + i * (gridLineSpacing), -arenaHalfSize - 12 , arenaHalfSize );
+	pyramid[i].rotateY(-Math.PI / 2);
+	scene.add(pyramid[i]);
+}
+//top back wall generators facing away from us
+for (var i = 0; i < 17; i++) {
+	pyramid[i] = new THREE.Mesh(pyramidAwayGeometry, pyramidMaterial);
+	pyramid[i].position.set( (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), arenaHalfSize , arenaHalfSize + 12);
+	pyramid[i].rotateZ(-Math.PI / 2);
 	scene.add(pyramid[i]);
 }
 //var wireframe = new THREE.WireframeHelper(pyramid, 0x222222);
