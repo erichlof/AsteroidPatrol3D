@@ -127,13 +127,13 @@ pyramidDownGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2
 //facing up
 pyramidUpGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
 
-var pyramidMaterial = new THREE.MeshPhongMaterial({
-	metal: true,
+var pyramidMaterial = new THREE.MeshLambertMaterial({
+	//metal: true,
 	//shading: THREE.FlatShading,
-	color: 'rgb(30,30,70)',
-	shininess: 10,
-	specular: 'rgb(155,155,155)',
-	emissive: 'rgb(20,20,20)'	
+	//shininess: 10,
+	//specular: 'rgb(105,105,105)',
+	//emissive: 'rgb(0,0,0)'
+	color: 'rgb(30,30,30)'
 });
 
 var pyramid = [];
