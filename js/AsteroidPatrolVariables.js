@@ -48,7 +48,7 @@ scene.add(planet);
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
-var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 var imageSuffix = ".jpg";
 var skyGeometry = new THREE.BoxGeometry( 2900, 2900, 2900 );	
 
