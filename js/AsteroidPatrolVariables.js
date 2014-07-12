@@ -48,7 +48,7 @@ scene.add(planet);
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
-var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 var imageSuffix = ".jpg";
 var skyGeometry = new THREE.BoxGeometry( 2900, 2900, 2900 );	
 
@@ -229,6 +229,9 @@ scene.add(box);
 var helper = new THREE.BoxHelper(box);
 scene.add(helper);
 
+var numberOfLargeAsteroids = 5;
+var largeAsteroids = [];
+var collisionSpheres = [];
 var asteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
 var asteroidMaterial = new THREE.MeshLambertMaterial({
 	color: 'rgb(75,45,15)',
@@ -236,20 +239,32 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 	emissive: 'rgb(30,15,5)',
 	shading: THREE.FlatShading
 });
-var asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
-asteroid.scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
-for ( var i = 0, l = asteroid.geometry.vertices.length; i < l; i++ ) {
 
-	asteroid.geometry.vertices[i].add( new THREE.Vector3( Math.random() * 5 - 2, Math.random() * 5 - 2, Math.random() * 5 - 2 ) );
+for (var i = 0; i < numberOfLargeAsteroids; i++) {
+	largeAsteroids[i] = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+	largeAsteroids[i].scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
+	for ( var v = 0, l = largeAsteroids[i].geometry.vertices.length; v < l; v++ ) {
 
+		largeAsteroids[i].geometry.vertices[v].add( new THREE.Vector3( Math.random() * 5 - 2, Math.random() * 5 - 2, Math.random() * 5 - 2 ) );
+
+	}
+	largeAsteroids[i].geometry.computeFaceNormals();
+	largeAsteroids[i].geometry.computeVertexNormals();
+	largeAsteroids[i].geometry.verticesNeedUpdate = true;
+	largeAsteroids[i].geometry.normalsNeedUpdate = true;
+	THREE.GeometryUtils.center( largeAsteroids[i].geometry );
+	largeAsteroids[i].geometry.computeBoundingSphere();
+	scene.add(largeAsteroids[i]);
+	
+	largeAsteroids[i].asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+	largeAsteroids[i].asteroidRotationAxis.normalize();
+	largeAsteroids[i].asteroidRotationAmount = Math.random() + 0.5;
+	largeAsteroids[i].asteroidDirection = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+	largeAsteroids[i].asteroidDirection.normalize();
+	largeAsteroids[i].asteroidSpeed = Math.random() * 20 + 10;
+	
+	collisionSpheres[i] = new THREE.Sphere();
 }
-asteroid.geometry.computeFaceNormals();
-asteroid.geometry.computeVertexNormals();
-asteroid.geometry.verticesNeedUpdate = true;
-asteroid.geometry.normalsNeedUpdate = true;
-THREE.GeometryUtils.center( asteroid.geometry );
-asteroid.geometry.computeBoundingSphere();
-scene.add(asteroid);
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
@@ -296,18 +311,12 @@ var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
 
-var collisionSphere = new THREE.Sphere();
 var bulletRay = new THREE.Ray();
 var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var collisionNormal = new THREE.Vector3();
-var asteroidRotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-asteroidRotationAxis.normalize();
-var asteroidRotationAmount = Math.random() + 0.5;
-var asteroidDirection = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-asteroidDirection.normalize();
-var asteroidSpeed = Math.random() * 20 + 10;
+
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
