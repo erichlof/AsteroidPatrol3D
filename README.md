@@ -27,10 +27,16 @@ To Do
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
 * Add multiple asteroids that break apart when shot
 * Make explosion effect when asteroids are shot
-* Add UFO saucer that can be shot at (and UFO can shoot back!)
+* allow multiple bullets, by creating an array[] of them
 * Asteroids must collide with each other, UFO saucer, and of course your ship
+* Add UFO saucer that can be shot at (and UFO can shoot back!)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
+
+July 12, 2014 Progress Note
+----------------------------
+
+Sorry for the lack of updates - busy summer :) . Added multiple Large asteroids by creating an array[] called largeAsteroids[].  Each asteroid in this group has its own position, speed, rotation, collision bounding-sphere, etc.  Next order of business will be to have the Large asteroids break apart into 2 Medium asteroids, which will each break apart into 2 Small asteroids.  Also asteroid object-creation will be necessary each level (1 or 2 more asteroids added to each new level, to increase difficulty), as well as asteroid object-deletion when an asteroid is shot.
 
 
 May 30, 2014 Progress Note
