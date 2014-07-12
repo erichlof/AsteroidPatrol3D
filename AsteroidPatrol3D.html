@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<title>AsteroidPatrol3D</title>
 	<style>
 		body {
@@ -64,17 +64,24 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.getElementById("container").appendChild(renderer.domElement);
 			window.addEventListener('resize', onWindowResize, false);
-
-			asteroid.position.set(10, 50, -100);
 			
-			//collisionSphere is a copy of the asteroid mesh's (or any mesh's) boundingSphere.
-			//this will essentially copy the size (radius) of the original boundingSphere
-			collisionSphere.copy(asteroid.geometry.boundingSphere);
-			//now move collisionSphere's center to asteroid mesh's world location,
-			//so it can be used for collision detection.
-			//Note: if the asteroid mesh moves at all, the following line will need to 
-			//accompany it every animation frame, to keep the collisionSphere properly updated
-			collisionSphere.center.copy(asteroid.position);
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
+				
+				largeAsteroids[i].position.set( Math.random() * 800 - 400, 
+								Math.random() * 800 - 400, 
+								Math.random() * 800 - 400 );
+			
+				//collisionSpheres[i] is a copy of the asteroid mesh's (or any mesh's) boundingSphere.
+				//this will essentially copy the size (radius) of the original boundingSphere
+				collisionSpheres[i].copy(largeAsteroids[i].geometry.boundingSphere);
+				//now move collisionSphere's center to asteroid mesh's world location,
+				//so it can be used for collision detection.
+				//Note: if the asteroid mesh moves at all, the following line will need to 
+				//accompany it every animation frame, to keep the collisionSphere properly updated
+				collisionSpheres[i].center.copy(largeAsteroids[i].position);
+				
+			}
+			
 			
 			//put the ship position at the origin
 			ship.position.set(0, 0, 0);
@@ -172,39 +179,50 @@
 				else shipSpeed = 0;
 			}
 
-			//if bullet is alive, update it
-			if (bulletAlive){
-				
-				moveBullet();
-				//now we test for a collision between bullet and sphere
-				bulletRayCollisionPoint = bulletRay.intersectSphere(collisionSphere);
-				//if bulletRayCollisionPoint !== null
-				if (bulletRayCollisionPoint) {
-					//compare the distance between collision point and bullet object, vs. where the
-					//bullet is now and where the bullet will end up the next frame, and if the first 
-					//length is less, we have a collision.  Else, the collision point is too far away still.
-					if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
-						newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
-						
-						//the following will freeze the projectile
-						bulletAlive = false;
-						//place it right where the collision occurred
-						bulletSphere.position.copy(bulletRayCollisionPoint);
-						//the following is optional:
-						//get the collisionNormal so we can bounce the bullet off the sphere
-						collisionNormal.subVectors(asteroid.position, bulletRayCollisionPoint);
-						collisionNormal.normalize();
-						
-						// the following will send the bullet projectile on its new path
-						//uncomment the following 2 lines to see the bullet bounce off the sphere
-						//bulletDirection.reflect(collisionNormal);
-						//bulletAlive = true;
-						
-					}
+			
+				//if bullet is alive, update it
+				if (bulletAlive){
+
+					moveBullet();
 					
-				}
+					for (var i = 0; i < numberOfLargeAsteroids; i++) {
+						//now we test for a collision between bullet and sphere
+						bulletRayCollisionPoint = bulletRay.intersectSphere(collisionSpheres[i]);
+						//if bulletRayCollisionPoint !== null
+						if (bulletRayCollisionPoint) {
+							//compare the distance between collision point and bullet object, vs. where the
+							//bullet is now and where the bullet will end up the next frame, and if the first 
+							//length is less, we have a collision.  Else, the collision point is too far away still.
+							if (bulletRayCollisionPoint.distanceToSquared(bulletSphere.position) < 
+								newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+
+								//the following will freeze the projectile
+								bulletAlive = false;
+								//place it right where the collision occurred
+								bulletSphere.position.copy(bulletRayCollisionPoint);
+								debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+								debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
+								debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
+								
+								//the following is optional:
+								//get the collisionNormal so we can bounce the bullet off the sphere
+								collisionNormal.subVectors(collisionSpheres[i].center, bulletRayCollisionPoint);
+								collisionNormal.normalize();
+
+								// the following will send the bullet projectile on its new path
+								//uncomment the following 2 lines to see the bullet bounce off the sphere
+								//bulletDirection.reflect(collisionNormal);
+								//bulletAlive = true;
+
+							}
+
+						}//end if (bulletRayCollisionPoint) {
+						
+					}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
+
+				}//end if (bulletAlive){
 				
-			}
+			
 
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
@@ -272,54 +290,58 @@
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
-			asteroid.localToWorld(asteroid.position);
-			//move asteroid along its initial randomly-picked path
-			asteroid.translateOnAxis(asteroidDirection, asteroidSpeed * frameTime);
-			
-			asteroid.worldToLocal(asteroid.position);
-			
-			//rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
-			asteroid.rotateOnAxis(asteroidRotationAxis, asteroidRotationAmount * frameTime);
-			
-			if (asteroid.position.x > arenaHalfSize + 40){
-				asteroid.position.x = -arenaHalfSize - 40;
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				
-			}
-			if (asteroid.position.x < -arenaHalfSize - 40){
-				asteroid.position.x = arenaHalfSize + 40;
+				largeAsteroids[i].localToWorld(largeAsteroids[i].position);
+				//move asteroid along its initial randomly-picked path
+				largeAsteroids[i].translateOnAxis(largeAsteroids[i].asteroidDirection, largeAsteroids[i].asteroidSpeed * frameTime);
+
+				largeAsteroids[i].worldToLocal(largeAsteroids[i].position);
+
+				//rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
+				largeAsteroids[i].rotateOnAxis(largeAsteroids[i].asteroidRotationAxis, largeAsteroids[i].asteroidRotationAmount * frameTime);
+
+				if (largeAsteroids[i].position.x > arenaHalfSize + 40){
+					largeAsteroids[i].position.x = -arenaHalfSize - 40;
+
+				}
+				if (largeAsteroids[i].position.x < -arenaHalfSize - 40){
+					largeAsteroids[i].position.x = arenaHalfSize + 40;
+
+				}
+				if (largeAsteroids[i].position.y > arenaHalfSize + 40){
+					largeAsteroids[i].position.y = -arenaHalfSize - 40;
+
+				}
+				if (largeAsteroids[i].position.y < -arenaHalfSize - 40){
+					largeAsteroids[i].position.y = arenaHalfSize + 40;
+
+				}
+				if (largeAsteroids[i].position.z > arenaHalfSize + 40){
+					largeAsteroids[i].position.z = -arenaHalfSize - 40;
+
+				}
+				if (largeAsteroids[i].position.z < -arenaHalfSize - 40){
+					largeAsteroids[i].position.z = arenaHalfSize + 40;
+
+				}
+
+				//update the collisionSphere to match the asteroid's new position
+				collisionSpheres[i].center.copy(largeAsteroids[i].position);
 				
-			}
-			if (asteroid.position.y > arenaHalfSize + 40){
-				asteroid.position.y = -arenaHalfSize - 40;
-				
-			}
-			if (asteroid.position.y < -arenaHalfSize - 40){
-				asteroid.position.y = arenaHalfSize + 40;
-				
-			}
-			if (asteroid.position.z > arenaHalfSize + 40){
-				asteroid.position.z = -arenaHalfSize - 40;
-				
-			}
-			if (asteroid.position.z < -arenaHalfSize - 40){
-				asteroid.position.z = arenaHalfSize + 40;
-				
-			}
-			
-			//update the collisionSphere to match the asteroid's new position
-			collisionSphere.center.copy(asteroid.position);
+			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
 			
 			//update the controls
 			controls.update(frameTime);
 			//render the scene with our camera
 			renderer.render(scene, camera);
-
+			
 			//helpful real-time debug text, so we can monitor game variables
-			if(!bulletAlive){
-				debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
-				debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
-				debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
-			}
+		/*	
+			debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
+			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
+		*/
 			debugText4.innerHTML = "shipSpeed: " + shipSpeed.toFixed(1);
 
 		} //end function animate()
