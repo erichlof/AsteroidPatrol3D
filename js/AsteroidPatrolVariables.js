@@ -252,7 +252,7 @@ for (var i = 0; i < numberOfLargeAsteroids; i++) {
 	largeAsteroids[i].geometry.computeVertexNormals();
 	largeAsteroids[i].geometry.verticesNeedUpdate = true;
 	largeAsteroids[i].geometry.normalsNeedUpdate = true;
-	THREE.GeometryUtils.center( largeAsteroids[i].geometry );
+	largeAsteroids[i].geometry.center();
 	largeAsteroids[i].geometry.computeBoundingSphere();
 	scene.add(largeAsteroids[i]);
 	
