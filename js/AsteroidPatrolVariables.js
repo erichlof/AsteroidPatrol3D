@@ -63,70 +63,7 @@ for (var i = 0; i < 6; i++) {
 var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 scene.add( skyBox );
-/*
-// stars
-var i, r = 2500, vertex, s, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
 
-for ( i = 0; i < 250; i ++ ) {
-
-	vertex = new THREE.Vector3();
-	vertex.x = Math.random() * 2 - 1;
-	vertex.y = Math.random() * 2 - 1;
-	vertex.z = Math.random() * 2 - 1;
-	vertex.multiplyScalar( r );
-	//stars must stay outside the arena
-	if(Math.abs(vertex.x) < 1000 && Math.abs(vertex.y) < 1000 && Math.abs(vertex.z) < 1000)
-		continue;
-	
-	starsGeometry[ 0 ].vertices.push( vertex );
-
-}
-
-for ( i = 0; i < 1500; i ++ ) {
-
-	vertex = new THREE.Vector3();
-	vertex.x = Math.random() * 2 - 1;
-	vertex.y = Math.random() * 2 - 1;
-	vertex.z = Math.random() * 2 - 1;
-	vertex.multiplyScalar( r );
-	
-	//stars must stay outside the arena
-	if(Math.abs(vertex.x) < 1000 && Math.abs(vertex.y) < 1000 && Math.abs(vertex.z) < 1000)
-		continue;
-	
-	starsGeometry[ 1 ].vertices.push( vertex ); //else
-
-}
-
-var stars;
-var starsMaterials = [
-	new THREE.PointCloudMaterial( { color: 0xdddddd, size: 1, sizeAttenuation: false } ),
-	new THREE.PointCloudMaterial( { color: 0xdddddd, size: 1, sizeAttenuation: false } ),
-	new THREE.PointCloudMaterial( { color: 0xaaaaaa, size: 1, sizeAttenuation: false } ),
-	new THREE.PointCloudMaterial( { color: 0xaaaaaa, size: 1, sizeAttenuation: false } ),
-	new THREE.PointCloudMaterial( { color: 0x777777, size: 1, sizeAttenuation: false } ),
-	new THREE.PointCloudMaterial( { color: 0x777777, size: 1, sizeAttenuation: false } )
-];
-
-for ( i = 10; i < 30; i ++ ) {
-
-	stars = new THREE.PointCloud( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
-
-	stars.rotation.x = Math.random() * 6;
-	stars.rotation.y = Math.random() * 6;
-	stars.rotation.z = Math.random() * 6;
-
-	//s = i * 10;
-	//stars.scale.set( s, s, s );
-
-	stars.matrixAutoUpdate = false;
-	stars.updateMatrix();
-
-	scene.add( stars );
-
-}
-
-*/
 // stars
 var i, r = 2500, vertex, s, starsGeometry = new THREE.Geometry();
 
