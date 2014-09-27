@@ -34,19 +34,25 @@ To Do
 * Add 3D spatial sound FX to surround the player from all angles
 
 
-September 19, 2014 Progress Note
-----------------------------
+September 27, 2014 Progress Note
+--------------------------------
 
-Added stars that gently move against the background when your ship accelerates.  Developed algorithm to procedurally generate asteroid vertex deformation, so that every asteroid looks slightly different from each other.  Next up is to create medium and small size asteroids when you shoot the larger ones.
+Now you can rapid-fire multiple shots!  I set the maximum to 30 shots on screen at one time - even the quickest of trigger fingers can't fire more than that and still have the first shot inside the arena.  Plus, this maximum places a limit on the number of loops the program has to perform in order to check for all possible collisions.  This will keep the frame rate smooth, hopefully even after I start adding many different asteroids and the enemy UFO saucer (and his shots to loop through and check for too!).  Next up is to create medium and small size asteroids when you shoot the larger ones.
+
+
+September 19, 2014 Progress Note
+--------------------------------
+
+Added stars that gently move against the background when your ship accelerates.  Developed algorithm to procedurally generate asteroid vertex deformation, so that every asteroid looks slightly different from each other.  In the next update I will add the ability to rapid-fire multiple shots. 
 
 
 July 12, 2014 Progress Note
-----------------------------
+---------------------------
 
 Sorry for the lack of updates - busy summer :) . Added multiple Large asteroids by creating an array[] called largeAsteroids[].  Each asteroid in this group has its own position, speed, rotation, collision bounding-sphere, etc.  Next order of business will be to have the Large asteroids break apart into 2 Medium asteroids, which will each break apart into 2 Small asteroids.  Also asteroid object-creation will be necessary each level (1 or 2 more asteroids added to each new level, to increase difficulty), as well as asteroid object-deletion when an asteroid is shot.
 
 
 May 30, 2014 Progress Note
-----------------------------
+--------------------------
 
 Now when the player's ship crosses an arena boundary, a cool 'warp' effect animation is played, and the ship is instantly teleported to the opposite wall of the arena.  This keeps the action tight inside the game arena and feels a lot like the original 2D Asteroids. :)  Eventually when sound effects are added to this game, I will choose a quick 'reverse-cymbal' type sound to accompany this effect.  June 1st: added randomly-chosen rotation axis, speed, and direction of travel for asteroids. When leaving the arena boundaries, asteroids now warp to the other side.
