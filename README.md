@@ -27,7 +27,6 @@ To Do
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
 * Add multiple asteroids that break apart when shot
 * Make explosion effect when asteroids are shot
-* allow multiple bullets, by creating an array[] of them
 * Asteroids must collide with each other, UFO saucer, and of course your ship
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
