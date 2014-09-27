@@ -334,12 +334,6 @@ for (var i = 0; i < numberOfLargeAsteroids; i++) {
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
-var bulletGeometry = new THREE.SphereGeometry(3);
-var bulletMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(255,0,0)'
-});
-var bulletSphere = new THREE.Mesh(bulletGeometry, bulletMaterial);
-scene.add(bulletSphere);
 
 // Sunlight
 var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
@@ -357,18 +351,37 @@ crossHairsSprite.scale.set(0.5, 0.5, 0.5);
 //add crossHairsSprite as a child of our camera object, so it will stay in camera's view
 camera.add(crossHairsSprite);
 
-var frameTime = 0;
-var spriteAngle = 0;
-var groundNormal = new THREE.Vector3(0, 1, 0);
+//bullets
+var MAX_BULLETS = 30;
 var bulletSpeed = 400;
-var bulletDirection = new THREE.Vector3(0, 0, -1);
-var bulletAlive = false;
-//var bulletCounter = 0;
+var bulletCounter = 0;
+var bulletGeometry = new THREE.SphereGeometry(3);
+var bulletMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(255,0,0)'
+});
+var bulletSphereArray = [];
+for (var i = 0; i < MAX_BULLETS; i++) {
+	bulletSphereArray[i] = new THREE.Mesh(bulletGeometry, bulletMaterial);
+	scene.add(bulletSphereArray[i]);
+}
+var bulletArray = [];
+for (var i = 0; i < MAX_BULLETS; i++) {
+	bulletArray[i] = {
+		alive: false,
+		direction: new THREE.Vector3(0, 0, 0)
+	};
+}
+var bulletRay = new THREE.Ray();
+var bulletRayCollisionPoint = new THREE.Vector3();
+var oldBulletSpherePos = new THREE.Vector3();
+var newBulletSpherePos = new THREE.Vector3();
+var collisionNormal = new THREE.Vector3();
 var canShoot = true;
+
+var frameTime = 0;
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
-
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
 var frictionVector = new THREE.Vector3();
@@ -376,13 +389,6 @@ var ship = new THREE.Object3D();
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
-
-var bulletRay = new THREE.Ray();
-var bulletRayCollisionPoint = new THREE.Vector3();
-var oldBulletSpherePos = new THREE.Vector3();
-var newBulletSpherePos = new THREE.Vector3();
-var collisionNormal = new THREE.Vector3();
-
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
