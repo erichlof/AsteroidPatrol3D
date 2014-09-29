@@ -61,24 +61,61 @@
 
 
 		function initLevel() {
-
+			
+			//if we are on a later level, first clean up all of the old asteroid objects
+			if(level > 0){
+				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
+					scene.remove( largeAsteroids[i] );
+					scene.remove( largeCollisionSpheres[i] );
+				}
+			}
+			
+			level += 1;
+			numberOfLargeAsteroids = Math.floor( level * 4 + 2 );
+			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
+			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
+			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
-				
+
+				largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
+
+				for (var v = 0; v < lvLength; v++) {	
+					deformVec.set(Math.random() * 10, Math.random() * 10, Math.random() * 10);
+					largeAsteroidGeometry.vertices[v].add(deformVec);
+				}
+
+				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterial);
+				largeAsteroids[i].scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
+
+				largeAsteroids[i].geometry.computeFaceNormals();
+				largeAsteroids[i].geometry.computeVertexNormals();
+				largeAsteroids[i].geometry.verticesNeedUpdate = true;
+				largeAsteroids[i].geometry.normalsNeedUpdate = true;
+				largeAsteroids[i].geometry.center();
+				largeAsteroids[i].geometry.computeBoundingSphere();
+				scene.add(largeAsteroids[i]);
+
+				largeAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				largeAsteroids[i].rotationAxis.normalize();
+				largeAsteroids[i].rotationAmount = Math.random() + 0.5;
+				largeAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				largeAsteroids[i].direction.normalize();
+				largeAsteroids[i].speed = Math.random() * 20 + 10;
 				largeAsteroids[i].position.set( Math.random() * 800 - 400, 
 								Math.random() * 800 - 400, 
 								Math.random() * 800 - 400 );
 			
-				//collisionSpheres[i] is a copy of the asteroid mesh's (or any mesh's) boundingSphere.
+				//largeCollisionSpheres[i] is a copy of the largeAsteroid mesh's (or any mesh's) boundingSphere.
+				largeCollisionSpheres[i] = new THREE.Sphere();
 				//this will essentially copy the size (radius) of the original boundingSphere
-				collisionSpheres[i].copy(largeAsteroids[i].geometry.boundingSphere);
+				largeCollisionSpheres[i].copy(largeAsteroids[i].geometry.boundingSphere);
 				//now move collisionSphere's center to asteroid mesh's world location,
 				//so it can be used for collision detection.
 				//Note: if the asteroid mesh moves at all, the following line will need to 
 				//accompany it every animation frame, to keep the collisionSphere properly updated
-				collisionSpheres[i].center.copy(largeAsteroids[i].position);
-				
+				largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
 			}
-			
+	
 			//put the ship position at the origin
 			ship.position.set(0, 0, 0);
 			//put the camera right where the ship is
@@ -162,7 +199,7 @@
 
 			}
 			else{ //no thrust is being applied, so slow the ship down gradually
-				//Although no friction exists in space, this makes handling the ship easier
+				//Although no air drag friction exists in space, this makes handling the ship easier
 				if (shipSpeed > 0.1) {
 					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
 					//in order to point in the opposing direction
@@ -176,47 +213,56 @@
 				}
 				else shipSpeed = 0;
 			}
-
+			
 			//loop through bulletArray, update bullet positions, update collisions
 			for (var i = 0; i < MAX_BULLETS; i++) {
+				
+				//deactivate bullets if they leave arena
+				if(bulletArray[i].alive){
+					if( bulletArray[i].position.x > arenaHalfSize || bulletArray[i].position.x < -arenaHalfSize || 
+					    bulletArray[i].position.y > arenaHalfSize || bulletArray[i].position.y < -arenaHalfSize ||
+					    bulletArray[i].position.z > arenaHalfSize || bulletArray[i].position.z < -arenaHalfSize ) {
+						
+						bulletArray[i].alive = false;
+						bulletArray[i].visible = false;
+					}
+				}
 				//if bullet is alive, update it
 				if (bulletArray[i].alive){
 					//keep updating the bullet ray to equal the bulletSphere's position and direction vectors,
 					//so this ray can be used for ray-boundingSphere collision detection.
-					bulletRay.set(bulletSphereArray[i].position, bulletArray[i].direction);
+					bulletRay.set(bulletArray[i].position, bulletArray[i].direction);
 					//record the current bullet location
-					oldBulletSpherePos.copy(bulletSphereArray[i].position);
+					oldBulletSpherePos.copy(bulletArray[i].position);
 					//move bullet along bullet direction vector, at the rate of bulletSpeed times the framerate
-					bulletSphereArray[i].translateOnAxis(bulletArray[i].direction, bulletSpeed * frameTime);
+					bulletArray[i].translateOnAxis(bulletArray[i].direction, bulletSpeed * frameTime);
 					//now that we have moved it, record the new bullet location
-					newBulletSpherePos.copy(bulletSphereArray[i].position);
+					newBulletSpherePos.copy(bulletArray[i].position);
 
 					for (var c = 0; c < numberOfLargeAsteroids; c++) {
 						//now we test for a collision between bullet and sphere
-						bulletRayCollisionPoint = bulletRay.intersectSphere(collisionSpheres[c]);
+						bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
 						//if bulletRayCollisionPoint !== null
 						if (bulletRayCollisionPoint) {
 							//compare the distance between collision point and bullet object, vs. where the
 							//bullet is now and where the bullet will end up the next frame, and if the first 
 							//length is less, we have a collision.  Else, the collision point is too far away still.
-							if (bulletRayCollisionPoint.distanceToSquared(bulletSphereArray[i].position) < 
+							if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
 								newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 
 								//the following will freeze the projectile
 								bulletArray[i].alive = false;
 								//place it right where the collision occurred
-								bulletSphereArray[i].position.copy(bulletRayCollisionPoint);
+								bulletArray[i].position.copy(bulletRayCollisionPoint);
 								debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 								debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 								debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
 								/*	
 								//the following is optional:
 								//get the collisionNormal so we can bounce the bullet off the sphere
-								collisionNormal.subVectors(collisionSpheres[i].center, bulletRayCollisionPoint);
+								collisionNormal.subVectors(largeCollisionSpheres[i].center, bulletRayCollisionPoint);
 								collisionNormal.normalize();
-
 								// the following will send the bullet projectile on its new path
-								//uncomment the following 2 lines to see the bullet bounce off the sphere
 								//bulletArray[i].direction.reflect(collisionNormal);
 								//bulletArray[i].alive = true;
 								*/
@@ -308,6 +354,7 @@
 				//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
 				largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 
+				//keep large asteroids inside the arena
 				if (largeAsteroids[i].position.x > arenaHalfSize + 40){
 					largeAsteroids[i].position.x = -arenaHalfSize - 40;
 
@@ -334,7 +381,7 @@
 				}
 
 				//update the collisionSphere to match the asteroid's new position
-				collisionSpheres[i].center.copy(largeAsteroids[i].position);
+				largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
 				
 			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
 			
@@ -357,17 +404,18 @@
 
 		function shootBullet() {
 
-			//set bullet to alive
+			//set bullet to alive and visibility to true
 			bulletArray[bulletCounter].alive = true;
+			bulletArray[bulletCounter].visible = true;
 			//spawn bullet at player's location
-			bulletSphereArray[bulletCounter].position.copy(ship.position);
+			bulletArray[bulletCounter].position.copy(ship.position);
 			//reset the bullet direction vector to unit length of 1 to avoid accumulation
 			bulletArray[bulletCounter].direction.set(0, 0, -1);
 			//rotate the vector by our camera's rotation quaternion
 			bulletArray[bulletCounter].direction.applyQuaternion(camera.quaternion);
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
-			bulletSphereArray[bulletCounter].translateOnAxis(bulletArray[bulletCounter].direction, 15);
+			bulletArray[bulletCounter].translateOnAxis(bulletArray[bulletCounter].direction, 15);
 			
 			//update bulletCounter for next time
 			bulletCounter += 1;
