@@ -289,7 +289,7 @@ var helper = new THREE.BoxHelper(box);
 scene.add(helper);
 
 var level = 0;
-var numberOfLargeAsteroids = 6;
+var numberOfLargeAsteroids = 0;
 var numberOfMediumAsteroids = 0;
 var numberOfSmallAsteroids = 0;
 var largeAsteroids = [];
@@ -305,11 +305,13 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 	shading: THREE.FlatShading
 });
 
-var largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
+var largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//this needs to match in the html file
+var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(30, 1);//this needs to match in the html file
+var smallAsteroidGeometry = new THREE.IcosahedronGeometry(20, 0);//this needs to match in the html file
 var lvLength = largeAsteroidGeometry.vertices.length;
+var mvLength = mediumAsteroidGeometry.vertices.length;
+var svLength = smallAsteroidGeometry.vertices.length;
 var deformVec = new THREE.Vector3();
-
-
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
