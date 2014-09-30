@@ -68,6 +68,8 @@
 					scene.remove( largeAsteroids[i] );
 					scene.remove( largeCollisionSpheres[i] );
 				}
+				//TODO clean up medium asteroids
+				//TODO clean up small asteroids
 			}
 			
 			level += 1;
@@ -77,16 +79,17 @@
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
-				largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//0 for small asteroids
-
+				largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);
+				//note - update lvLength in Variables.js if above geometry is changed!
 				for (var v = 0; v < lvLength; v++) {	
 					deformVec.set(Math.random() * 10, Math.random() * 10, Math.random() * 10);
 					largeAsteroidGeometry.vertices[v].add(deformVec);
 				}
 
 				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterial);
-				largeAsteroids[i].scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
-
+				//largeAsteroids[i].scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
+				largeAsteroids[i].scale.set( 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10) );
+				
 				largeAsteroids[i].geometry.computeFaceNormals();
 				largeAsteroids[i].geometry.computeVertexNormals();
 				largeAsteroids[i].geometry.verticesNeedUpdate = true;
@@ -95,6 +98,8 @@
 				largeAsteroids[i].geometry.computeBoundingSphere();
 				scene.add(largeAsteroids[i]);
 
+				largeAsteroids[i].alive = true;
+				largeAsteroids[i].visible = true;
 				largeAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				largeAsteroids[i].rotationAxis.normalize();
 				largeAsteroids[i].rotationAmount = Math.random() + 0.5;
@@ -114,6 +119,78 @@
 				//Note: if the asteroid mesh moves at all, the following line will need to 
 				//accompany it every animation frame, to keep the collisionSphere properly updated
 				largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
+			}
+			
+			//build medium asteroids
+			for (var i = 0; i < numberOfMediumAsteroids; i++) {
+
+				mediumAsteroidGeometry = new THREE.IcosahedronGeometry(30, 1);
+				//note - update mvLength in Variables.js if above geometry is changed!
+				for (var v = 0; v < mvLength; v++) {	
+					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
+					mediumAsteroidGeometry.vertices[v].add(deformVec);
+				}
+
+				mediumAsteroids[i] = new THREE.Mesh(mediumAsteroidGeometry, asteroidMaterial);
+				mediumAsteroids[i].scale.set( 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10) );
+				
+				mediumAsteroids[i].geometry.computeFaceNormals();
+				mediumAsteroids[i].geometry.computeVertexNormals();
+				mediumAsteroids[i].geometry.verticesNeedUpdate = true;
+				mediumAsteroids[i].geometry.normalsNeedUpdate = true;
+				mediumAsteroids[i].geometry.center();
+				mediumAsteroids[i].geometry.computeBoundingSphere();
+				scene.add(mediumAsteroids[i]);
+
+				mediumAsteroids[i].alive = false;//these come alive when big ones break apart
+				mediumAsteroids[i].visible = false;//these stay hidden until big ones break apart
+				mediumAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				mediumAsteroids[i].rotationAxis.normalize();
+				mediumAsteroids[i].rotationAmount = Math.random() + 0.7;//medium spins faster
+				mediumAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				mediumAsteroids[i].direction.normalize();
+				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
+				mediumAsteroids[i].position.set(500, 500, 500);//place outside arena for now
+			
+				mediumCollisionSpheres[i] = new THREE.Sphere();
+				mediumCollisionSpheres[i].copy(mediumAsteroids[i].geometry.boundingSphere);
+				mediumCollisionSpheres[i].center.copy(mediumAsteroids[i].position);
+			}
+			
+			//build small asteroids
+			for (var i = 0; i < numberOfSmallAsteroids; i++) {
+
+				smallAsteroidGeometry = new THREE.IcosahedronGeometry(20, 0);//0 for small asteroids
+				//note - update svLength in Variables.js if above geometry is changed!
+				for (var v = 0; v < svLength; v++) {	
+					deformVec.set(Math.random() * 5, Math.random() * 5, Math.random() * 5);
+					smallAsteroidGeometry.vertices[v].add(deformVec);
+				}
+
+				smallAsteroids[i] = new THREE.Mesh(smallAsteroidGeometry, asteroidMaterial);
+				smallAsteroids[i].scale.set( 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10), 1.0 + (Math.random() * 3 / 10) );
+				
+				smallAsteroids[i].geometry.computeFaceNormals();
+				smallAsteroids[i].geometry.computeVertexNormals();
+				smallAsteroids[i].geometry.verticesNeedUpdate = true;
+				smallAsteroids[i].geometry.normalsNeedUpdate = true;
+				smallAsteroids[i].geometry.center();
+				smallAsteroids[i].geometry.computeBoundingSphere();
+				scene.add(smallAsteroids[i]);
+
+				smallAsteroids[i].alive = false;//these come alive when big ones break apart
+				smallAsteroids[i].visible = false;//these stay hidden until big ones break apart
+				smallAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				smallAsteroids[i].rotationAxis.normalize();
+				smallAsteroids[i].rotationAmount = Math.random() + 0.9;//small spins faster
+				smallAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				smallAsteroids[i].direction.normalize();
+				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
+				smallAsteroids[i].position.set(500, 500, 500);//place outside arena for now
+			
+				smallCollisionSpheres[i] = new THREE.Sphere();
+				smallCollisionSpheres[i].copy(smallAsteroids[i].geometry.boundingSphere);
+				smallCollisionSpheres[i].center.copy(smallAsteroids[i].position);
 			}
 	
 			//put the ship position at the origin
@@ -240,37 +317,41 @@
 					newBulletSpherePos.copy(bulletArray[i].position);
 
 					for (var c = 0; c < numberOfLargeAsteroids; c++) {
-						//now we test for a collision between bullet and sphere
-						bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
-						//if bulletRayCollisionPoint !== null
-						if (bulletRayCollisionPoint) {
-							//compare the distance between collision point and bullet object, vs. where the
-							//bullet is now and where the bullet will end up the next frame, and if the first 
-							//length is less, we have a collision.  Else, the collision point is too far away still.
-							if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
-								newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+						//only check active alive asteroids
+						if(largeAsteroids[c].alive){
+							//now we test for a collision between bullet and sphere
+							bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
+							//if bulletRayCollisionPoint !== null
+							if (bulletRayCollisionPoint) {
+								//compare the distance between collision point and bullet object, vs. where the
+								//bullet is now and where the bullet will end up the next frame, and if the first 
+								//length is less, we have a collision.  Else, the collision point is too far away still.
+								if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
+									newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 
-								//the following will freeze the projectile
-								bulletArray[i].alive = false;
-								//place it right where the collision occurred
-								bulletArray[i].position.copy(bulletRayCollisionPoint);
-								debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
-								debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
-								debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
-								/*	
-								//the following is optional:
-								//get the collisionNormal so we can bounce the bullet off the sphere
-								collisionNormal.subVectors(largeCollisionSpheres[i].center, bulletRayCollisionPoint);
-								collisionNormal.normalize();
-								// the following will send the bullet projectile on its new path
-								//bulletArray[i].direction.reflect(collisionNormal);
-								//bulletArray[i].alive = true;
-								*/
-							}
+									//the following will freeze the projectile
+									bulletArray[i].alive = false;
+									//place it right where the collision occurred
+									bulletArray[i].position.copy(bulletRayCollisionPoint);
+									debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+									debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
+									debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
+									/*	
+									//the following is optional:
+									//get the collisionNormal so we can bounce the bullet off the sphere
+									collisionNormal.subVectors(largeCollisionSpheres[i].center, bulletRayCollisionPoint);
+									collisionNormal.normalize();
+									// the following will send the bullet projectile on its new path
+									//bulletArray[i].direction.reflect(collisionNormal);
+									//bulletArray[i].alive = true;
+									*/
+								}
 
-						}//end if (bulletRayCollisionPoint) {
-
-					}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
+							}//end if (bulletRayCollisionPoint) {
+							
+						}//end if(largeAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfLargeAsteroids; c++) {
 
 				}//end if (bulletArray[i].alive){
 				
