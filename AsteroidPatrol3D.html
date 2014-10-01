@@ -64,18 +64,30 @@
 			
 			//if we are on a later level, first clean up all of the old asteroid objects
 			if(level > 0){
+				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
 					scene.remove( largeCollisionSpheres[i] );
 				}
-				//TODO clean up medium asteroids
-				//TODO clean up small asteroids
+				for (var i = 0; i < numberOfMediumAsteroids; i++) {	
+					scene.remove( mediumAsteroids[i] );
+					scene.remove( mediumCollisionSpheres[i] );
+				}
+				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
+					scene.remove( smallAsteroids[i] );
+					scene.remove( smallCollisionSpheres[i] );
+				}
+
 			}
 			
 			level += 1;
-			numberOfLargeAsteroids = Math.floor( level * 4 + 2 );
+			numberOfLargeAsteroids = Math.floor( level * 3 + 2 );
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
+			smallAsteroidsRemaining = numberOfSmallAsteroids;
+			
+			debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+			
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
@@ -315,12 +327,13 @@
 					bulletArray[i].translateOnAxis(bulletArray[i].direction, bulletSpeed * frameTime);
 					//now that we have moved it, record the new bullet location
 					newBulletSpherePos.copy(bulletArray[i].position);
-
-					for (var c = 0; c < numberOfLargeAsteroids; c++) {
+					
+					//loop through smallAsteroids and check for collisions with our bullets
+					for (var c = 0; c < numberOfSmallAsteroids; c++) {
 						//only check active alive asteroids
-						if(largeAsteroids[c].alive){
+						if(smallAsteroids[c].alive){
 							//now we test for a collision between bullet and sphere
-							bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
+							bulletRayCollisionPoint = bulletRay.intersectSphere(smallCollisionSpheres[c]);
 							//if bulletRayCollisionPoint !== null
 							if (bulletRayCollisionPoint) {
 								//compare the distance between collision point and bullet object, vs. where the
@@ -329,13 +342,94 @@
 								if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
 									newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 
-									//the following will freeze the projectile
 									bulletArray[i].alive = false;
+									bulletArray[i].visible = false;
 									//place it right where the collision occurred
-									bulletArray[i].position.copy(bulletRayCollisionPoint);
+									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									smallAsteroids[c].alive = false;
+									smallAsteroids[c].visible = false;
+									
+									smallAsteroidsRemaining -= 1;
+									if(smallAsteroidsRemaining < 1)
+										initLevel();
+									
+									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							
+								}
+
+							}//end if (bulletRayCollisionPoint) {
+							
+						}//end if(smallAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfSmallAsteroids; c++) {
+					
+					//loop through mediumAsteroids and check for collisions with our bullets
+					for (var c = 0; c < numberOfMediumAsteroids; c++) {
+						
+						if(mediumAsteroids[c].alive){
+							
+							bulletRayCollisionPoint = bulletRay.intersectSphere(mediumCollisionSpheres[c]);
+							
+							if (bulletRayCollisionPoint) {
+								
+								if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
+									newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+
+									bulletArray[i].alive = false;
+									bulletArray[i].visible = false;
+									//place it right where the collision occurred
+									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									mediumAsteroids[c].alive = false;
+									mediumAsteroids[c].visible = false;
+									
+									//spawn 2 new small asteroids
+									smallAsteroids[c*2].alive = true;
+									smallAsteroids[c*2].visible = true;
+									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
+									smallAsteroids[c*2+1].alive = true;
+									smallAsteroids[c*2+1].visible = true;
+									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
+							
+								}
+
+							}//end if (bulletRayCollisionPoint) {
+							
+						}//end if(mediumAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfMediumAsteroids; c++) {
+					
+					//loop through largeAsteroids and check for collisions with our bullets
+					for (var c = 0; c < numberOfLargeAsteroids; c++) {
+						
+						if(largeAsteroids[c].alive){
+							
+							bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
+							
+							if (bulletRayCollisionPoint) {
+								
+								if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
+									newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+
+									bulletArray[i].alive = false;
+									bulletArray[i].visible = false;
+									//place it right where the collision occurred
+									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									largeAsteroids[c].alive = false;
+									largeAsteroids[c].visible = false;
+									
+									//spawn 2 new medium asteroids
+									mediumAsteroids[c*2].alive = true;
+									mediumAsteroids[c*2].visible = true;
+									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
+									mediumAsteroids[c*2+1].alive = true;
+									mediumAsteroids[c*2+1].visible = true;
+									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
+									/*
 									debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 									debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 									debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);
+									*/
+									
 									/*	
 									//the following is optional:
 									//get the collisionNormal so we can bounce the bullet off the sphere
@@ -423,48 +517,116 @@
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
+			//move and spin largeAsteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				
-				//change to world coordinate system to do position translations
-				largeAsteroids[i].localToWorld(largeAsteroids[i].position);
-				//now move asteroid along its initial randomly-picked path
-				largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, largeAsteroids[i].speed * frameTime);
+				if(largeAsteroids[i].alive){
+					//change to world coordinate system to do position translations
+					largeAsteroids[i].localToWorld(largeAsteroids[i].position);
+					//now move asteroid along its initial randomly-picked path
+					largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, largeAsteroids[i].speed * frameTime);
 
-				//change to local coordinate system so that asteroid rotates around its own center
-				largeAsteroids[i].worldToLocal(largeAsteroids[i].position);
-				//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
-				largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
+					//change to local coordinate system so that asteroid rotates around its own center
+					largeAsteroids[i].worldToLocal(largeAsteroids[i].position);
+					//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
+					largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 
-				//keep large asteroids inside the arena
-				if (largeAsteroids[i].position.x > arenaHalfSize + 40){
-					largeAsteroids[i].position.x = -arenaHalfSize - 40;
+					//keep large asteroids inside the arena
+					if (largeAsteroids[i].position.x > arenaHalfSize + 40)
+						largeAsteroids[i].position.x = -arenaHalfSize - 40;
 
-				}
-				if (largeAsteroids[i].position.x < -arenaHalfSize - 40){
-					largeAsteroids[i].position.x = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.x < -arenaHalfSize - 40)
+						largeAsteroids[i].position.x = arenaHalfSize + 40;
 
-				}
-				if (largeAsteroids[i].position.y > arenaHalfSize + 40){
-					largeAsteroids[i].position.y = -arenaHalfSize - 40;
+					if (largeAsteroids[i].position.y > arenaHalfSize + 40)
+						largeAsteroids[i].position.y = -arenaHalfSize - 40;
 
-				}
-				if (largeAsteroids[i].position.y < -arenaHalfSize - 40){
-					largeAsteroids[i].position.y = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.y < -arenaHalfSize - 40)
+						largeAsteroids[i].position.y = arenaHalfSize + 40;
 
-				}
-				if (largeAsteroids[i].position.z > arenaHalfSize + 40){
-					largeAsteroids[i].position.z = -arenaHalfSize - 40;
+					if (largeAsteroids[i].position.z > arenaHalfSize + 40)
+						largeAsteroids[i].position.z = -arenaHalfSize - 40;
 
-				}
-				if (largeAsteroids[i].position.z < -arenaHalfSize - 40){
-					largeAsteroids[i].position.z = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.z < -arenaHalfSize - 40)
+						largeAsteroids[i].position.z = arenaHalfSize + 40;
 
-				}
-
-				//update the collisionSphere to match the asteroid's new position
-				largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
+					//update the collisionSphere to match the asteroid's new position
+					largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
+				}//end if(largeAsteroids[i].alive)
 				
 			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
+			
+			//move and spin mediumAsteroids
+			for (var i = 0; i < numberOfMediumAsteroids; i++) {
+				
+				if(mediumAsteroids[i].alive){
+					
+					mediumAsteroids[i].localToWorld(mediumAsteroids[i].position);
+					mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumAsteroids[i].speed * frameTime);
+
+					mediumAsteroids[i].worldToLocal(mediumAsteroids[i].position);
+					mediumAsteroids[i].rotateOnAxis(mediumAsteroids[i].rotationAxis, mediumAsteroids[i].rotationAmount * frameTime);
+
+					if (mediumAsteroids[i].position.x > arenaHalfSize + 30)
+						mediumAsteroids[i].position.x = -arenaHalfSize - 30;
+
+					if (mediumAsteroids[i].position.x < -arenaHalfSize - 30)
+						mediumAsteroids[i].position.x = arenaHalfSize + 30;
+
+					if (mediumAsteroids[i].position.y > arenaHalfSize + 30)
+						mediumAsteroids[i].position.y = -arenaHalfSize - 30;
+
+					if (mediumAsteroids[i].position.y < -arenaHalfSize - 30)
+						mediumAsteroids[i].position.y = arenaHalfSize + 30;
+
+					if (mediumAsteroids[i].position.z > arenaHalfSize + 30)
+						mediumAsteroids[i].position.z = -arenaHalfSize - 30;
+
+					if (mediumAsteroids[i].position.z < -arenaHalfSize - 30)
+						mediumAsteroids[i].position.z = arenaHalfSize + 30;
+
+					//update the collisionSphere to match the asteroid's new position
+					mediumCollisionSpheres[i].center.copy(mediumAsteroids[i].position);
+					
+				}//end if(mediumAsteroids[i].alive)
+				
+			}//end for (var i = 0; i < numberOfMediumAsteroids; i++) {
+			
+			//move and spin smallAsteroids
+			for (var i = 0; i < numberOfSmallAsteroids; i++) {
+				
+				if(smallAsteroids[i].alive){
+					
+					smallAsteroids[i].localToWorld(smallAsteroids[i].position);
+					smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallAsteroids[i].speed * frameTime);
+
+					smallAsteroids[i].worldToLocal(smallAsteroids[i].position);
+					smallAsteroids[i].rotateOnAxis(smallAsteroids[i].rotationAxis, smallAsteroids[i].rotationAmount * frameTime);
+
+					if (smallAsteroids[i].position.x > arenaHalfSize + 20)
+						smallAsteroids[i].position.x = -arenaHalfSize - 20;
+
+					if (smallAsteroids[i].position.x < -arenaHalfSize - 20)
+						smallAsteroids[i].position.x = arenaHalfSize + 20;
+
+					if (smallAsteroids[i].position.y > arenaHalfSize + 20)
+						smallAsteroids[i].position.y = -arenaHalfSize - 20;
+
+					if (smallAsteroids[i].position.y < -arenaHalfSize - 20)
+						smallAsteroids[i].position.y = arenaHalfSize + 20;
+
+					if (smallAsteroids[i].position.z > arenaHalfSize + 20)
+						smallAsteroids[i].position.z = -arenaHalfSize - 20;
+
+					if (smallAsteroids[i].position.z < -arenaHalfSize - 20)
+						smallAsteroids[i].position.z = arenaHalfSize + 20;
+
+					//update the collisionSphere to match the asteroid's new position
+					smallCollisionSpheres[i].center.copy(smallAsteroids[i].position);
+					
+				}//end if(smallAsteroids[i].alive)
+				
+			}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
 			
 			//update the controls
 			controls.update(frameTime);
@@ -500,7 +662,7 @@
 			
 			//update bulletCounter for next time
 			bulletCounter += 1;
-			//bulletArray[] index size can't exceed MAX_BULLETS
+			//bulletArray[] index size (bulletCounter) can't exceed MAX_BULLETS
 			if(bulletCounter >= MAX_BULLETS)
 				bulletCounter = 0;
 
