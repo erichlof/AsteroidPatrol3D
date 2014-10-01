@@ -25,12 +25,19 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Add multiple asteroids that break apart when shot
 * Make explosion effect when asteroids are shot
 * Asteroids must collide with each other, UFO saucer, and of course your ship
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
+* If player is killed, create algorithm to respawn at a safe location (far enough from current asteroids)
+* Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
+
+
+October 1, 2014 Progress Note
+--------------------------------
+
+Asteroids now break apart when shot!  Following the original arcade Asteroids format, Large asteroids break apart into 2 Medium asteroids.  Medium asteroids break apart into 2 Small asteroids.  The chain ends there - once you shoot the Small asteroids, they are completely destroyed.  When all remaining Small asteroids are wiped out, the next level begins with more Large asteroids (of course!) :)  
 
 
 September 27, 2014 Progress Note
