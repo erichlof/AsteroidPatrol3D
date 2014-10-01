@@ -312,6 +312,7 @@ var lvLength = largeAsteroidGeometry.vertices.length;
 var mvLength = mediumAsteroidGeometry.vertices.length;
 var svLength = smallAsteroidGeometry.vertices.length;
 var deformVec = new THREE.Vector3();
+var smallAsteroidsRemaining = 0;
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
@@ -333,7 +334,7 @@ crossHairsSprite.scale.set(0.5, 0.5, 0.5);
 camera.add(crossHairsSprite);
 
 //bullets
-var MAX_BULLETS = 30;
+var MAX_BULLETS = 20;
 var bulletSpeed = 400;
 var bulletCounter = 0;
 var bulletGeometry = new THREE.SphereGeometry(3);
