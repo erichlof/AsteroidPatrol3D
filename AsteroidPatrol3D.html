@@ -91,7 +91,7 @@
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
-				largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);
+				largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 1);
 				//note - update lvLength in Variables.js if above geometry is changed!
 				for (var v = 0; v < lvLength; v++) {	
 					deformVec.set(Math.random() * 10, Math.random() * 10, Math.random() * 10);
@@ -112,6 +112,7 @@
 
 				largeAsteroids[i].alive = true;
 				largeAsteroids[i].visible = true;
+				largeAsteroids[i].hasCollided = false;
 				largeAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				largeAsteroids[i].rotationAxis.normalize();
 				largeAsteroids[i].rotationAmount = Math.random() + 0.5;
@@ -136,7 +137,7 @@
 			//build medium asteroids
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
 
-				mediumAsteroidGeometry = new THREE.IcosahedronGeometry(30, 1);
+				mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);
 				//note - update mvLength in Variables.js if above geometry is changed!
 				for (var v = 0; v < mvLength; v++) {	
 					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
@@ -159,7 +160,12 @@
 				mediumAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				mediumAsteroids[i].rotationAxis.normalize();
 				mediumAsteroids[i].rotationAmount = Math.random() + 0.7;//medium spins faster
+				//give it a random direction
 				mediumAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				//if i index is odd, copy the direction created one iteration earlier, and negate it,
+				//so it travels opposite its neighbor during large parent asteroid's explosion and its own(and partner's) creation
+				if(i%2 == 1)
+					mediumAsteroids[i].direction.copy(mediumAsteroids[i-1].direction).negate();
 				mediumAsteroids[i].direction.normalize();
 				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
 				mediumAsteroids[i].position.set(500, 500, 500);//place outside arena for now
@@ -172,7 +178,7 @@
 			//build small asteroids
 			for (var i = 0; i < numberOfSmallAsteroids; i++) {
 
-				smallAsteroidGeometry = new THREE.IcosahedronGeometry(20, 0);//0 for small asteroids
+				smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);//0 for small asteroids
 				//note - update svLength in Variables.js if above geometry is changed!
 				for (var v = 0; v < svLength; v++) {	
 					deformVec.set(Math.random() * 5, Math.random() * 5, Math.random() * 5);
@@ -196,6 +202,10 @@
 				smallAsteroids[i].rotationAxis.normalize();
 				smallAsteroids[i].rotationAmount = Math.random() + 0.9;//small spins faster
 				smallAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				//if i index is odd, copy the direction created one iteration earlier, and negate it,
+				//so it travels opposite its neighbor during medium parent asteroid's explosion and its own(and partner's) creation
+				if(i%2 == 1)
+					smallAsteroids[i].direction.copy(smallAsteroids[i-1].direction).negate();
 				smallAsteroids[i].direction.normalize();
 				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
 				smallAsteroids[i].position.set(500, 500, 500);//place outside arena for now
@@ -383,12 +393,18 @@
 									mediumAsteroids[c].visible = false;
 									
 									//spawn 2 new small asteroids
+									//small asteroid #1
 									smallAsteroids[c*2].alive = true;
 									smallAsteroids[c*2].visible = true;
 									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
+									//move the new neighbooring asteroids away so they don't spawn on top of each other
+									smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallCollisionSpheres[i].radius);
+									//small asteroid #2
 									smallAsteroids[c*2+1].alive = true;
 									smallAsteroids[c*2+1].visible = true;
 									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
+									//move the new neighbooring asteroids away so they don't spawn on top of each other
+									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallCollisionSpheres[c*2+1].radius);
 							
 								}
 
@@ -421,9 +437,11 @@
 									mediumAsteroids[c*2].alive = true;
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
+									mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumCollisionSpheres[i].radius);
 									mediumAsteroids[c*2+1].alive = true;
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
+									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumCollisionSpheres[c*2+1].radius);
 									/*
 									debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 									debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
@@ -450,7 +468,41 @@
 				}//end if (bulletArray[i].alive){
 				
 			}//end for (var i = 0; i < MAX_BULLETS; i++)
-
+			
+			//loop through largeAsteroids and check for collisions with other asteroids
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
+				//only check alive asteroids
+				if (largeAsteroids[i].alive) { //deleted && !hasCollided
+					//loop through other largeAsteroids
+					for (var iL = 0; iL < numberOfLargeAsteroids; iL++) {
+						//if other asteroid is not alive, or if we are checking against self, 
+						//or other asteroid has already been flagged as colliding, then skip and continue to next loop
+						if (!largeAsteroids[iL].alive || i==iL || largeAsteroids[iL].hasCollided) continue;
+						//if the distance between asteroid centers is less than their combined radii, we have a collision
+						if ( largeCollisionSpheres[i].center.distanceTo(largeCollisionSpheres[iL].center) < 
+						   	largeCollisionSpheres[i].radius + largeCollisionSpheres[iL].radius ) {
+							//collision handler
+							asteroidToAsteroidDistance = largeCollisionSpheres[i].center.distanceTo(largeCollisionSpheres[iL].center);
+							combinedRadii = largeCollisionSpheres[i].radius + largeCollisionSpheres[iL].radius;
+							distanceRadiiDifference = (combinedRadii - asteroidToAsteroidDistance) / 1;// / 2
+							largeAsteroids[i].direction.negate();
+							largeAsteroids[iL].direction.negate();
+							largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, distanceRadiiDifference + 2);
+							largeAsteroids[iL].translateOnAxis(largeAsteroids[iL].direction, distanceRadiiDifference + 2);
+							largeAsteroids[i].hasCollided = true;
+							largeAsteroids[iL].hasCollided = true;
+							//remember to set hasCollided back to 'false' before continuing to next test below
+							break;
+						}
+					}
+				}
+			}
+			//reset largeAsteroids[i].hasCollided flag back to 'false' for next animation frame
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
+				largeAsteroids[i].hasCollided = false;
+			}
+			
+			
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
 			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
 			//if player ship leaves the boundaries of the game arena,
@@ -532,23 +584,23 @@
 					largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 
 					//keep large asteroids inside the arena
-					if (largeAsteroids[i].position.x > arenaHalfSize + 40)
-						largeAsteroids[i].position.x = -arenaHalfSize - 40;
+					if (largeAsteroids[i].position.x > arenaHalfSize + largeAsteroidRadius)
+						largeAsteroids[i].position.x = -arenaHalfSize - largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.x < -arenaHalfSize - 40)
-						largeAsteroids[i].position.x = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.x < -arenaHalfSize - largeAsteroidRadius)
+						largeAsteroids[i].position.x = arenaHalfSize + largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.y > arenaHalfSize + 40)
-						largeAsteroids[i].position.y = -arenaHalfSize - 40;
+					if (largeAsteroids[i].position.y > arenaHalfSize + largeAsteroidRadius)
+						largeAsteroids[i].position.y = -arenaHalfSize - largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.y < -arenaHalfSize - 40)
-						largeAsteroids[i].position.y = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.y < -arenaHalfSize - largeAsteroidRadius)
+						largeAsteroids[i].position.y = arenaHalfSize + largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.z > arenaHalfSize + 40)
-						largeAsteroids[i].position.z = -arenaHalfSize - 40;
+					if (largeAsteroids[i].position.z > arenaHalfSize + largeAsteroidRadius)
+						largeAsteroids[i].position.z = -arenaHalfSize - largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.z < -arenaHalfSize - 40)
-						largeAsteroids[i].position.z = arenaHalfSize + 40;
+					if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
+						largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
 
 					//update the collisionSphere to match the asteroid's new position
 					largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
@@ -567,23 +619,23 @@
 					mediumAsteroids[i].worldToLocal(mediumAsteroids[i].position);
 					mediumAsteroids[i].rotateOnAxis(mediumAsteroids[i].rotationAxis, mediumAsteroids[i].rotationAmount * frameTime);
 
-					if (mediumAsteroids[i].position.x > arenaHalfSize + 30)
-						mediumAsteroids[i].position.x = -arenaHalfSize - 30;
+					if (mediumAsteroids[i].position.x > arenaHalfSize + mediumAsteroidRadius)
+						mediumAsteroids[i].position.x = -arenaHalfSize - mediumAsteroidRadius;
 
-					if (mediumAsteroids[i].position.x < -arenaHalfSize - 30)
-						mediumAsteroids[i].position.x = arenaHalfSize + 30;
+					if (mediumAsteroids[i].position.x < -arenaHalfSize - mediumAsteroidRadius)
+						mediumAsteroids[i].position.x = arenaHalfSize + mediumAsteroidRadius;
 
-					if (mediumAsteroids[i].position.y > arenaHalfSize + 30)
-						mediumAsteroids[i].position.y = -arenaHalfSize - 30;
+					if (mediumAsteroids[i].position.y > arenaHalfSize + mediumAsteroidRadius)
+						mediumAsteroids[i].position.y = -arenaHalfSize - mediumAsteroidRadius;
 
-					if (mediumAsteroids[i].position.y < -arenaHalfSize - 30)
-						mediumAsteroids[i].position.y = arenaHalfSize + 30;
+					if (mediumAsteroids[i].position.y < -arenaHalfSize - mediumAsteroidRadius)
+						mediumAsteroids[i].position.y = arenaHalfSize + mediumAsteroidRadius;
 
-					if (mediumAsteroids[i].position.z > arenaHalfSize + 30)
-						mediumAsteroids[i].position.z = -arenaHalfSize - 30;
+					if (mediumAsteroids[i].position.z > arenaHalfSize + mediumAsteroidRadius)
+						mediumAsteroids[i].position.z = -arenaHalfSize - mediumAsteroidRadius;
 
-					if (mediumAsteroids[i].position.z < -arenaHalfSize - 30)
-						mediumAsteroids[i].position.z = arenaHalfSize + 30;
+					if (mediumAsteroids[i].position.z < -arenaHalfSize - mediumAsteroidRadius)
+						mediumAsteroids[i].position.z = arenaHalfSize + mediumAsteroidRadius;
 
 					//update the collisionSphere to match the asteroid's new position
 					mediumCollisionSpheres[i].center.copy(mediumAsteroids[i].position);
@@ -603,23 +655,23 @@
 					smallAsteroids[i].worldToLocal(smallAsteroids[i].position);
 					smallAsteroids[i].rotateOnAxis(smallAsteroids[i].rotationAxis, smallAsteroids[i].rotationAmount * frameTime);
 
-					if (smallAsteroids[i].position.x > arenaHalfSize + 20)
-						smallAsteroids[i].position.x = -arenaHalfSize - 20;
+					if (smallAsteroids[i].position.x > arenaHalfSize + smallAsteroidRadius)
+						smallAsteroids[i].position.x = -arenaHalfSize - smallAsteroidRadius;
 
-					if (smallAsteroids[i].position.x < -arenaHalfSize - 20)
-						smallAsteroids[i].position.x = arenaHalfSize + 20;
+					if (smallAsteroids[i].position.x < -arenaHalfSize - smallAsteroidRadius)
+						smallAsteroids[i].position.x = arenaHalfSize + smallAsteroidRadius;
 
-					if (smallAsteroids[i].position.y > arenaHalfSize + 20)
-						smallAsteroids[i].position.y = -arenaHalfSize - 20;
+					if (smallAsteroids[i].position.y > arenaHalfSize + smallAsteroidRadius)
+						smallAsteroids[i].position.y = -arenaHalfSize - smallAsteroidRadius;
 
-					if (smallAsteroids[i].position.y < -arenaHalfSize - 20)
-						smallAsteroids[i].position.y = arenaHalfSize + 20;
+					if (smallAsteroids[i].position.y < -arenaHalfSize - smallAsteroidRadius)
+						smallAsteroids[i].position.y = arenaHalfSize + smallAsteroidRadius;
 
-					if (smallAsteroids[i].position.z > arenaHalfSize + 20)
-						smallAsteroids[i].position.z = -arenaHalfSize - 20;
+					if (smallAsteroids[i].position.z > arenaHalfSize + smallAsteroidRadius)
+						smallAsteroids[i].position.z = -arenaHalfSize - smallAsteroidRadius;
 
-					if (smallAsteroids[i].position.z < -arenaHalfSize - 20)
-						smallAsteroids[i].position.z = arenaHalfSize + 20;
+					if (smallAsteroids[i].position.z < -arenaHalfSize - smallAsteroidRadius)
+						smallAsteroids[i].position.z = arenaHalfSize + smallAsteroidRadius;
 
 					//update the collisionSphere to match the asteroid's new position
 					smallCollisionSpheres[i].center.copy(smallAsteroids[i].position);
@@ -667,8 +719,7 @@
 				bulletCounter = 0;
 
 		}
-
-		
+	
 	</script>
 </body>
 
