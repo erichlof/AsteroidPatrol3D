@@ -305,14 +305,20 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 	shading: THREE.FlatShading
 });
 
-var largeAsteroidGeometry = new THREE.IcosahedronGeometry(40, 1);//this needs to match in the html file
-var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(30, 1);//this needs to match in the html file
-var smallAsteroidGeometry = new THREE.IcosahedronGeometry(20, 0);//this needs to match in the html file
+var largeAsteroidRadius = 40;
+var mediumAsteroidRadius = 30;
+var smallAsteroidRadius = 20;
+var largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 1);
+var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);
+var smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);
 var lvLength = largeAsteroidGeometry.vertices.length;
 var mvLength = mediumAsteroidGeometry.vertices.length;
 var svLength = smallAsteroidGeometry.vertices.length;
 var deformVec = new THREE.Vector3();
 var smallAsteroidsRemaining = 0;
+var asteroidToAsteroidDistance = 0;
+var combinedRadii = 0;
+var distanceRadiiDifference = 0;
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
