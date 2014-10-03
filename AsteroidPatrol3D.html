@@ -476,21 +476,14 @@
 					//loop through other largeAsteroids
 					for (var iL = 0; iL < numberOfLargeAsteroids; iL++) {
 						//if other asteroid is not alive, or if we are checking against self, 
-						//or other asteroid has already been flagged as colliding, then skip and continue to next loop
-						if (!largeAsteroids[iL].alive || i==iL || largeAsteroids[iL].hasCollided) continue;
+						//or either asteroid has already been flagged as colliding, then skip and continue to next loop
+						if (!largeAsteroids[iL].alive || i==iL || largeAsteroids[i].hasCollided || largeAsteroids[iL].hasCollided) continue;
 						//if the distance between asteroid centers is less than their combined radii, we have a collision
 						if ( largeCollisionSpheres[i].center.distanceTo(largeCollisionSpheres[iL].center) < 
 						   	largeCollisionSpheres[i].radius + largeCollisionSpheres[iL].radius ) {
-							//collision handler
-							asteroidToAsteroidDistance = largeCollisionSpheres[i].center.distanceTo(largeCollisionSpheres[iL].center);
-							combinedRadii = largeCollisionSpheres[i].radius + largeCollisionSpheres[iL].radius;
-							distanceRadiiDifference = (combinedRadii - asteroidToAsteroidDistance) / 1;// / 2
-							largeAsteroids[i].direction.negate();
-							largeAsteroids[iL].direction.negate();
-							largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, distanceRadiiDifference + 2);
-							largeAsteroids[iL].translateOnAxis(largeAsteroids[iL].direction, distanceRadiiDifference + 2);
-							largeAsteroids[i].hasCollided = true;
-							largeAsteroids[iL].hasCollided = true;
+							
+							collisionResolver(i, iL);
+							applyImpulse(i, iL);
 							//remember to set hasCollided back to 'false' before continuing to next test below
 							break;
 						}
@@ -718,6 +711,38 @@
 			if(bulletCounter >= MAX_BULLETS)
 				bulletCounter = 0;
 
+		}
+		
+		function collisionResolver( body1, body2 ) {
+			
+			
+			///largeAsteroids[body1].translateOnAxis(largeAsteroids[body1].direction, largeCollisionSpheres[body1].radius * -1.0);
+			///largeAsteroids[body2].translateOnAxis(largeAsteroids[body2].direction, largeCollisionSpheres[body2].radius * -1.0);
+			//largeAsteroids[body1].direction.negate();
+			//largeAsteroids[body2].direction.negate();
+			largeAsteroids[body1].hasCollided = true;
+			largeAsteroids[body2].hasCollided = true;
+			
+		}
+		
+		function applyImpulse( body1, body2 ) {
+			
+			collisionNormal.subVectors(largeAsteroids[body1].position, largeAsteroids[body2].position);
+			velocity1.copy(largeAsteroids[body1].direction).multiplyScalar(largeAsteroids[body1].speed);
+			velocity2.copy(largeAsteroids[body2].direction).multiplyScalar(largeAsteroids[body2].speed);
+			relativeVelocity.subVectors(velocity1, velocity2);
+			var j = -1 * ( relativeVelocity.dot(collisionNormal) / collisionNormal.dot(collisionNormal) );
+			//largeAsteroids[body1].direction.add(collisionNormal); largeAsteroids[body1].direction.normalize();
+			//largeAsteroids[body1].speed *= j;
+			//largeAsteroids[body2].direction.sub(collisionNormal); largeAsteroids[body2].direction.normalize();
+			//largeAsteroids[body2].speed *= j;
+			collisionNormal.multiplyScalar( j );
+			velocity1.add(collisionNormal);
+			velocity2.sub(collisionNormal);
+			largeAsteroids[body1].speed = velocity1.length();
+			largeAsteroids[body1].direction.copy(velocity1).normalize();
+			largeAsteroids[body2].speed = velocity2.length();
+			largeAsteroids[body2].direction.copy(velocity2).normalize();
 		}
 	
 	</script>
