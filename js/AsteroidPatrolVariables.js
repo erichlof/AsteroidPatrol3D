@@ -359,8 +359,12 @@ var bulletRay = new THREE.Ray();
 var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
-var collisionNormal = new THREE.Vector3();
 var canShoot = true;
+
+var collisionNormal = new THREE.Vector3();
+var velocity1 = new THREE.Vector3();
+var velocity2 = new THREE.Vector3();
+var relativeVelocity = new THREE.Vector3();
 
 var frameTime = 0;
 var playingWarpAnimation = false;
