@@ -322,7 +322,9 @@
 				
 				//deactivate bullets if they leave arena
 				if(bulletArray[i].alive){
-				if( bulletArray[i].position.x > arenaHalfSize || bulletArray[i].position.x < -arenaHalfSize || bulletArray[i].position.y > arenaHalfSize || bulletArray[i].position.y < -arenaHalfSize || bulletArray[i].position.z > arenaHalfSize || bulletArray[i].position.z < -arenaHalfSize ) {
+					if( bulletArray[i].position.x > arenaHalfSize || bulletArray[i].position.x < -arenaHalfSize || 
+					    bulletArray[i].position.y > arenaHalfSize || bulletArray[i].position.y < -arenaHalfSize || 
+					    bulletArray[i].position.z > arenaHalfSize || bulletArray[i].position.z < -arenaHalfSize ) {
 					
 						bulletArray[i].alive = false;
 						bulletArray[i].visible = false;
