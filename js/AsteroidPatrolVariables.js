@@ -48,7 +48,7 @@ function onWindowResize() {
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
-var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var directions = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 var imageSuffix = ".jpg";
 var skyGeometry = new THREE.BoxGeometry( 2900, 2900, 2900 );	
 
@@ -316,9 +316,7 @@ var mvLength = mediumAsteroidGeometry.vertices.length;
 var svLength = smallAsteroidGeometry.vertices.length;
 var deformVec = new THREE.Vector3();
 var smallAsteroidsRemaining = 0;
-var asteroidToAsteroidDistance = 0;
-var combinedRadii = 0;
-var distanceRadiiDifference = 0;
+var collisionSphereRadiusSquared = 0;
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
@@ -361,10 +359,22 @@ var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var canShoot = true;
 
+var combinedRadii = 0;
+var distanceBetweenBodies = new THREE.Vector3();
+var separation = 0;
 var collisionNormal = new THREE.Vector3();
 var velocity1 = new THREE.Vector3();
 var velocity2 = new THREE.Vector3();
 var relativeVelocity = new THREE.Vector3();
+var relativeDotNormal = 0;
+var Vcn1 = new THREE.Vector3();
+var Vcn2 = new THREE.Vector3();
+var asteroidCopy1 = new THREE.Object3D();
+var asteroidCopy2 = new THREE.Object3D();
+asteroidCopy1.direction = new THREE.Vector3();
+asteroidCopy2.direction = new THREE.Vector3();
+asteroidCopy1.speed = 0;
+asteroidCopy2.speed = 0;
 
 var frameTime = 0;
 var playingWarpAnimation = false;
@@ -374,10 +384,15 @@ var aspectIncrementAmount = -8;
 var thrustVector = new THREE.Vector3(0, 0, -1);
 var frictionVector = new THREE.Vector3();
 var ship = new THREE.Object3D();
+//put the ship position at the origin
+ship.position.set(0, 0, 0);
+//put the camera right where the ship is
+camera.position.copy(ship.position);
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
 
+var numOfAsteroidCollisions = 0;
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
