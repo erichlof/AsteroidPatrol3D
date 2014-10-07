@@ -67,21 +67,18 @@
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
-					scene.remove( largeCollisionSpheres[i] );
 				}
 				for (var i = 0; i < numberOfMediumAsteroids; i++) {	
 					scene.remove( mediumAsteroids[i] );
-					scene.remove( mediumCollisionSpheres[i] );
 				}
 				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
 					scene.remove( smallAsteroids[i] );
-					scene.remove( smallCollisionSpheres[i] );
 				}
 
 			}
 			
 			//for debug collisions
-			//level = 4;
+			level = 4;
 			level += 1;
 			numberOfLargeAsteroids = Math.floor( level * 3 + 2 );
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
@@ -125,16 +122,7 @@
 				largeAsteroids[i].position.set( Math.random() * 800 - 400, 
 								Math.random() * 800 - 400, 
 								Math.random() * 800 - 400 );
-			
-				//largeCollisionSpheres[i] is a copy of the largeAsteroid mesh's (or any mesh's) boundingSphere.
-				largeCollisionSpheres[i] = new THREE.Sphere();
-				//this will essentially copy the size (radius) of the original boundingSphere
-				largeCollisionSpheres[i].copy(largeAsteroids[i].geometry.boundingSphere);
-				//now move collisionSphere's center to asteroid mesh's world location,
-				//so it can be used for collision detection.
-				//Note: if the asteroid mesh moves at all, the following line will need to 
-				//accompany it every animation frame, to keep the collisionSphere properly updated
-				largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
+				
 			}
 			
 			//build medium asteroids
@@ -173,9 +161,6 @@
 				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
 				mediumAsteroids[i].position.set(500, 500, 500);//place outside arena for now
 			
-				mediumCollisionSpheres[i] = new THREE.Sphere();
-				mediumCollisionSpheres[i].copy(mediumAsteroids[i].geometry.boundingSphere);
-				mediumCollisionSpheres[i].center.copy(mediumAsteroids[i].position);
 			}
 			
 			//build small asteroids
@@ -213,9 +198,6 @@
 				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
 				smallAsteroids[i].position.set(500, 500, 500);//place outside arena for now
 			
-				smallCollisionSpheres[i] = new THREE.Sphere();
-				smallCollisionSpheres[i].copy(smallAsteroids[i].geometry.boundingSphere);
-				smallCollisionSpheres[i].center.copy(smallAsteroids[i].position);
 			}
 	
 			//put the ship position at the origin
@@ -347,7 +329,10 @@
 						//only check active alive asteroids
 						if(smallAsteroids[c].alive){
 							//now we test for a collision between bullet and sphere
-							bulletRayCollisionPoint = bulletRay.intersectSphere(smallCollisionSpheres[c]);
+							savedCenter.copy(smallAsteroids[c].geometry.boundingSphere.center);
+							smallAsteroids[c].geometry.boundingSphere.center.copy(smallAsteroids[c].position);
+							bulletRayCollisionPoint = bulletRay.intersectSphere(smallAsteroids[c].geometry.boundingSphere);
+							smallAsteroids[c].geometry.boundingSphere.center.copy(savedCenter);
 							//if bulletRayCollisionPoint !== null
 							if (bulletRayCollisionPoint) {
 								//compare the distance between collision point and bullet object, vs. where the
@@ -382,7 +367,10 @@
 						
 						if(mediumAsteroids[c].alive){
 							
-							bulletRayCollisionPoint = bulletRay.intersectSphere(mediumCollisionSpheres[c]);
+							savedCenter.copy(mediumAsteroids[c].geometry.boundingSphere.center);
+							mediumAsteroids[c].geometry.boundingSphere.center.copy(mediumAsteroids[c].position);
+							bulletRayCollisionPoint = bulletRay.intersectSphere(mediumAsteroids[c].geometry.boundingSphere);
+							mediumAsteroids[c].geometry.boundingSphere.center.copy(savedCenter);
 							
 							if (bulletRayCollisionPoint) {
 								
@@ -402,13 +390,13 @@
 									smallAsteroids[c*2].visible = true;
 									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
-									smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallCollisionSpheres[i].radius);
+									smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallAsteroids[i].geometry.boundingSphere.radius);
 									//small asteroid #2
 									smallAsteroids[c*2+1].alive = true;
 									smallAsteroids[c*2+1].visible = true;
 									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
-									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallCollisionSpheres[c*2+1].radius);
+									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
 							
 								}
 
@@ -423,7 +411,10 @@
 						
 						if(largeAsteroids[c].alive){
 							
-							bulletRayCollisionPoint = bulletRay.intersectSphere(largeCollisionSpheres[c]);
+							savedCenter.copy(largeAsteroids[c].geometry.boundingSphere.center);
+							largeAsteroids[c].geometry.boundingSphere.center.copy(largeAsteroids[c].position);
+							bulletRayCollisionPoint = bulletRay.intersectSphere(largeAsteroids[c].geometry.boundingSphere);
+							largeAsteroids[c].geometry.boundingSphere.center.copy(savedCenter);
 							
 							if (bulletRayCollisionPoint) {
 								
@@ -441,11 +432,11 @@
 									mediumAsteroids[c*2].alive = true;
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
-									mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumCollisionSpheres[i].radius);
+									mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumAsteroids[i].geometry.boundingSphere.radius);
 									mediumAsteroids[c*2+1].alive = true;
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
-									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumCollisionSpheres[c*2+1].radius);
+									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
 									/*
 									debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 									debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
@@ -455,7 +446,7 @@
 									/*	
 									//the following is optional:
 									//get the collisionNormal so we can bounce the bullet off the sphere
-									collisionNormal.subVectors(largeCollisionSpheres[i].center, bulletRayCollisionPoint);
+									collisionNormal.subVectors(largeAsteroids[i].position, bulletRayCollisionPoint);
 									collisionNormal.normalize();
 									// the following will send the bullet projectile on its new path
 									//bulletArray[i].direction.reflect(collisionNormal);
@@ -593,8 +584,6 @@
 					if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
 						largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
 
-					//update the collisionSphere to match the asteroid's new position
-					largeCollisionSpheres[i].center.copy(largeAsteroids[i].position);
 				}//end if(largeAsteroids[i].alive)
 				
 			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -627,9 +616,6 @@
 
 					if (mediumAsteroids[i].position.z < -arenaHalfSize - mediumAsteroidRadius)
 						mediumAsteroids[i].position.z = arenaHalfSize + mediumAsteroidRadius;
-
-					//update the collisionSphere to match the asteroid's new position
-					mediumCollisionSpheres[i].center.copy(mediumAsteroids[i].position);
 					
 				}//end if(mediumAsteroids[i].alive)
 				
@@ -663,9 +649,6 @@
 
 					if (smallAsteroids[i].position.z < -arenaHalfSize - smallAsteroidRadius)
 						smallAsteroids[i].position.z = arenaHalfSize + smallAsteroidRadius;
-
-					//update the collisionSphere to match the asteroid's new position
-					smallCollisionSpheres[i].center.copy(smallAsteroids[i].position);
 					
 				}//end if(smallAsteroids[i].alive)
 				
@@ -717,11 +700,12 @@
 		
 		function stepSimulation( body1, body2 ) {
 			
-			var fTime = frameTime;
-			var tryAgain = true;
-			var check = 0;
+			fTime = frameTime;
+			tryAgain = true;
+			check = 0;
+			combinedRadii = body1.geometry.boundingSphere.radius + body2.geometry.boundingSphere.radius;
 			
-			while ( tryAgain && fTime > 0.0001 ) {
+			while ( tryAgain && (fTime > 0.00001) ) {
 				
 				tryAgain = false;
 				
@@ -731,7 +715,6 @@
 				asteroidCopy1.translateOnAxis(body1.direction, body1.speed * fTime);
 				asteroidCopy2.translateOnAxis(body2.direction, body2.speed * fTime);
 				
-				combinedRadii = 40 + 40;
 				distanceBetweenBodies.subVectors(asteroidCopy1.position, asteroidCopy2.position);
 				separation = distanceBetweenBodies.length() - combinedRadii;
 				distanceBetweenBodies.normalize();
@@ -744,23 +727,27 @@
 				relativeVelocity.subVectors(velocity1, velocity2);
 				relativeDotNormal = relativeVelocity.dot(collisionNormal);
 				
-				if ( Math.abs(separation) <= 2 && relativeDotNormal < 0.0 ) {
+				if ( Math.abs(separation) <= 1 && relativeDotNormal < 0.0 ) {
 					check = 1;//collision
-				} else if (separation < -2) {
+				} else if (separation < -1) {
 					check = -1;//penetrating
 				} else {
 					check = 0;//no collision
+					howManyTries = 0;
 				}
 	
 				if (check == -1) { //penetrating
 					
 					tryAgain = true;
 					fTime /= 2;
+					howManyTries += 1;
 				
 				} else if (check == 1) { //collision
+					
+					debugText3.innerHTML = "howManyTries: " + Math.floor(howManyTries);
 					//apply impulse
 					combinedMass = body1.mass + body2.mass;
-					var j = -0.5 * ( relativeVelocity.dot(collisionNormal) / (collisionNormal.dot(collisionNormal) * (1/combinedMass) ) );
+					j = -0.5 * ( relativeVelocity.dot(collisionNormal) / (collisionNormal.dot(collisionNormal) * (1/combinedMass) ) );
 
 					collisionNormal.multiplyScalar(j);
 					Vcn1.copy(collisionNormal); Vcn1.divideScalar(body1.mass);
