@@ -295,9 +295,8 @@ var numberOfSmallAsteroids = 0;
 var largeAsteroids = [];
 var mediumAsteroids = [];
 var smallAsteroids = [];
-var largeCollisionSpheres = [];
-var mediumCollisionSpheres = [];
-var smallCollisionSpheres = [];
+
+var savedCenter = new THREE.Vector3();
 var asteroidMaterial = new THREE.MeshLambertMaterial({
 	color: 'rgb(75,45,15)',
 	//ambient: 'rgb(55,25,5)',
@@ -391,8 +390,13 @@ camera.position.copy(ship.position);
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
-
+var fTime = 0;
+var tryAgain = false;
+var check = 0;
+var j = 0;
 var numOfAsteroidCollisions = 0;
+var howManyTries = 0;
+
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
