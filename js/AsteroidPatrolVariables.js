@@ -296,7 +296,7 @@ var largeAsteroids = [];
 var mediumAsteroids = [];
 var smallAsteroids = [];
 
-var savedCenter = new THREE.Vector3();
+var testSphere = new THREE.Sphere();
 var asteroidMaterial = new THREE.MeshLambertMaterial({
 	color: 'rgb(75,45,15)',
 	//ambient: 'rgb(55,25,5)',
@@ -304,12 +304,12 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 	shading: THREE.FlatShading
 });
 
-var largeAsteroidRadius = 40;
-var mediumAsteroidRadius = 30;
+var largeAsteroidRadius = 70;
+var mediumAsteroidRadius = 40;
 var smallAsteroidRadius = 20;
-var largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 1);
-var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);
-var smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);
+var largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);//this number needs to match html file
+var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);//this number needs to match html file
+var smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);//this number needs to match html file
 var lvLength = largeAsteroidGeometry.vertices.length;
 var mvLength = mediumAsteroidGeometry.vertices.length;
 var svLength = smallAsteroidGeometry.vertices.length;
@@ -395,7 +395,7 @@ var tryAgain = false;
 var check = 0;
 var j = 0;
 var numOfAsteroidCollisions = 0;
-var howManyTries = 0;
+//var howManyTries = 0;
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
