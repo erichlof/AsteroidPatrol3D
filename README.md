@@ -25,13 +25,18 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Make explosion effect when asteroids are shot
-* Asteroids must collide with each other, UFO saucer, and of course your ship
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
 * If player is killed, create algorithm to respawn at a safe location (far enough from current asteroids)
+* Make explosion effect when asteroids are shot
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
+
+
+October 7, 2014 Progress Note
+--------------------------------
+
+Collision detection and collision response is now working for all sizes of asteroids.  They each have their own bounding spheres and masses so when they collide, it looks pretty realistic!  I put a link to the original game physics book in the source code comments of the html file. Next TODO is to add the UFO flying saucer that can shoot randomly (like the original Asteroids arcade).  Must implement simple path following and detect collisions between the alien craft and asteroids/player and alien bullets and asteroids/player.  Also, I am trying to avoid making players download 3d models, so I must figure out how to procedurally/geometrically generate the alien saucer. Should be fun!
 
 
 October 1, 2014 Progress Note
@@ -56,9 +61,3 @@ July 12, 2014 Progress Note
 ---------------------------
 
 Sorry for the lack of updates - busy summer :) . Added multiple Large asteroids by creating an array[] called largeAsteroids[].  Each asteroid in this group has its own position, speed, rotation, collision bounding-sphere, etc.  Next order of business will be to have the Large asteroids break apart into 2 Medium asteroids, which will each break apart into 2 Small asteroids.  Also asteroid object-creation will be necessary each level (1 or 2 more asteroids added to each new level, to increase difficulty), as well as asteroid object-deletion when an asteroid is shot.
-
-
-May 30, 2014 Progress Note
---------------------------
-
-Now when the player's ship crosses an arena boundary, a cool 'warp' effect animation is played, and the ship is instantly teleported to the opposite wall of the arena.  This keeps the action tight inside the game arena and feels a lot like the original 2D Asteroids. :)  Eventually when sound effects are added to this game, I will choose a quick 'reverse-cymbal' type sound to accompany this effect.  June 1st: added randomly-chosen rotation axis, speed, and direction of travel for asteroids. When leaving the arena boundaries, asteroids now warp to the other side.
