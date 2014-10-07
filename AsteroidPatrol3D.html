@@ -750,10 +750,11 @@
 
 		}
 		
-		
-		
-		
-		
+		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
+		//found in the 2001 book "Physics for Game Developers" by David Bourg, published by O'Reilly. I highly recommend
+		//this great book which covers almost all aspects of putting physics into your games and/or projects.
+		//the book's companion website is: http://shop.oreilly.com/product/9780596000066.do and the original C++ source code
+		//is located at:  http://examples.oreilly.com/9780596000066/
 		function stepSimulation( body1, body2 ) {
 			
 			fTime = frameTime;
