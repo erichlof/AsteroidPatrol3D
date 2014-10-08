@@ -78,7 +78,7 @@
 			}
 			
 			//for debug collisions
-			level = 4;
+			//level = 4;
 			level += 1;
 			numberOfLargeAsteroids = Math.floor( level * 3 + 2 );
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
@@ -86,19 +86,18 @@
 			smallAsteroidsRemaining = numberOfSmallAsteroids;
 			
 			debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
-			
+			numberOfLargeAsteroidsCreated = 0;
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
 				largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);
 				for (var v = 0; v < lvLength; v++) {	
-					deformVec.set(Math.random() * 8, Math.random() * 8, Math.random() * 8);
+					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
 					largeAsteroidGeometry.vertices[v].add(deformVec);
 				}
 
 				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterial);
-				//largeAsteroids[i].scale.set( 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10), 0.7 + (Math.random() * 3 / 10) );
-				largeAsteroids[i].scale.set( 1.0 + (Math.random() * 0.5 ), 1.0 + (Math.random() * 0.5 ), 1.0 + (Math.random() * 0.5 ) );
+				largeAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
 				largeAsteroids[i].geometry.computeVertexNormals();
@@ -118,9 +117,16 @@
 				largeAsteroids[i].direction.normalize();
 				largeAsteroids[i].mass = 100;
 				largeAsteroids[i].speed = Math.random() * 20 + 10;
-				largeAsteroids[i].position.set( Math.random() * 800 - 400, 
-								Math.random() * 800 - 400, 
-								Math.random() * 800 - 400 );
+				numberOfLargeAsteroidsCreated += 1
+				placingLargeAsteroids = true;
+				while (placingLargeAsteroids) {
+					placingLargeAsteroids = false;
+					largeAsteroids[i].position.set( Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400 );
+					for (var j = 0; j < numberOfLargeAsteroidsCreated; j++) {
+						if(i!=j && largeAsteroids[i].position.distanceTo(largeAsteroids[j].position) < 150)
+							placingLargeAsteroids = true;
+					}
+				}
 				
 			}
 			
@@ -134,7 +140,7 @@
 				}
 
 				mediumAsteroids[i] = new THREE.Mesh(mediumAsteroidGeometry, asteroidMaterial);
-				mediumAsteroids[i].scale.set( 1.0 + (Math.random() * 0.4), 1.0 + (Math.random() * 0.4), 1.0 + (Math.random() * 0.4) );
+				mediumAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				mediumAsteroids[i].geometry.computeFaceNormals();
 				mediumAsteroids[i].geometry.computeVertexNormals();
@@ -173,7 +179,7 @@
 				}
 
 				smallAsteroids[i] = new THREE.Mesh(smallAsteroidGeometry, asteroidMaterial);
-				smallAsteroids[i].scale.set( 1.0 + (Math.random() * 0.4), 1.0 + (Math.random() * 0.4), 1.0 + (Math.random() * 0.4) );
+				smallAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				smallAsteroids[i].geometry.computeFaceNormals();
 				smallAsteroids[i].geometry.computeVertexNormals();
@@ -200,8 +206,8 @@
 			
 			}
 	
-			//put the ship position at the origin
-			//ship.position.set(0, 0, 0);
+			placeShip();
+			
 			//put the camera right where the ship is
 			//camera.position.copy(ship.position);
 			
@@ -389,7 +395,7 @@
 									smallAsteroids[c*2].visible = true;
 									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
-									smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallAsteroids[i].geometry.boundingSphere.radius);
+									smallAsteroids[c*2].translateOnAxis(smallAsteroids[c*2].direction, smallAsteroids[c*2].geometry.boundingSphere.radius);
 									//small asteroid #2
 									smallAsteroids[c*2+1].alive = true;
 									smallAsteroids[c*2+1].visible = true;
@@ -430,7 +436,7 @@
 									mediumAsteroids[c*2].alive = true;
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
-									mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumAsteroids[i].geometry.boundingSphere.radius);
+									mediumAsteroids[c*2].translateOnAxis(mediumAsteroids[c*2].direction, mediumAsteroids[c*2].geometry.boundingSphere.radius);
 									mediumAsteroids[c*2+1].alive = true;
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
@@ -726,7 +732,30 @@
 		} //end function animate()
 		
 		
-
+		function placeShip() {
+			
+			placingShip = true;
+			
+			while ( placingShip ) {
+				
+				placingShip = false;
+				ship.position.set(Math.random() * 350 - 350, Math.random() * 350 - 350, Math.random() * 350 - 350);
+				for (var i = 0; i < numberOfLargeAsteroids; i++) {
+					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 100) 
+						placingShip = true;
+				}
+				for (var i = 0; i < numberOfMediumAsteroids; i++) {
+					if (mediumAsteroids[i].alive && ship.position.distanceTo(mediumAsteroids[i].position) < 70) 
+						placingShip = true;
+				}
+				for (var i = 0; i < numberOfSmallAsteroids; i++) {
+					if (smallAsteroids[i].alive && ship.position.distanceTo(smallAsteroids[i].position) < 50) 
+						placingShip = true;
+				}
+				
+			}
+		}
+		
 		function shootBullet() {
 
 			//set bullet to alive and visibility to true
@@ -804,9 +833,9 @@
 					//debugText3.innerHTML = "howManyTries: " + Math.floor(howManyTries);
 					//apply impulse
 					combinedMass = body1.mass + body2.mass;
-					j = -0.4 * ( relativeVelocity.dot(collisionNormal) / (collisionNormal.dot(collisionNormal) * (1/combinedMass) ) );
+					impulseAmount = -0.4 * ( relativeVelocity.dot(collisionNormal) / (collisionNormal.dot(collisionNormal) * (1/combinedMass) ) );
 
-					collisionNormal.multiplyScalar(j);
+					collisionNormal.multiplyScalar(impulseAmount);
 					Vcn1.copy(collisionNormal); Vcn1.divideScalar(body1.mass);
 					Vcn2.copy(collisionNormal); Vcn2.divideScalar(body2.mass);
 					velocity1.add(Vcn1);
