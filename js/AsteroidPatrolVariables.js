@@ -289,7 +289,10 @@ var helper = new THREE.BoxHelper(box);
 scene.add(helper);
 
 var level = 0;
+var placingShip = true;
+var placingLargeAsteroids = true;
 var numberOfLargeAsteroids = 0;
+var numberOfLargeAsteroidsCreated = 0;
 var numberOfMediumAsteroids = 0;
 var numberOfSmallAsteroids = 0;
 var largeAsteroids = [];
@@ -393,7 +396,7 @@ var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
 var fTime = 0;
 var tryAgain = false;
 var check = 0;
-var j = 0;
+var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
 //var howManyTries = 0;
 
