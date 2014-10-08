@@ -26,7 +26,6 @@ To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
 * Add UFO saucer that can be shot at (and UFO can shoot back!)
-* If player is killed, create algorithm to respawn at a safe location (far enough from current asteroids)
 * Make explosion effect when asteroids are shot
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
