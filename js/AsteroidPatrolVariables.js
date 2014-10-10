@@ -300,13 +300,49 @@ var mediumAsteroids = [];
 var smallAsteroids = [];
 
 var testSphere = new THREE.Sphere();
+/*
+//brown rock
 var asteroidMaterial = new THREE.MeshLambertMaterial({
-	color: 'rgb(75,45,15)',
-	//ambient: 'rgb(55,25,5)',
+	color: 'rgb(100,45,15)',
 	emissive: 'rgb(30,15,5)',
 	shading: THREE.FlatShading
 });
+*/
 
+//dark grey rock
+var asteroidMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(40,40,40)',
+	emissive: 'rgb(20,20,20)',
+	shading: THREE.FlatShading
+});
+
+/*
+//high-contrast, 'snowy' comet-like rock
+var asteroidMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(240,240,240)',
+	emissive: 'rgb(20,20,20)',
+	shading: THREE.FlatShading
+});
+*/
+/*
+//red, mars-like rock
+var asteroidMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(100,10,0)',
+	emissive: 'rgb(30,5,0)',
+	shading: THREE.FlatShading
+});
+*/
+/*
+//blue, transparent water-ice rock
+var asteroidMaterial = new THREE.MeshLambertMaterial({
+	transparent: true,
+	opacity: 0.85,
+	color: 'rgb(0,150,255)',
+	emissive: 'rgb(0,75,120)',
+	side: THREE.DoubleSide,
+	shading: THREE.FlatShading
+});
+*/
 var largeAsteroidRadius = 70;
 var mediumAsteroidRadius = 40;
 var smallAsteroidRadius = 20;
@@ -322,6 +358,12 @@ var collisionSphereRadiusSquared = 0;
 //var wireframe = new THREE.WireframeHelper(asteroid);
 //scene.add(wireframe);
 
+// Explosion Pieces
+var explosionPieces = [];    //( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
+var explosionPiecesGeometry = new THREE.CylinderGeometry(0,2,2,2,1,false);
+var numberOfExplosionPieces = 100;
+var isExploding = false;
+var explosionTimer = new THREEx.GameTimer(2);
 
 // Sunlight
 var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
