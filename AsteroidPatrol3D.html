@@ -105,9 +105,12 @@
 				largeAsteroids[i].geometry.normalsNeedUpdate = true;
 				largeAsteroids[i].geometry.center();
 				largeAsteroids[i].geometry.computeBoundingSphere();
-				
-				//var wireframe = new THREE.WireframeHelper(largeAsteroids[i]);
-				//scene.add(wireframe);
+				/*
+				var wireframe = new THREE.WireframeHelper(largeAsteroids[i]);
+				wireframe.material.transparent = true;
+				wireframe.material.opacity = 0.25;
+				scene.add(wireframe);
+				*/
 				scene.add(largeAsteroids[i]);
 
 				largeAsteroids[i].alive = true;
@@ -212,11 +215,12 @@
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				
-				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidMaterial);
+				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, explosionMaterial);
 				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				explosionPieces[i].direction.normalize();
 				explosionPieces[i].speed = Math.random() * 200 + 100;
+				explosionPieces[i].rotation.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				explosionPieces[i].visible = false;
 				scene.add(explosionPieces[i]);
@@ -371,7 +375,7 @@
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									
-									initExplosionPieces(smallAsteroids[c].position);
+									initExplosionPieces(bulletRayCollisionPoint);
 									
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
@@ -422,7 +426,7 @@
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(mediumAsteroids[c].position);
+									initExplosionPieces(bulletRayCollisionPoint);
 									
 								}
 
@@ -463,7 +467,7 @@
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(largeAsteroids[c].position);
+									initExplosionPieces(bulletRayCollisionPoint);
 									
 									/*	
 									//the following is optional:
@@ -634,6 +638,7 @@
 				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {
 					explosionPieces[i].translateOnAxis(explosionPieces[i].direction, explosionPieces[i].speed * frameTime);
+					explosionPieces[i].material.opacity -= 0.01 * frameTime;
 				}
 				
 				explosionTimer.run(frameTime);
@@ -641,6 +646,7 @@
 				if (explosionTimer.alarmSounding) {
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						explosionPieces[i].visible = false;
+						explosionPieces[i].material.opacity = 1.0;
 					}
 					isExploding = false;
 				}
@@ -825,6 +831,7 @@
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				explosionPieces[i].position.copy(location);
 				explosionPieces[i].visible = true;
+				explosionPieces[i].material.opacity = 1.0;
 			}
 			isExploding = true;
 			explosionTimer.reset();
