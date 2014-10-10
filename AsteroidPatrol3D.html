@@ -97,7 +97,7 @@
 				}
 
 				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterial);
-				largeAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
+				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
 				largeAsteroids[i].geometry.computeVertexNormals();
@@ -105,6 +105,9 @@
 				largeAsteroids[i].geometry.normalsNeedUpdate = true;
 				largeAsteroids[i].geometry.center();
 				largeAsteroids[i].geometry.computeBoundingSphere();
+				
+				//var wireframe = new THREE.WireframeHelper(largeAsteroids[i]);
+				//scene.add(wireframe);
 				scene.add(largeAsteroids[i]);
 
 				largeAsteroids[i].alive = true;
@@ -189,8 +192,8 @@
 				smallAsteroids[i].geometry.computeBoundingSphere();
 				scene.add(smallAsteroids[i]);
 
-				smallAsteroids[i].alive = false;//these come alive when big ones break apart
-				smallAsteroids[i].visible = false;//these stay hidden until big ones break apart
+				smallAsteroids[i].alive = false;//these come alive when medium ones break apart
+				smallAsteroids[i].visible = false;//these stay hidden until medium ones break apart
 				smallAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				smallAsteroids[i].rotationAxis.normalize();
 				smallAsteroids[i].rotationAmount = Math.random() * 2 + 2;//small spins fastest
@@ -204,6 +207,20 @@
 				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
 				smallAsteroids[i].position.set(500, 500, 500);//place outside arena for now
 			
+			}
+
+			//build explosion pieces
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				
+				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidMaterial);
+				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
+				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				explosionPieces[i].direction.normalize();
+				explosionPieces[i].speed = Math.random() * 200 + 100;
+				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
+				explosionPieces[i].visible = false;
+				scene.add(explosionPieces[i]);
+				
 			}
 	
 			placeShip();
@@ -354,6 +371,8 @@
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									
+									initExplosionPieces(smallAsteroids[c].position);
+									
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
@@ -402,7 +421,9 @@
 									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
-							
+									
+									initExplosionPieces(mediumAsteroids[c].position);
+									
 								}
 
 							}//end if (bulletRayCollisionPoint) {
@@ -441,6 +462,8 @@
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
+									
+									initExplosionPieces(largeAsteroids[c].position);
 									
 									/*	
 									//the following is optional:
@@ -584,7 +607,7 @@
 			planet.position.y = camera.position.y - 900;
 			planet.position.z = camera.position.z - 900;
 			
-			if (playingWarpAnimation){
+			if (playingWarpAnimation) {
 				
 				camera.fov += fovIncrementAmount * frameTime;
 				camera.aspect -= aspectIncrementAmount * frameTime;
@@ -603,6 +626,24 @@
 				}
 				
 				camera.updateProjectionMatrix();
+				
+			}
+			
+			// if explosion has occurred, update the exploding pieces
+			if (isExploding) {
+				
+				for (var i = 0; i < numberOfExplosionPieces; i++) {
+					explosionPieces[i].translateOnAxis(explosionPieces[i].direction, explosionPieces[i].speed * frameTime);
+				}
+				
+				explosionTimer.run(frameTime);
+				
+				if (explosionTimer.alarmSounding) {
+					for (var i = 0; i < numberOfExplosionPieces; i++) {
+						explosionPieces[i].visible = false;
+					}
+					isExploding = false;
+				}
 				
 			}
 			
@@ -777,6 +818,16 @@
 			if(bulletCounter >= MAX_BULLETS)
 				bulletCounter = 0;
 
+		}
+		
+		function initExplosionPieces ( location ) {
+			
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				explosionPieces[i].position.copy(location);
+				explosionPieces[i].visible = true;
+			}
+			isExploding = true;
+			explosionTimer.reset();
 		}
 		
 		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
