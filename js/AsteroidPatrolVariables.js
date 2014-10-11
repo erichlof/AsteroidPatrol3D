@@ -348,58 +348,64 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 //Explosion Pieces
 /*
 //brown rock
-var explosionMaterial = new THREE.MeshLambertMaterial({
+var explosionMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(100,45,15)',
-	emissive: 'rgb(30,15,5)',
-	shading: THREE.FlatShading
+	emissive: 'rgb(30,15,5)'
 });
 */
 
 //dark grey rock
-var explosionMaterial = new THREE.MeshLambertMaterial({
+var explosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(40,40,40)',
-	emissive: 'rgb(20,20,20)',
-	shading: THREE.FlatShading
+	emissive: 'rgb(20,20,20)'
 });
 
 /*
 //high-contrast, 'snowy' comet-like rock
-var explosionMaterial = new THREE.MeshLambertMaterial({
+var explosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(240,240,240)',
-	emissive: 'rgb(20,20,20)',
-	shading: THREE.FlatShading
+	emissive: 'rgb(20,20,20)'
 });
 */
 /*
 //red, mars-like rock
-var explosionMaterial = new THREE.MeshLambertMaterial({
+var explosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(100,10,0)',
-	emissive: 'rgb(30,5,0)',
-	shading: THREE.FlatShading
+	emissive: 'rgb(30,5,0)'
 });
 */
 /*
 //blue, transparent water-ice rock
-var explosionMaterial = new THREE.MeshLambertMaterial({
+var explosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(0,150,255)',
-	emissive: 'rgb(0,75,120)',
-	side: THREE.DoubleSide,
-	shading: THREE.FlatShading
+	emissive: 'rgb(0,75,120)'
 });
 */
 var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
 var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
 var numberOfExplosionPieces = 100;
 var isExploding = false;
-var explosionTimer = new THREEx.GameTimer(2);
+var explosionTimer = new THREEx.GameTimer(4);
+var explosionSphereGeometry = new THREE.SphereGeometry(5,10,10);
+var explosionSphereMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0.3,
+	color: 'rgb(255,170,0)',
+	depthTest: false,
+	side: THREE.DoubleSide
+});
+var explosionSphere = new THREE.Mesh(explosionSphereGeometry, explosionSphereMaterial);
+var explosionScale = 1.0;
+explosionSphere.visible = false;
+scene.add(explosionSphere);
 
 var largeAsteroidRadius = 70;
 var mediumAsteroidRadius = 40;
