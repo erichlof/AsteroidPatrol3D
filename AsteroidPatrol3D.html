@@ -219,8 +219,8 @@
 				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				explosionPieces[i].direction.normalize();
-				explosionPieces[i].speed = Math.random() * 200 + 100;
-				explosionPieces[i].rotation.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				explosionPieces[i].speed = Math.random() * 400 + 200;
+				explosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
 				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				explosionPieces[i].visible = false;
 				scene.add(explosionPieces[i]);
@@ -636,9 +636,15 @@
 			// if explosion has occurred, update the exploding pieces
 			if (isExploding) {
 				
+				explosionScale += 50.0 * frameTime;
+				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+				explosionSphere.material.opacity -= 0.8 * frameTime;
+				
+				//only need to update 1 of the pieces' material, in order to change them all, 
+				//because they all share same material
+				explosionPieces[0].material.opacity -= 0.8 * frameTime;
 				for (var i = 0; i < numberOfExplosionPieces; i++) {
 					explosionPieces[i].translateOnAxis(explosionPieces[i].direction, explosionPieces[i].speed * frameTime);
-					explosionPieces[i].material.opacity -= 0.01 * frameTime;
 				}
 				
 				explosionTimer.run(frameTime);
@@ -646,8 +652,13 @@
 				if (explosionTimer.alarmSounding) {
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						explosionPieces[i].visible = false;
-						explosionPieces[i].material.opacity = 1.0;
 					}
+					explosionScale = 1.0;
+					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+					explosionSphere.visible = false;
+					explosionSphere.material.opacity = 0.3;
+					
+					explosionPieces[0].material.opacity = 1.0;
 					isExploding = false;
 				}
 				
@@ -828,11 +839,18 @@
 		
 		function initExplosionPieces ( location ) {
 			
+			explosionSphere.position.copy(location);
+			explosionScale = 1.0;
+			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
+			explosionSphere.visible = true;
+			explosionSphere.material.opacity = 0.3;
+			//only need to update 1 piece's material - they all share the same material
+			explosionPieces[0].material.opacity = 1.0;
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				explosionPieces[i].position.copy(location);
 				explosionPieces[i].visible = true;
-				explosionPieces[i].material.opacity = 1.0;
 			}
+			
 			isExploding = true;
 			explosionTimer.reset();
 		}
