@@ -25,11 +25,16 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Add UFO saucer that can be shot at (and UFO can shoot back!)
-* Make explosion effect when asteroids are shot
+* Make UFO saucer able to navigate the arena and shoot
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
+
+
+October 17, 2014 Progress Note
+--------------------------------
+
+Now when asteroids are shot there is a cool explosion effect!  Also, added enemy UFO saucer with a little green alien inside. :) I created the saucer and alien from basic THREE.js primitives such as spheres and cylinders.  Then I sized and scaled these basic shapes to make the end result look right.  Procedurally generating the objects in this way means a faster load time for the game's web page, since the end user doesn't have to download any game models.  For the next update I will give the enemy some simple AI, enough to shoot and navigate a random path through the asteroid arena.  The game will have to test for collisions between the UFO and asteroids/player ship (if he slips up) and the UFO's bullets and asteroids/player (if he aims well enough).
 
 
 October 7, 2014 Progress Note
