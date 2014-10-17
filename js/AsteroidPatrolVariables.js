@@ -101,8 +101,8 @@ for ( i = 0; i < 10; i ++ ) {
 	stars.rotation.y = Math.random() * 6;
 	stars.rotation.z = Math.random() * 6;
 
-	stars.matrixAutoUpdate = false;
 	stars.updateMatrix();
+	stars.matrixAutoUpdate = false;
 
 	scene.add( stars );
 
@@ -201,24 +201,32 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidRightGeometry, pyramidMaterial);
 	pyramid[i].position.set(-arenaHalfSize - 12, (-arenaHalfSize) + i * (gridLineSpacing), -arenaHalfSize);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //left front wall generators facing away from us
 for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidAwayGeometry, pyramidMaterial);
 	pyramid[i].position.set(-arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), arenaHalfSize + 12);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //right back wall generators facing towards us
 for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidTowardsGeometry, pyramidMaterial);
 	pyramid[i].position.set(arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), -arenaHalfSize - 12);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //right front wall generators facing left
 for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidLeftGeometry, pyramidMaterial);
 	pyramid[i].position.set(arenaHalfSize + 12, (-arenaHalfSize) + i * (gridLineSpacing), arenaHalfSize);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //left bottom wall generators facing right
 for (var i = 0; i < 17; i++) {
@@ -226,12 +234,16 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set(-arenaHalfSize - 12, -arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
 	pyramid[i].rotateX(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //right bottom wall generators facing up
 for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidUpGeometry, pyramidMaterial);
 	pyramid[i].position.set(arenaHalfSize, -arenaHalfSize - 12, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //right top wall generators facing left
 for (var i = 0; i < 17; i++) {
@@ -239,12 +251,16 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set(arenaHalfSize + 12, arenaHalfSize, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
 	pyramid[i].rotateX(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //left top wall generators facing down
 for (var i = 0; i < 17; i++) {
 	pyramid[i] = new THREE.Mesh(pyramidDownGeometry, pyramidMaterial);
 	pyramid[i].position.set(-arenaHalfSize, arenaHalfSize + 12, (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset) );
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //top back wall generators facing down
 for (var i = 0; i < 17; i++) {
@@ -252,6 +268,8 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set( (-arenaHalfSize) + i * (gridLineSpacing), arenaHalfSize + 12, -arenaHalfSize );
 	pyramid[i].rotateY(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //bottom back wall generators facing towards us
 for (var i = 0; i < 17; i++) {
@@ -259,6 +277,8 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set( (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), -arenaHalfSize , -arenaHalfSize - 12);
 	pyramid[i].rotateZ(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //bottom front wall generators facing up
 for (var i = 0; i < 17; i++) {
@@ -266,6 +286,8 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set( (-arenaHalfSize) + i * (gridLineSpacing), -arenaHalfSize - 12 , arenaHalfSize );
 	pyramid[i].rotateY(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //top back wall generators facing away from us
 for (var i = 0; i < 17; i++) {
@@ -273,6 +295,8 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].position.set( (-arenaHalfSize - 1) + i * (gridLineSpacing + gridLineOffset), arenaHalfSize , arenaHalfSize + 12);
 	pyramid[i].rotateZ(-Math.PI / 2);
 	scene.add(pyramid[i]);
+	pyramid[i].updateMatrix();
+	pyramid[i].matrixAutoUpdate = false;
 }
 //var wireframe = new THREE.WireframeHelper(pyramid, 0x222222);
 //scene.add(wireframe);
@@ -478,6 +502,8 @@ asteroidCopy1.speed = 0;
 asteroidCopy2.speed = 0;
 
 var frameTime = 0;
+var TWO_PI = Math.PI * 2;
+var enemyPosAngle = 0;
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
@@ -498,6 +524,94 @@ var check = 0;
 var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
 //var howManyTries = 0;
+
+//Enemy UFO Object
+var enemy = new THREE.Object3D();
+scene.add(enemy);
+//enemy.visible = false;
+
+//Enemy Saucer
+var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
+var enemySaucerMaterial = new THREE.MeshPhongMaterial({
+	shading: THREE.FlatShading,
+	metal: true,
+	shininess: 10,
+	specular: 'rgb(255,255,255)',
+	emissive: 'rgb(0,0,100)',
+	color: 'rgb(0,0,255)'
+});
+var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
+enemySaucer.scale.set(1.0, 0.3, 1.0);
+enemySaucer.updateMatrix();
+enemySaucer.matrixAutoUpdate = false;
+enemy.add(enemySaucer);
+
+//Enemy Saucer Tripod Feet (Spheres)
+var enemySaucerFeetGeometry = new THREE.SphereGeometry(3,6,6);
+
+var enemySaucerFoot1 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot1.position.set(39, -30, 19.5);
+enemySaucerFoot1.updateMatrix();
+enemySaucerFoot1.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot1);
+var enemySaucerFoot2 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot2.position.set(-39, -30, 19.5);
+enemySaucerFoot2.updateMatrix();
+enemySaucerFoot2.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot2);
+var enemySaucerFoot3 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot3.position.set(0, -30, -45);
+enemySaucerFoot3.updateMatrix();
+enemySaucerFoot3.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot3);
+
+//Enemy Saucer Landing Tripod Legs //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
+var enemyTripodGeometry = new THREE.CylinderGeometry( 4, 0, 33, 6, 1, false );
+var enemyTripodMaterial = new THREE.MeshPhongMaterial({
+	shading: THREE.FlatShading,
+	metal: true,
+	shininess: 10,
+	specular: 'rgb(255,255,255)',
+	emissive: 'rgb(50,50,50)',
+	color: 'rgb(100,100,100)'
+});
+var enemyTripod1 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod1.position.set(30, -20, 15);
+enemyTripod1.lookAt( new THREE.Vector3(400, 400, 200) );
+enemyTripod1.updateMatrix();
+enemyTripod1.matrixAutoUpdate = false;
+enemy.add(enemyTripod1);
+var enemyTripod2 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod2.position.set(-30, -20, 15);
+enemyTripod2.lookAt( new THREE.Vector3(-400, 400, 200) );
+enemyTripod2.updateMatrix();
+enemyTripod2.matrixAutoUpdate = false;
+enemy.add(enemyTripod2);
+var enemyTripod3 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod3.position.set(0, -20, -33.541);
+enemyTripod3.lookAt( new THREE.Vector3(0, 400, -400) );
+enemyTripod3.updateMatrix();
+enemyTripod3.matrixAutoUpdate = false;
+enemy.add(enemyTripod3);
+
+//Enemy ship glass dome
+var enemyDomeGeometry = new THREE.SphereGeometry(25,10,10);
+var enemyDomeMaterial = new THREE.MeshPhongMaterial({
+	transparent: true,
+	opacity: 0.3,
+	shininess: 50,
+	emissive: 'rgb(55,55,55)',
+	specular: 'rgb(255,255,255)',
+	color: 'rgb(255,255,255)'
+});
+var enemyDome = new THREE.Mesh(enemyDomeGeometry, enemyDomeMaterial);
+enemyDome.position.set(0, 15, 0);
+enemyDome.scale.set(1.0, 0.5, 1.0);
+enemyDome.updateMatrix();
+enemyDome.matrixAutoUpdate = false;
+enemy.add(enemyDome);
+
+
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
