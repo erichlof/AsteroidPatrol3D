@@ -607,16 +607,15 @@
 			
 			skyBox.position.copy(camera.position);
 			
-			planet.position.x = camera.position.x - 900;
-			planet.position.y = camera.position.y - 900;
-			planet.position.z = camera.position.z - 900;
+			planet.position.copy(camera.position).addScalar(-900);
 			
 			enemyPosAngle += 2 * frameTime;
 			if (enemyPosAngle >= TWO_PI ) 
 				enemyPosAngle -= TWO_PI;
-			enemy.position.x = Math.sin(enemyPosAngle) * 100;
-			enemy.position.y = Math.cos(enemyPosAngle) * 100;
+			//enemy.position.x = Math.sin(enemyPosAngle) * 100;
+			//enemy.position.y = Math.cos(enemyPosAngle) * 100;
 			enemy.rotation.y = enemyPosAngle;
+			
 			
 			if (playingWarpAnimation) {
 				
