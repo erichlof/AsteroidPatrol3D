@@ -611,6 +611,13 @@
 			planet.position.y = camera.position.y - 900;
 			planet.position.z = camera.position.z - 900;
 			
+			enemyPosAngle += 2 * frameTime;
+			if (enemyPosAngle >= TWO_PI ) 
+				enemyPosAngle -= TWO_PI;
+			enemy.position.x = Math.sin(enemyPosAngle) * 100;
+			enemy.position.y = Math.cos(enemyPosAngle) * 100;
+			enemy.rotation.y = enemyPosAngle;
+			
 			if (playingWarpAnimation) {
 				
 				camera.fov += fovIncrementAmount * frameTime;
@@ -636,9 +643,9 @@
 			// if explosion has occurred, update the exploding pieces
 			if (isExploding) {
 				
-				explosionScale += 50.0 * frameTime;
+				explosionScale += 150.0 * frameTime;
 				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
-				explosionSphere.material.opacity -= 0.8 * frameTime;
+				explosionSphere.material.opacity -= 1.5 * frameTime;
 				
 				//only need to update 1 of the pieces' material, in order to change them all, 
 				//because they all share same material
@@ -797,7 +804,7 @@
 			while ( placingShip ) {
 				
 				placingShip = false;
-				ship.position.set(Math.random() * 350 - 350, Math.random() * 350 - 350, Math.random() * 350 - 350);
+				ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 700 - 350);
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {
 					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 100) 
 						placingShip = true;
