@@ -26,6 +26,9 @@ To Do
 -----
 * nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
 * Make UFO saucer able to navigate the arena and shoot
+* Make explosion when the player crashes into an asteroid, or gets shot by UFO
+* Add Sun with possible solar flare effect
+* Add 'ships remaining' in the top corner using simple shapes to represent ships
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Add 3D spatial sound FX to surround the player from all angles
