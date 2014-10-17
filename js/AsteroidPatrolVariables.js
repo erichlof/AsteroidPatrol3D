@@ -533,12 +533,12 @@ scene.add(enemy);
 //Enemy Saucer
 var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
 var enemySaucerMaterial = new THREE.MeshPhongMaterial({
-	shading: THREE.FlatShading,
+	//shading: THREE.FlatShading,
 	metal: true,
 	shininess: 10,
 	specular: 'rgb(255,255,255)',
-	emissive: 'rgb(0,0,100)',
-	color: 'rgb(0,0,255)'
+	emissive: 'rgb(66,0,100)',
+	color: 'rgb(170,0,255)'
 });
 var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
 enemySaucer.scale.set(1.0, 0.3, 1.0);
@@ -550,17 +550,17 @@ enemy.add(enemySaucer);
 var enemySaucerFeetGeometry = new THREE.SphereGeometry(3,6,6);
 
 var enemySaucerFoot1 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot1.position.set(39, -30, 19.5);
+enemySaucerFoot1.position.set(39, -28, 19.5);
 enemySaucerFoot1.updateMatrix();
 enemySaucerFoot1.matrixAutoUpdate = false;
 enemy.add(enemySaucerFoot1);
 var enemySaucerFoot2 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot2.position.set(-39, -30, 19.5);
+enemySaucerFoot2.position.set(-39, -28, 19.5);
 enemySaucerFoot2.updateMatrix();
 enemySaucerFoot2.matrixAutoUpdate = false;
 enemy.add(enemySaucerFoot2);
 var enemySaucerFoot3 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot3.position.set(0, -30, -45);
+enemySaucerFoot3.position.set(0, -28, -45);
 enemySaucerFoot3.updateMatrix();
 enemySaucerFoot3.matrixAutoUpdate = false;
 enemy.add(enemySaucerFoot3);
@@ -576,19 +576,19 @@ var enemyTripodMaterial = new THREE.MeshPhongMaterial({
 	color: 'rgb(100,100,100)'
 });
 var enemyTripod1 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod1.position.set(30, -20, 15);
+enemyTripod1.position.set(30, -18, 15);
 enemyTripod1.lookAt( new THREE.Vector3(400, 400, 200) );
 enemyTripod1.updateMatrix();
 enemyTripod1.matrixAutoUpdate = false;
 enemy.add(enemyTripod1);
 var enemyTripod2 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod2.position.set(-30, -20, 15);
+enemyTripod2.position.set(-30, -18, 15);
 enemyTripod2.lookAt( new THREE.Vector3(-400, 400, 200) );
 enemyTripod2.updateMatrix();
 enemyTripod2.matrixAutoUpdate = false;
 enemy.add(enemyTripod2);
 var enemyTripod3 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod3.position.set(0, -20, -33.541);
+enemyTripod3.position.set(0, -18, -33.541);
 enemyTripod3.lookAt( new THREE.Vector3(0, 400, -400) );
 enemyTripod3.updateMatrix();
 enemyTripod3.matrixAutoUpdate = false;
@@ -599,18 +599,59 @@ var enemyDomeGeometry = new THREE.SphereGeometry(25,10,10);
 var enemyDomeMaterial = new THREE.MeshPhongMaterial({
 	transparent: true,
 	opacity: 0.3,
-	shininess: 50,
-	emissive: 'rgb(55,55,55)',
+	//metal: true,
+	shininess: 200,
+	emissive: 'rgb(0,40,50)',
 	specular: 'rgb(255,255,255)',
-	color: 'rgb(255,255,255)'
+	color: 'rgb(0,100,120)'
 });
 var enemyDome = new THREE.Mesh(enemyDomeGeometry, enemyDomeMaterial);
-enemyDome.position.set(0, 15, 0);
-enemyDome.scale.set(1.0, 0.5, 1.0);
+enemyDome.position.set(0, 14, 0);
+enemyDome.scale.set(1.0, 0.9, 1.0);
 enemyDome.updateMatrix();
 enemyDome.matrixAutoUpdate = false;
 enemy.add(enemyDome);
 
+//Enemy Alien Head
+var enemyHeadGeometry = new THREE.SphereGeometry(3,10,10);
+var enemyHeadMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(0,255,0)',
+	emissive: 'rgb(0,55,0)'
+});
+var enemyHead = new THREE.Mesh(enemyHeadGeometry, enemyHeadMaterial);
+enemyHead.position.set(0, 22, 0);
+enemyHead.scale.set(1.0, 1.2, 1.0);
+enemyHead.updateMatrix();
+enemyHead.matrixAutoUpdate = false;
+enemy.add(enemyHead);
+
+//Enemy Alien Antenna
+var enemyAntennaGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 6, 4, 1, false );
+var enemyAntenna1 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
+enemyAntenna1.position.set(-2, 25, 0);
+enemyAntenna1.lookAt( new THREE.Vector3(400, 400, 0) );
+enemyAntenna1.updateMatrix();
+enemyAntenna1.matrixAutoUpdate = false;
+enemy.add(enemyAntenna1);
+var enemyAntenna2 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
+enemyAntenna2.position.set(2, 25, 0);
+enemyAntenna2.lookAt( new THREE.Vector3(-400, 400, 0) );
+enemyAntenna2.updateMatrix();
+enemyAntenna2.matrixAutoUpdate = false;
+enemy.add(enemyAntenna2);
+
+//Enemy Alien Body
+var enemyBodyGeometry = new THREE.SphereGeometry(2,6,6);
+var enemyBodyMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(20,20,20)',
+	emissive: 'rgb(5,5,5)'
+});
+var enemyBody = new THREE.Mesh(enemyBodyGeometry, enemyBodyMaterial);
+enemyBody.position.set(0, 16, 0);
+enemyBody.scale.set(1.0, 1.5, 1.0);
+enemyBody.updateMatrix();
+enemyBody.matrixAutoUpdate = false;
+enemy.add(enemyBody);
 
 
 var debugText1 = document.getElementById("debug1");
