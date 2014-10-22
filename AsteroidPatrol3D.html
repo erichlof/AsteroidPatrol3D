@@ -229,6 +229,9 @@
 	
 			placeShip();
 			
+			enemySpawnTimer.reset();
+			enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+			
 			//put the camera right where the ship is
 			//camera.position.copy(ship.position);
 			
@@ -312,7 +315,7 @@
 			}
 			else{ //no thrust is being applied, so slow the ship down gradually
 				//Although no air drag friction exists in space, this makes handling the ship easier
-				if (shipSpeed > 0.1) {
+				if (shipSpeed > 1) {
 					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
 					//in order to point in the opposing direction
 					frictionVector.copy(shipVelocity).negate().normalize();
@@ -323,7 +326,8 @@
 					//record the current speed of the ship, which equals the length of its velocity vector
 					shipSpeed = shipVelocity.length();
 				}
-				else shipSpeed = 0;
+				else if (shipSpeed <= 1) 
+					shipSpeed = 0;
 			}
 			
 			//loop through bulletArray, update bullet positions, update collisions
@@ -609,12 +613,109 @@
 			
 			planet.position.copy(camera.position).addScalar(-900);
 			
-			enemyPosAngle += 2 * frameTime;
-			if (enemyPosAngle >= TWO_PI ) 
-				enemyPosAngle -= TWO_PI;
-			//enemy.position.x = Math.sin(enemyPosAngle) * 100;
-			//enemy.position.y = Math.cos(enemyPosAngle) * 100;
-			enemy.rotation.y = enemyPosAngle;
+			//ENEMY UFO SAUCER CODE///////////
+			//if the UFO is not spawned yet, 
+			if (!enemyAlive) {
+				// count timer to a random number of seconds
+				enemySpawnTimer.run(frameTime);
+				// if the target alarm time has been reached,
+				if (enemySpawnTimer.alarmSounding) {
+					enemyAlive = true;
+					enemy.visible = true;
+					randomPick = Math.floor(Math.random() * 6 + 1);
+					if (randomPick == 1) {
+						enemy.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, -399);
+						whichSide = BACK_WALL;
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, 1000);
+					}
+					if (randomPick == 2) {
+						enemy.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, 399);
+						whichSide = FRONT_WALL;
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, -1000);
+					}
+					if (randomPick == 3) {
+						enemy.position.set(-399, Math.random() * 700 - 350, Math.random() * 700 - 350);
+						whichSide = LEFT_WALL;
+						enemyMoveTargetLocation.set(1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					}
+					if (randomPick == 4) {
+						enemy.position.set(399, Math.random() * 700 - 350, Math.random() * 700 - 350);
+						whichSide = RIGHT_WALL;
+						enemyMoveTargetLocation.set(-1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					}
+					if (randomPick == 5) {
+						enemy.position.set(Math.random() * 700 - 350, 399, Math.random() * 700 - 350);
+						whichSide = TOP_WALL;
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, -1000, Math.random() * 800 - 400);
+					}
+					if (randomPick == 6) {
+						enemy.position.set(Math.random() * 700 - 350, -399, Math.random() * 700 - 350);
+						whichSide = BOTTOM_WALL;
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, 1000, Math.random() * 800 - 400);
+					}
+					
+					enemyDirection.subVectors(enemyMoveTargetLocation, enemy.position);
+					enemyDirection.normalize();
+					
+					enemySpawnTimer.reset();
+					enemyChangeDirectionTimer.reset();
+					enemyChangeDirectionTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+				}
+					
+			}//end if (!enemyAlive)
+			
+			//if UFO is alive, update it
+			if (enemyAlive) {
+				
+				enemyChangeDirectionTimer.run(frameTime);
+				
+				if (enemyChangeDirectionTimer.alarmSounding) {
+					
+					if (whichSide == BACK_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, 1000);
+					}
+					if (whichSide == FRONT_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, -1000);
+					}
+					if (whichSide == LEFT_WALL) {
+						enemyMoveTargetLocation.set(1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					}
+					if (whichSide == RIGHT_WALL) {
+						enemyMoveTargetLocation.set(-1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					}
+					if (whichSide == TOP_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, -1000, Math.random() * 800 - 400);
+					}
+					if (whichSide == BOTTOM_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, 1000, Math.random() * 800 - 400);
+					}
+					
+					enemyDirection.subVectors(enemyMoveTargetLocation, enemy.position);
+					enemyDirection.normalize();
+					enemyChangeDirectionTimer.reset();
+					enemyChangeDirectionTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+					
+				}
+				
+				enemy.localToWorld(enemy.position);
+				enemy.translateOnAxis(enemyDirection, enemySpeed * frameTime);
+				
+				enemy.worldToLocal(enemy.position);
+				enemy.rotateY(2 * frameTime);
+				
+				if (enemy.position.x > 420 || enemy.position.x < -420 || 
+				   	enemy.position.y > 420 || enemy.position.y < -420 ||
+				    	enemy.position.z > 420 || enemy.position.z < -420 ) {
+					
+					enemyAlive = false;
+					enemy.visible = false;
+					enemySpawnTimer.reset();
+					enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+				}
+				
+			}
+				
+			
 			
 			
 			if (playingWarpAnimation) {
@@ -791,7 +892,7 @@
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
 		*/
-			debugText4.innerHTML = "shipSpeed: " + shipSpeed.toFixed(1);
+			debugText4.innerHTML = "whichSide: " + whichSide;
 
 		} //end function animate()
 		
