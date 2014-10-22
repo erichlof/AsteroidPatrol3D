@@ -1,4 +1,6 @@
-// GLOBAL VARIABLES ////////////////////////////////////////////////////////////////////////////
+/*
+// GLOBAL VARIABLES
+*/
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 3000);
@@ -45,6 +47,8 @@ function onWindowResize() {
 	//crossHairsSprite.position.y = spritePositionY;
 			
 }
+
+// GAME SCENE OBJECTS ///////////////////////////////////////////////////////////////////////////////
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
@@ -462,6 +466,164 @@ crossHairsSprite.scale.set(0.5, 0.5, 0.5);
 //add crossHairsSprite as a child of our camera object, so it will stay in camera's view
 camera.add(crossHairsSprite);
 
+
+
+//Enemy UFO Object
+var enemy = new THREE.Object3D();
+scene.add(enemy);
+//enemy.scale.set(3.5,3.5,3.5);
+//enemy.updateMatrix();
+enemy.visible = false;
+
+//Enemy Saucer
+var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
+var enemySaucerMaterial = new THREE.MeshPhongMaterial({
+	//shading: THREE.FlatShading,
+	metal: true,
+	shininess: 10,
+	specular: 'rgb(255,255,255)',
+	emissive: 'rgb(59,0,100)',
+	color: 'rgb(150,0,255)'
+});
+var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
+enemySaucer.scale.set(0.5, 0.15, 0.5);
+enemySaucer.updateMatrix();
+enemySaucer.matrixAutoUpdate = false;
+enemy.add(enemySaucer);
+
+//Enemy Saucer Tripod Feet (Spheres)
+var enemySaucerFeetGeometry = new THREE.SphereGeometry(3,6,6);
+
+var enemySaucerFoot1 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot1.scale.set(0.5,0.5,0.5);
+enemySaucerFoot1.position.set(20, -14, 9.75);
+enemySaucerFoot1.updateMatrix();
+enemySaucerFoot1.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot1);
+var enemySaucerFoot2 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot2.scale.set(0.5,0.5,0.5);
+enemySaucerFoot2.position.set(-20, -14, 9.75);
+enemySaucerFoot2.updateMatrix();
+enemySaucerFoot2.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot2);
+var enemySaucerFoot3 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
+enemySaucerFoot3.scale.set(0.5,0.5,0.5);
+enemySaucerFoot3.position.set(0, -14, -22.5);
+enemySaucerFoot3.updateMatrix();
+enemySaucerFoot3.matrixAutoUpdate = false;
+enemy.add(enemySaucerFoot3);
+
+//Enemy Saucer Landing Tripod Legs //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
+var enemyTripodGeometry = new THREE.CylinderGeometry( 4, 0, 33, 6, 1, false );
+var enemyTripodMaterial = new THREE.MeshPhongMaterial({
+	shading: THREE.FlatShading,
+	metal: true,
+	shininess: 10,
+	specular: 'rgb(255,255,255)',
+	emissive: 'rgb(50,50,50)',
+	color: 'rgb(100,100,100)'
+});
+var enemyTripod1 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod1.scale.set(0.5,0.5,0.5);
+enemyTripod1.position.set(15, -9, 7.5);
+enemyTripod1.lookAt( new THREE.Vector3(400, 400, 200) );
+enemyTripod1.updateMatrix();
+enemyTripod1.matrixAutoUpdate = false;
+enemy.add(enemyTripod1);
+var enemyTripod2 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod2.scale.set(0.5,0.5,0.5);
+enemyTripod2.position.set(-15, -9, 7.5);
+enemyTripod2.lookAt( new THREE.Vector3(-400, 400, 200) );
+enemyTripod2.updateMatrix();
+enemyTripod2.matrixAutoUpdate = false;
+enemy.add(enemyTripod2);
+var enemyTripod3 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
+enemyTripod3.scale.set(0.5,0.5,0.5);
+enemyTripod3.position.set(0, -9, -16.7705);
+enemyTripod3.lookAt( new THREE.Vector3(0, 400, -400) );
+enemyTripod3.updateMatrix();
+enemyTripod3.matrixAutoUpdate = false;
+enemy.add(enemyTripod3);
+
+//Enemy ship glass dome
+var enemyDomeGeometry = new THREE.SphereGeometry(25,10,10);
+var enemyDomeMaterial = new THREE.MeshPhongMaterial({
+	transparent: true,
+	opacity: 0.2,
+	//metal: true,
+	shininess: 200,
+	emissive: 'rgb(0,40,50)',
+	specular: 'rgb(255,255,255)',
+	color: 'rgb(0,100,120)'
+});
+var enemyDome = new THREE.Mesh(enemyDomeGeometry, enemyDomeMaterial);
+enemyDome.scale.set(0.5, 0.45, 0.5);
+enemyDome.position.set(0, 7, 0);
+enemyDome.updateMatrix();
+enemyDome.matrixAutoUpdate = false;
+enemy.add(enemyDome);
+
+//Enemy Alien Head
+var enemyHeadGeometry = new THREE.SphereGeometry(3,10,10);
+var enemyHeadMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(0,255,0)',
+	emissive: 'rgb(0,55,0)'
+});
+var enemyHead = new THREE.Mesh(enemyHeadGeometry, enemyHeadMaterial);
+enemyHead.scale.set(0.5, 0.6, 0.5);
+enemyHead.position.set(0, 11, 0);
+enemyHead.updateMatrix();
+enemyHead.matrixAutoUpdate = false;
+enemy.add(enemyHead);
+
+//Enemy Alien Antenna
+var enemyAntennaGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 6, 4, 1, false );
+var enemyAntenna1 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
+enemyAntenna1.scale.set(0.5, 0.5, 0.5);
+enemyAntenna1.position.set(-1, 12.5, 0);
+enemyAntenna1.lookAt( new THREE.Vector3(400, 400, 0) );
+enemyAntenna1.updateMatrix();
+enemyAntenna1.matrixAutoUpdate = false;
+enemy.add(enemyAntenna1);
+var enemyAntenna2 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
+enemyAntenna2.scale.set(0.5, 0.5, 0.5);
+enemyAntenna2.position.set(1, 12.5, 0);
+enemyAntenna2.lookAt( new THREE.Vector3(-400, 400, 0) );
+enemyAntenna2.updateMatrix();
+enemyAntenna2.matrixAutoUpdate = false;
+enemy.add(enemyAntenna2);
+
+//Enemy Alien Body
+var enemyBodyGeometry = new THREE.SphereGeometry(2,6,6);
+var enemyBodyMaterial = new THREE.MeshLambertMaterial({
+	color: 'rgb(20,20,20)',
+	emissive: 'rgb(5,5,5)'
+});
+var enemyBody = new THREE.Mesh(enemyBodyGeometry, enemyBodyMaterial);
+enemyBody.scale.set(0.5, 0.75, 0.5);
+enemyBody.position.set(0, 8, 0);
+enemyBody.updateMatrix();
+enemyBody.matrixAutoUpdate = false;
+enemy.add(enemyBody);
+
+
+
+// GAME VARIABLES ////////////////////////////////////////////////////////////////////////////////////
+
+var enemyDirection = new THREE.Vector3();
+var enemySpeed = 70;
+var enemyMoveTargetLocation = new THREE.Vector3();
+var enemyShootTargetLocation = new THREE.Vector3();
+var enemySpawnTimer = new THREEx.GameTimer();
+var enemyChangeDirectionTimer = new THREEx.GameTimer();
+var enemyShootTimer = new THREEx.GameTimer();
+var enemyAlive = false;
+var randomPick = 0;
+var whichSide = 0;
+var FRONT_WALL = 1; var BACK_WALL = 2;
+var RIGHT_WALL = 3; var LEFT_WALL = 4;
+var TOP_WALL = 5; var BOTTOM_WALL = 6;
+
 //bullets
 var MAX_BULLETS = 20;
 var bulletSpeed = 400;
@@ -502,8 +664,6 @@ asteroidCopy1.speed = 0;
 asteroidCopy2.speed = 0;
 
 var frameTime = 0;
-var TWO_PI = Math.PI * 2;
-var enemyPosAngle = 0;
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
@@ -525,139 +685,8 @@ var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
 //var howManyTries = 0;
 
-//Enemy UFO Object
-var enemy = new THREE.Object3D();
-scene.add(enemy);
-//enemy.visible = false;
-
-//Enemy Saucer
-var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
-var enemySaucerMaterial = new THREE.MeshPhongMaterial({
-	//shading: THREE.FlatShading,
-	metal: true,
-	shininess: 10,
-	specular: 'rgb(255,255,255)',
-	emissive: 'rgb(66,0,100)',
-	color: 'rgb(170,0,255)'
-});
-var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
-enemySaucer.scale.set(1.0, 0.3, 1.0);
-enemySaucer.updateMatrix();
-enemySaucer.matrixAutoUpdate = false;
-enemy.add(enemySaucer);
-
-//Enemy Saucer Tripod Feet (Spheres)
-var enemySaucerFeetGeometry = new THREE.SphereGeometry(3,6,6);
-
-var enemySaucerFoot1 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot1.position.set(39, -28, 19.5);
-enemySaucerFoot1.updateMatrix();
-enemySaucerFoot1.matrixAutoUpdate = false;
-enemy.add(enemySaucerFoot1);
-var enemySaucerFoot2 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot2.position.set(-39, -28, 19.5);
-enemySaucerFoot2.updateMatrix();
-enemySaucerFoot2.matrixAutoUpdate = false;
-enemy.add(enemySaucerFoot2);
-var enemySaucerFoot3 = new THREE.Mesh(enemySaucerFeetGeometry, enemySaucerMaterial);
-enemySaucerFoot3.position.set(0, -28, -45);
-enemySaucerFoot3.updateMatrix();
-enemySaucerFoot3.matrixAutoUpdate = false;
-enemy.add(enemySaucerFoot3);
-
-//Enemy Saucer Landing Tripod Legs //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
-var enemyTripodGeometry = new THREE.CylinderGeometry( 4, 0, 33, 6, 1, false );
-var enemyTripodMaterial = new THREE.MeshPhongMaterial({
-	shading: THREE.FlatShading,
-	metal: true,
-	shininess: 10,
-	specular: 'rgb(255,255,255)',
-	emissive: 'rgb(50,50,50)',
-	color: 'rgb(100,100,100)'
-});
-var enemyTripod1 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod1.position.set(30, -18, 15);
-enemyTripod1.lookAt( new THREE.Vector3(400, 400, 200) );
-enemyTripod1.updateMatrix();
-enemyTripod1.matrixAutoUpdate = false;
-enemy.add(enemyTripod1);
-var enemyTripod2 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod2.position.set(-30, -18, 15);
-enemyTripod2.lookAt( new THREE.Vector3(-400, 400, 200) );
-enemyTripod2.updateMatrix();
-enemyTripod2.matrixAutoUpdate = false;
-enemy.add(enemyTripod2);
-var enemyTripod3 = new THREE.Mesh(enemyTripodGeometry, enemyTripodMaterial);
-enemyTripod3.position.set(0, -18, -33.541);
-enemyTripod3.lookAt( new THREE.Vector3(0, 400, -400) );
-enemyTripod3.updateMatrix();
-enemyTripod3.matrixAutoUpdate = false;
-enemy.add(enemyTripod3);
-
-//Enemy ship glass dome
-var enemyDomeGeometry = new THREE.SphereGeometry(25,10,10);
-var enemyDomeMaterial = new THREE.MeshPhongMaterial({
-	transparent: true,
-	opacity: 0.3,
-	//metal: true,
-	shininess: 200,
-	emissive: 'rgb(0,40,50)',
-	specular: 'rgb(255,255,255)',
-	color: 'rgb(0,100,120)'
-});
-var enemyDome = new THREE.Mesh(enemyDomeGeometry, enemyDomeMaterial);
-enemyDome.position.set(0, 14, 0);
-enemyDome.scale.set(1.0, 0.9, 1.0);
-enemyDome.updateMatrix();
-enemyDome.matrixAutoUpdate = false;
-enemy.add(enemyDome);
-
-//Enemy Alien Head
-var enemyHeadGeometry = new THREE.SphereGeometry(3,10,10);
-var enemyHeadMaterial = new THREE.MeshLambertMaterial({
-	color: 'rgb(0,255,0)',
-	emissive: 'rgb(0,55,0)'
-});
-var enemyHead = new THREE.Mesh(enemyHeadGeometry, enemyHeadMaterial);
-enemyHead.position.set(0, 22, 0);
-enemyHead.scale.set(1.0, 1.2, 1.0);
-enemyHead.updateMatrix();
-enemyHead.matrixAutoUpdate = false;
-enemy.add(enemyHead);
-
-//Enemy Alien Antenna
-var enemyAntennaGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 6, 4, 1, false );
-var enemyAntenna1 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
-enemyAntenna1.position.set(-2, 25, 0);
-enemyAntenna1.lookAt( new THREE.Vector3(400, 400, 0) );
-enemyAntenna1.updateMatrix();
-enemyAntenna1.matrixAutoUpdate = false;
-enemy.add(enemyAntenna1);
-var enemyAntenna2 = new THREE.Mesh(enemyAntennaGeometry, enemyHeadMaterial);
-enemyAntenna2.position.set(2, 25, 0);
-enemyAntenna2.lookAt( new THREE.Vector3(-400, 400, 0) );
-enemyAntenna2.updateMatrix();
-enemyAntenna2.matrixAutoUpdate = false;
-enemy.add(enemyAntenna2);
-
-//Enemy Alien Body
-var enemyBodyGeometry = new THREE.SphereGeometry(2,6,6);
-var enemyBodyMaterial = new THREE.MeshLambertMaterial({
-	color: 'rgb(20,20,20)',
-	emissive: 'rgb(5,5,5)'
-});
-var enemyBody = new THREE.Mesh(enemyBodyGeometry, enemyBodyMaterial);
-enemyBody.position.set(0, 16, 0);
-enemyBody.scale.set(1.0, 1.5, 1.0);
-enemyBody.updateMatrix();
-enemyBody.matrixAutoUpdate = false;
-enemy.add(enemyBody);
-
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
-
-
-// END GLOBAL VARIABLES /////////////////////////////////////////////////////////////////
