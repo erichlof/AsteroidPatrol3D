@@ -53,8 +53,60 @@
 	<script src="js/threex.GameTimer.js"></script>
 	<script src="js/threex.geometricglowmesh.js"></script>
 	<script src="js/webaudioxGameSounds.js"></script>
-	<script src="js/AsteroidPatrolVariables.js"></script>
+	
+	<script id="vertexShader" type="x-shader/x-vertex">
+		
+		varying vec2 vUv;
 
+		void main()
+		{
+			vUv = uv;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
+		}
+
+	</script>
+		
+	<script id="fragmentShader" type="x-shader/x-fragment">
+
+		uniform float time;
+		uniform vec2 resolution;
+		
+		varying vec2 vUv;
+		
+		float rand(int seed, float ray)
+		{
+			return mod(sin(float(seed)*363.5346+ray*674.2454)*6743.4365, 1.0);
+		}
+
+		void main( void )
+		{
+			float pi = 3.14159;
+			vec2 position = -1.0 + 2.0 * vUv;
+			float ang = atan(position.y, position.x);
+			float dist = length(position);
+			gl_FragColor.rgb = vec3(1.0, 0.9, 0.8) * (pow(dist, -1.0) * 0.1);
+			for (float ray = 0.0; ray < 10.0; ray += 1.0) {
+				float rayang = rand(5234, ray)*6.2+(time*0.05)*10.0*(rand(2546, ray)-rand(5785, ray))-(rand(3545, ray)-rand(5467, ray));
+				rayang = mod(rayang, pi*2.0);
+				if (rayang < ang - pi) {rayang += pi*2.0;}
+				if (rayang > ang + pi) {rayang -= pi*2.0;}
+				float brite = .5 - abs(ang - rayang);
+				brite -= dist * 0.2;
+				if (brite > 0.0) {
+					gl_FragColor.rgb += vec3(0.2+0.4*rand(8644, ray), 0.4+0.4*rand(4567, ray), 0.5+0.4*rand(7354, ray)) * brite * 0.1;
+				}
+			}
+			gl_FragColor.a = 1.0 - (dist * 1.5);
+			if(dist > 0.99)
+				gl_FragColor.a = 0.0;
+			
+		}
+
+	</script>
+	
+	<script src="js/AsteroidPatrolVariables.js"></script>
+	
 	<script>
 		initLevel();
 		animate();
@@ -759,6 +811,12 @@
 			skyBox.position.copy(camera.position);
 			
 			planet.position.copy(camera.position).addScalar(-900);
+			
+			sun.position.copy(camera.position);
+			sun.position.x -= 500;
+			sun.position.y += 500;
+			sun.position.z += 500;
+			sunUniforms.time.value = performance.now() * 0.001;
 			
 			//ENEMY UFO SAUCER CODE///////////
 			//if the UFO is not spawned yet, 
