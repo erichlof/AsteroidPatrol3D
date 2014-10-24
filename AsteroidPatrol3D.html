@@ -232,8 +232,8 @@
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
 			
-			//put the camera right where the ship is
-			//camera.position.copy(ship.position);
+			enemyShootTimer.reset();
+			enemyShootTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
 			
 			//setup controls parameters
 			//controls.movementSpeed = 100;
@@ -494,6 +494,153 @@
 				
 			}//end for (var i = 0; i < MAX_BULLETS; i++)
 			
+			//loop through enemyBulletArray, update enemyBullet positions, update collisions
+			for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
+				
+				//deactivate enemyBullets if they leave arena
+				if(enemyBulletArray[i].alive){
+					if( enemyBulletArray[i].position.x > arenaHalfSize || enemyBulletArray[i].position.x < -arenaHalfSize || 
+					    enemyBulletArray[i].position.y > arenaHalfSize || enemyBulletArray[i].position.y < -arenaHalfSize || 
+					    enemyBulletArray[i].position.z > arenaHalfSize || enemyBulletArray[i].position.z < -arenaHalfSize ) {
+					
+						enemyBulletArray[i].alive = false;
+						enemyBulletArray[i].visible = false;
+					}
+				}
+				//if enemyBullet is alive, update it
+				if (enemyBulletArray[i].alive){
+					
+					enemyBulletRay.set(enemyBulletArray[i].position, enemyBulletArray[i].direction);
+					oldEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					enemyBulletArray[i].translateOnAxis(enemyBulletArray[i].direction, enemyBulletSpeed * frameTime);
+					newEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					
+					//loop through smallAsteroids and check for collisions with enemyBullets
+					for (var c = 0; c < numberOfSmallAsteroids; c++) {
+						
+						if(smallAsteroids[c].alive){
+							
+							testSphere.radius = smallAsteroids[c].geometry.boundingSphere.radius;
+							testSphere.center.copy(smallAsteroids[c].position);
+							enemyBulletRayCollisionPoint = enemyBulletRay.intersectSphere(testSphere);
+							
+							if (enemyBulletRayCollisionPoint) {
+							
+								if (enemyBulletRayCollisionPoint.distanceToSquared(enemyBulletArray[i].position) < 
+									newEnemyBulletSpherePos.distanceToSquared(oldEnemyBulletSpherePos)){
+
+									enemyBulletArray[i].alive = false;
+									enemyBulletArray[i].visible = false;
+									
+									smallAsteroids[c].alive = false;
+									smallAsteroids[c].visible = false;
+									
+									initExplosionPieces(enemyBulletRayCollisionPoint);
+									
+									smallAsteroidsRemaining -= 1;
+									if(smallAsteroidsRemaining < 1)
+										initLevel();
+									
+									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							
+								}
+
+							}//end if (enemyBulletRayCollisionPoint) {
+							
+						}//end if(smallAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfSmallAsteroids; c++) {
+					
+					//loop through mediumAsteroids and check for collisions with enemyBullets
+					for (var c = 0; c < numberOfMediumAsteroids; c++) {
+						
+						if(mediumAsteroids[c].alive){
+							
+							testSphere.radius = mediumAsteroids[c].geometry.boundingSphere.radius;
+							testSphere.center.copy(mediumAsteroids[c].position);
+							enemyBulletRayCollisionPoint = enemyBulletRay.intersectSphere(testSphere);
+							
+							if (enemyBulletRayCollisionPoint) {
+								
+								if (enemyBulletRayCollisionPoint.distanceToSquared(enemyBulletArray[i].position) < 
+									newEnemyBulletSpherePos.distanceToSquared(oldEnemyBulletSpherePos)){
+
+									enemyBulletArray[i].alive = false;
+									enemyBulletArray[i].visible = false;
+								
+									mediumAsteroids[c].alive = false;
+									mediumAsteroids[c].visible = false;
+									
+									//spawn 2 new small asteroids
+									//small asteroid #1
+									smallAsteroids[c*2].alive = true;
+									smallAsteroids[c*2].visible = true;
+									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
+									//move the new neighbooring asteroids away so they don't spawn on top of each other
+									smallAsteroids[c*2].translateOnAxis(smallAsteroids[c*2].direction, smallAsteroids[c*2].geometry.boundingSphere.radius);
+									//small asteroid #2
+									smallAsteroids[c*2+1].alive = true;
+									smallAsteroids[c*2+1].visible = true;
+									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
+									//move the new neighbooring asteroids away so they don't spawn on top of each other
+									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
+									
+									initExplosionPieces(enemyBulletRayCollisionPoint);
+									
+								}
+
+							}//end if (enemyBulletRayCollisionPoint) {
+							
+						}//end if(mediumAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfMediumAsteroids; c++) {
+					
+					//loop through largeAsteroids and check for collisions with enemyBullets
+					for (var c = 0; c < numberOfLargeAsteroids; c++) {
+						
+						if(largeAsteroids[c].alive){
+							
+							testSphere.radius = largeAsteroids[c].geometry.boundingSphere.radius;
+							testSphere.center.copy(largeAsteroids[c].position);
+							enemyBulletRayCollisionPoint = enemyBulletRay.intersectSphere(testSphere);
+							
+							if (enemyBulletRayCollisionPoint) {
+								
+								if (enemyBulletRayCollisionPoint.distanceToSquared(enemyBulletArray[i].position) < 
+									newEnemyBulletSpherePos.distanceToSquared(oldEnemyBulletSpherePos)){
+
+									enemyBulletArray[i].alive = false;
+									enemyBulletArray[i].visible = false;
+								
+									largeAsteroids[c].alive = false;
+									largeAsteroids[c].visible = false;
+									
+									//spawn 2 new medium asteroids
+									mediumAsteroids[c*2].alive = true;
+									mediumAsteroids[c*2].visible = true;
+									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
+									mediumAsteroids[c*2].translateOnAxis(mediumAsteroids[c*2].direction, mediumAsteroids[c*2].geometry.boundingSphere.radius);
+									mediumAsteroids[c*2+1].alive = true;
+									mediumAsteroids[c*2+1].visible = true;
+									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
+									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
+									
+									initExplosionPieces(enemyBulletRayCollisionPoint);
+									
+								}
+
+							}//end if (enemyBulletRayCollisionPoint) {
+							
+						}//end if(largeAsteroids[c].alive) {
+						
+					}//end for(var c = 0; c < numberOfLargeAsteroids; c++) {
+
+				}//end if (enemyBulletArray[i].alive){
+				
+			}//end for (var i = 0; i < ENEMY_MAX_BULLETS; i++)
+			
+			
+			
 			//loop through largeAsteroids and check for collisions with other largeAsteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				//only check alive asteroids
@@ -694,6 +841,16 @@
 					enemyDirection.normalize();
 					enemyChangeDirectionTimer.reset();
 					enemyChangeDirectionTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+					
+				}
+				
+				enemyShootTimer.run(frameTime);
+				
+				if (enemyShootTimer.alarmSounding) {
+					
+					enemyShootBullet();
+					enemyShootTimer.reset();
+					enemyShootTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
 					
 				}
 				
@@ -943,6 +1100,35 @@
 				bulletCounter = 0;
 
 		}
+		
+		function enemyShootBullet() {
+
+			//set enemyBullet to alive and visibility to true
+			enemyBulletArray[enemyBulletCounter].alive = true;
+			enemyBulletArray[enemyBulletCounter].visible = true;
+			//spawn enemyBullet at enemy's location
+			enemyBulletArray[enemyBulletCounter].position.copy(enemy.position);
+			///reset the enemyBullet direction vector to unit length of 1 to avoid accumulation
+			///enemyBulletArray[enemyBulletCounter].direction.set(0, 0, -1);
+			//enemy gets direction of player and fires at us
+			//enemyBulletArray[enemyBulletCounter].direction.subVectors(ship.position, enemy.position);
+			//enemyBulletArray[enemyBulletCounter].direction.normalize();
+			
+			//enemy picks a random direction to fire in
+			enemyBulletArray[enemyBulletCounter].direction.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+			enemyBulletArray[enemyBulletCounter].direction.normalize();
+			//now the enemyBullet is pointing in the right direction, move it out away from the enemy a little,
+			//so it doesn't start right inside the enemy's saucer
+			enemyBulletArray[enemyBulletCounter].translateOnAxis(enemyBulletArray[enemyBulletCounter].direction, 15);
+			
+			//update enemyBulletCounter for next time
+			enemyBulletCounter += 1;
+			//enemyBulletArray[] index size (enemyBulletCounter) can't exceed ENEMY_MAX_BULLETS
+			if(enemyBulletCounter >= ENEMY_MAX_BULLETS)
+				enemyBulletCounter = 0;
+
+		}
+		
 		
 		function initExplosionPieces ( location ) {
 			
