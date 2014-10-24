@@ -38,13 +38,9 @@ window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
 
 	camera.aspect = window.innerWidth / window.innerHeight;
-	//camera.fov = 1000 * (camera.aspect * 0.01);
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	controls.handleResize();
-			
-	//crossHairsSprite.position.x = spritePositionX * camera.aspect;
-	//crossHairsSprite.position.y = spritePositionY;
 			
 }
 
@@ -191,11 +187,6 @@ pyramidDownGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2
 pyramidUpGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
 
 var pyramidMaterial = new THREE.MeshLambertMaterial({
-	//metal: true,
-	//shading: THREE.FlatShading,
-	//shininess: 10,
-	//specular: 'rgb(105,105,105)',
-	//emissive: 'rgb(0,0,0)'
 	color: 'rgb(30,30,30)'
 });
 
@@ -471,8 +462,6 @@ camera.add(crossHairsSprite);
 //Enemy UFO Object
 var enemy = new THREE.Object3D();
 scene.add(enemy);
-//enemy.scale.set(3.5,3.5,3.5);
-//enemy.updateMatrix();
 enemy.visible = false;
 
 //Enemy Saucer
@@ -646,6 +635,28 @@ var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var canShoot = true;
 
+//enemy bullets
+var ENEMY_MAX_BULLETS = 10;
+var enemyBulletSpeed = 300;
+var enemyBulletCounter = 0;
+var enemyBulletGeometry = new THREE.SphereGeometry(3);
+var enemyBulletMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(0,0,255)'
+});
+var enemyBulletArray = [];
+for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
+	enemyBulletArray[i] = new THREE.Mesh(enemyBulletGeometry, enemyBulletMaterial);
+	scene.add(enemyBulletArray[i]);
+	enemyBulletArray[i].visible = false;
+	enemyBulletArray[i].alive = false;
+	enemyBulletArray[i].direction = new THREE.Vector3(0, 0, 0);
+}
+var enemyBulletRay = new THREE.Ray();
+var enemyBulletRayCollisionPoint = new THREE.Vector3();
+var oldEnemyBulletSpherePos = new THREE.Vector3();
+var newEnemyBulletSpherePos = new THREE.Vector3();
+
+//physics variables
 var combinedRadii = 0;
 var distanceBetweenBodies = new THREE.Vector3();
 var separation = 0;
@@ -671,10 +682,6 @@ var aspectIncrementAmount = -8;
 var thrustVector = new THREE.Vector3(0, 0, -1);
 var frictionVector = new THREE.Vector3();
 var ship = new THREE.Object3D();
-//put the ship position at the origin
-ship.position.set(0, 0, 0);
-//put the camera right where the ship is
-camera.position.copy(ship.position);
 var shipSpeed = 0;
 var shipVelocity = new THREE.Vector3(0, 0, 0);
 var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
@@ -683,7 +690,6 @@ var tryAgain = false;
 var check = 0;
 var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
-//var howManyTries = 0;
 
 
 var debugText1 = document.getElementById("debug1");
