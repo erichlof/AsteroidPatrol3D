@@ -37,8 +37,12 @@ document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
 
+	sunUniforms.resolution.value.x = window.innerWidth;
+	sunUniforms.resolution.value.y = window.innerHeight;
+	
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
+	
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	controls.handleResize();
 			
@@ -118,11 +122,27 @@ var planetMaterial = new THREE.MeshBasicMaterial({
 });
 var planetGeometry = new THREE.PlaneGeometry(800, 800);
 var planet = new THREE.Mesh(planetGeometry, planetMaterial);
-planet.position.x = camera.position.x - 900;
-planet.position.y = camera.position.y - 900;
-planet.position.z = camera.position.z - 900;
+planet.position.copy(camera.position).addScalar(-900);
 planet.lookAt(camera.position);
 scene.add(planet);
+
+// Sun
+var sunGeometry = new THREE.PlaneGeometry(400, 400);
+var sunUniforms = {
+	time: { type: "f", value: 1.0 },
+	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+};			
+var sunMaterial = new THREE.ShaderMaterial( {
+	transparent: true,
+	opacity: 0.2,
+	uniforms: sunUniforms,
+	vertexShader: document.getElementById( 'vertexShader' ).textContent,
+	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+} );
+var sun = new THREE.Mesh(sunGeometry, sunMaterial);
+sun.position.set(-800, 800, 800);			
+sun.lookAt(scene.position);
+scene.add(sun);
 
 var arenaHalfSize = 400;
 var gridLineSpacing = 50;
