@@ -127,20 +127,20 @@ planet.lookAt(camera.position);
 scene.add(planet);
 
 // Sun
-var sunGeometry = new THREE.PlaneGeometry(400, 400);
+var sunGeometry = new THREE.PlaneGeometry(1200, 1200);
 var sunUniforms = {
 	time: { type: "f", value: 1.0 },
 	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
-};			
+};	
 var sunMaterial = new THREE.ShaderMaterial( {
 	transparent: true,
-	opacity: 0.2,
+	//opacity: 0.2,
 	uniforms: sunUniforms,
 	vertexShader: document.getElementById( 'vertexShader' ).textContent,
 	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 } );
 var sun = new THREE.Mesh(sunGeometry, sunMaterial);
-sun.position.set(-800, 800, 800);			
+sun.position.set(-700, 700, 700);
 sun.lookAt(scene.position);
 scene.add(sun);
 
@@ -428,11 +428,25 @@ var explosionMaterial = new THREE.MeshBasicMaterial({
 	emissive: 'rgb(0,75,120)'
 });
 */
+
+//enemy saucer explosion pieces material
+var enemyExplosionMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 1.0,
+	color: 'rgb(150,0,255)',
+	emissive: 'rgb(59,0,100)'
+});
+
 var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
 var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
 var numberOfExplosionPieces = 100;
 var isExploding = false;
 var explosionTimer = new THREEx.GameTimer(4);
+
+var enemyExplosionPieces = [];
+var enemyIsExploding = false;
+var enemyExplosionTimer = new THREEx.GameTimer(4);
+
 var explosionSphereGeometry = new THREE.SphereGeometry(5,10,10);
 var explosionSphereMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
@@ -498,6 +512,8 @@ var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
 enemySaucer.scale.set(0.5, 0.15, 0.5);
 enemySaucer.updateMatrix();
 enemySaucer.matrixAutoUpdate = false;
+enemySaucer.geometry.center();
+enemySaucer.geometry.computeBoundingSphere();
 enemy.add(enemySaucer);
 
 //Enemy Saucer Tripod Feet (Spheres)
