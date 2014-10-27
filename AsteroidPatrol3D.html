@@ -85,20 +85,20 @@
 			vec2 position = -1.0 + 2.0 * vUv;
 			float ang = atan(position.y, position.x);
 			float dist = length(position);
-			gl_FragColor.rgb = vec3(1.0, 0.9, 0.8) * (pow(dist, -1.0) * 0.1);
+			gl_FragColor.rgb = vec3(1.0, 0.8, 0.5) * (pow(dist, -1.5) * 0.01);
 			for (float ray = 0.0; ray < 10.0; ray += 1.0) {
-				float rayang = rand(5234, ray)*6.2+(time*0.05)*10.0*(rand(2546, ray)-rand(5785, ray))-(rand(3545, ray)-rand(5467, ray));
+				float rayang = rand(5234, ray)*6.2+(time*0.03)*10.0*(rand(2546, ray)-rand(5785, ray))-(rand(3545, ray)-rand(5467, ray));
 				rayang = mod(rayang, pi*2.0);
 				if (rayang < ang - pi) {rayang += pi*2.0;}
 				if (rayang > ang + pi) {rayang -= pi*2.0;}
-				float brite = .5 - abs(ang - rayang);
-				brite -= dist * 0.2;
+				float brite = 0.7 - abs(ang - rayang) * 1.5;
+				brite -= dist * 0.5;
 				if (brite > 0.0) {
 					gl_FragColor.rgb += vec3(0.2+0.4*rand(8644, ray), 0.4+0.4*rand(4567, ray), 0.5+0.4*rand(7354, ray)) * brite * 0.1;
 				}
 			}
-			gl_FragColor.a = 1.0 - (dist * 1.5);
-			if(dist > 0.99)
+			gl_FragColor.a = 1.0 - (dist + dist);
+			if(dist > 0.9)
 				gl_FragColor.a = 0.0;
 			
 		}
@@ -276,6 +276,20 @@
 				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				explosionPieces[i].visible = false;
 				scene.add(explosionPieces[i]);
+				
+			}
+			//build enemy explosion pieces
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				
+				enemyExplosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, enemyExplosionMaterial);
+				enemyExplosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
+				enemyExplosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				enemyExplosionPieces[i].direction.normalize();
+				enemyExplosionPieces[i].speed = Math.random() * 400 + 200;
+				enemyExplosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+				enemyExplosionPieces[i].position.set(500, 500, 500);//place outside arena for now
+				enemyExplosionPieces[i].visible = false;
+				scene.add(enemyExplosionPieces[i]);
 				
 			}
 	
@@ -541,6 +555,33 @@
 						}//end if(largeAsteroids[c].alive) {
 						
 					}//end for(var c = 0; c < numberOfLargeAsteroids; c++) {
+					
+					//check if enemy is alive
+					if (enemyAlive) {
+						//if so, see if enemy has been shot
+						testSphere.radius = enemySaucer.geometry.boundingSphere.radius;
+						testSphere.center.copy(enemy.position);
+						bulletRayCollisionPoint = bulletRay.intersectSphere(testSphere);
+							
+						if (bulletRayCollisionPoint) {
+						
+							if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
+								newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
+
+								bulletArray[i].alive = false;
+								bulletArray[i].visible = false;
+									
+								enemyAlive = false;
+								enemy.visible = false;
+								enemySpawnTimer.reset();
+								enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+									
+								initEnemyExplosionPieces(bulletRayCollisionPoint);
+							}
+
+						}//end if (bulletRayCollisionPoint) {
+							
+					}//end if(enemyAlive) {
 
 				}//end if (bulletArray[i].alive){
 				
@@ -813,9 +854,9 @@
 			planet.position.copy(camera.position).addScalar(-900);
 			
 			sun.position.copy(camera.position);
-			sun.position.x -= 500;
-			sun.position.y += 500;
-			sun.position.z += 500;
+			sun.position.x -= 700;
+			sun.position.y += 700;
+			sun.position.z += 700;
 			sunUniforms.time.value = performance.now() * 0.001;
 			
 			//ENEMY UFO SAUCER CODE///////////
@@ -984,7 +1025,37 @@
 					isExploding = false;
 				}
 				
-			}
+			}//end if (isExploding)
+			
+			if (enemyIsExploding) {
+				
+				explosionScale += 150.0 * frameTime;
+				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+				explosionSphere.material.opacity -= 1.5 * frameTime;
+				
+				//only need to update 1 of the pieces' material, in order to change them all, 
+				//because they all share same material
+				enemyExplosionPieces[0].material.opacity -= 0.8 * frameTime;
+				for (var i = 0; i < numberOfExplosionPieces; i++) {
+					enemyExplosionPieces[i].translateOnAxis(enemyExplosionPieces[i].direction, enemyExplosionPieces[i].speed * frameTime);
+				}
+				
+				enemyExplosionTimer.run(frameTime);
+				
+				if (enemyExplosionTimer.alarmSounding) {
+					for (var i = 0; i < numberOfExplosionPieces; i++) {
+						enemyExplosionPieces[i].visible = false;
+					}
+					explosionScale = 1.0;
+					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+					explosionSphere.visible = false;
+					explosionSphere.material.opacity = 0.3;
+					
+					enemyExplosionPieces[0].material.opacity = 1.0;
+					enemyIsExploding = false;
+				}
+				
+			}//end if (enemyIsExploding)
 			
 			box.rotation.y += frameTime;
 			//pyramid.rotation.x += frameTime;
@@ -1204,6 +1275,24 @@
 			
 			isExploding = true;
 			explosionTimer.reset();
+		}
+		
+		function initEnemyExplosionPieces ( location ) {
+			
+			explosionSphere.position.copy(location);
+			explosionScale = 1.0;
+			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
+			explosionSphere.visible = true;
+			explosionSphere.material.opacity = 0.3;
+			//only need to update 1 piece's material - they all share the same material
+			enemyExplosionPieces[0].material.opacity = 1.0;
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				enemyExplosionPieces[i].position.copy(location);
+				enemyExplosionPieces[i].visible = true;
+			}
+			
+			enemyIsExploding = true;
+			enemyExplosionTimer.reset();
 		}
 		
 		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
