@@ -24,13 +24,14 @@ Press Purple joystick-button2 to apply Thrusters <br>
 
 To Do
 -----
-* nothing much, just MAKE A 3D ASTEROIDS GAME FROM SCRATCH! - ha ha :)
-* Make UFO saucer able to navigate the arena and shoot
-* Make explosion when the player crashes into an asteroid, or gets shot by UFO
-* Add Sun with possible solar flare effect
+
+* Add score to the top of the screen
+* Offer '1up' free life when player reaches a certain amount of points
 * Add 'ships remaining' in the top corner using simple shapes to represent ships
-* Possibly add a radar in the corner of the screen to warn against surrounding asteroids
+* Slightly increase the difficulty each level
+* Randomly change the Asteroid materials each level so their re-appearance at level start is more fresh feeling
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
+* Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Add 3D spatial sound FX to surround the player from all angles
 
 
