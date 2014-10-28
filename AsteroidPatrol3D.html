@@ -115,6 +115,7 @@
 		function initLevel() {
 			
 			//if we are on a later level, first clean up all of the old asteroid objects
+			//and explosion pieces
 			if(level > 0){
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
@@ -125,6 +126,10 @@
 				}
 				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
 					scene.remove( smallAsteroids[i] );
+				}
+				for (var i = 0; i < numberOfExplosionPieces; i++) {	
+					scene.remove( explosionPieces[i] );
+					scene.remove( enemyExplosionPieces[i] );
 				}
 
 			}
@@ -294,6 +299,9 @@
 			}
 	
 			placeShip();
+			
+			isExploding = false;
+			enemyIsExploding = false;
 			
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
@@ -732,7 +740,60 @@
 				
 			}//end for (var i = 0; i < ENEMY_MAX_BULLETS; i++)
 			
+			//L radius = 75, M radius = 45, S radius = 23, enemy radius = 50
+			//loop through largeAsteroids and check for collisions with Enemy UFO and also with Player
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
+				//only check for collisions if enemy UFO is alive
+				if (enemyAlive) {
+					//only check alive asteroids
+					if (largeAsteroids[i].alive) {
+						if (largeAsteroids[i].position.distanceTo(enemy.position) < 120) {
+							enemyAlive = false;
+							enemy.visible = false;
+							enemySpawnTimer.reset();
+							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+									
+							initEnemyExplosionPieces(enemy.position);
+						}
+					}
+				}
+			}
 			
+			//loop through mediumAsteroids and check for collisions with Enemy UFO and also with Player
+			for (var i = 0; i < numberOfMediumAsteroids; i++) {
+				//only check for collisions if enemy UFO is alive
+				if (enemyAlive) {
+					//only check alive asteroids
+					if (mediumAsteroids[i].alive) {
+						if (mediumAsteroids[i].position.distanceTo(enemy.position) < 90) {
+							enemyAlive = false;
+							enemy.visible = false;
+							enemySpawnTimer.reset();
+							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+									
+							initEnemyExplosionPieces(enemy.position);
+						}
+					}
+				}
+			}
+			
+			//loop through smallAsteroids and check for collisions with Enemy UFO and also with Player
+			for (var i = 0; i < numberOfSmallAsteroids; i++) {
+				//only check for collisions if enemy UFO is alive
+				if (enemyAlive) {
+					//only check alive asteroids
+					if (smallAsteroids[i].alive) {
+						if (smallAsteroids[i].position.distanceTo(enemy.position) < 70) {
+							enemyAlive = false;
+							enemy.visible = false;
+							enemySpawnTimer.reset();
+							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+									
+							initEnemyExplosionPieces(enemy.position);
+						}
+					}
+				}
+			}
 			
 			//loop through largeAsteroids and check for collisions with other largeAsteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
