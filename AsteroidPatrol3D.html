@@ -404,6 +404,9 @@
 					shipSpeed = 0;
 			}
 			
+			//flip back and forth so bullets go from white to blue very fast
+			bulletFlipper = !bulletFlipper;
+			
 			//loop through bulletArray, update bullet positions, update collisions
 			for (var i = 0; i < MAX_BULLETS; i++) {
 				
@@ -415,6 +418,7 @@
 					
 						bulletArray[i].alive = false;
 						bulletArray[i].visible = false;
+						bulletTexPlaneCopy[i].visible = false;
 					}
 				}
 				//if bullet is alive, update it
@@ -422,12 +426,35 @@
 					//keep updating the bullet ray to equal the bulletSphere's position and direction vectors,
 					//so this ray can be used for ray-boundingSphere collision detection.
 					bulletRay.set(bulletArray[i].position, bulletArray[i].direction);
+					
+					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
+					bulletTexPlaneCopy[i].lookAt(camera.position);
+					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					
+					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2);
+					
+					bulletArray[i].localToWorld(bulletArray[i].position);
 					//record the current bullet location
 					oldBulletSpherePos.copy(bulletArray[i].position);
 					//move bullet along bullet direction vector, at the rate of bulletSpeed times the framerate
 					bulletArray[i].translateOnAxis(bulletArray[i].direction, bulletSpeed * frameTime);
 					//now that we have moved it, record the new bullet location
 					newBulletSpherePos.copy(bulletArray[i].position);
+					
+					///bulletTexPlaneCopy[i].localToWorld(bulletTexPlaneCopy[i].position);
+					///bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
+					///bulletTexPlaneCopy[i].translateOnAxis(bulletArray[i].direction, 10);
+					
+					//rotate the 'billboard' bullet object so that it always face our camera
+					bulletArray[i].worldToLocal(bulletArray[i].position);
+					bulletArray[i].lookAt(camera.position);
+					spinCounter += 6 * frameTime;
+					if (spinCounter > PI_2) spinCounter -= PI_2;
+					bulletArray[i].rotateZ(spinCounter);
+					
+					//bulletTexPlaneCopy[i].worldToLocal(bulletTexPlaneCopy[i].position);
+					//bulletTexPlaneCopy[i].lookAt(camera.position);
+					//bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
 					
 					//loop through smallAsteroids and check for collisions with our bullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -448,6 +475,7 @@
 
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
+									bulletTexPlaneCopy[i].visible = false;
 									//place it right where the collision occurred
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									smallAsteroids[c].alive = false;
@@ -485,6 +513,7 @@
 
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
+									bulletTexPlaneCopy[i].visible = false;
 									//place it right where the collision occurred
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									mediumAsteroids[c].alive = false;
@@ -530,6 +559,7 @@
 
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
+									bulletTexPlaneCopy[i].visible = false;
 									//place it right where the collision occurred
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									largeAsteroids[c].alive = false;
@@ -578,6 +608,7 @@
 
 								bulletArray[i].alive = false;
 								bulletArray[i].visible = false;
+								bulletTexPlaneCopy[i].visible = false;
 									
 								enemyAlive = false;
 								enemy.visible = false;
@@ -613,8 +644,11 @@
 					
 					enemyBulletRay.set(enemyBulletArray[i].position, enemyBulletArray[i].direction);
 					oldEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					enemyBulletArray[i].localToWorld(enemyBulletArray[i].position);
 					enemyBulletArray[i].translateOnAxis(enemyBulletArray[i].direction, enemyBulletSpeed * frameTime);
 					newEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					enemyBulletArray[i].worldToLocal(enemyBulletArray[i].position);
+					enemyBulletArray[i].lookAt(camera.position);
 					
 					//loop through smallAsteroids and check for collisions with enemyBullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -748,6 +782,20 @@
 					//only check alive asteroids
 					if (largeAsteroids[i].alive) {
 						if (largeAsteroids[i].position.distanceTo(enemy.position) < 120) {
+							
+							largeAsteroids[i].alive = false;
+							largeAsteroids[i].visible = false;
+							initExplosionPieces(largeAsteroids[i].position);
+							//spawn 2 new medium asteroids
+							mediumAsteroids[i*2].alive = true;
+							mediumAsteroids[i*2].visible = true;
+							mediumAsteroids[i*2].position.copy(largeAsteroids[i].position);
+							mediumAsteroids[i*2].translateOnAxis(mediumAsteroids[i*2].direction, mediumAsteroids[i*2].geometry.boundingSphere.radius);
+							mediumAsteroids[i*2+1].alive = true;
+							mediumAsteroids[i*2+1].visible = true;
+							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
+							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
+									
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
@@ -766,6 +814,20 @@
 					//only check alive asteroids
 					if (mediumAsteroids[i].alive) {
 						if (mediumAsteroids[i].position.distanceTo(enemy.position) < 90) {
+							
+							mediumAsteroids[i].alive = false;
+							mediumAsteroids[i].visible = false;
+							initExplosionPieces(mediumAsteroids[i].position);
+							//spawn 2 new small asteroids
+							smallAsteroids[i*2].alive = true;
+							smallAsteroids[i*2].visible = true;
+							smallAsteroids[i*2].position.copy(mediumAsteroids[i].position);
+							smallAsteroids[i*2].translateOnAxis(smallAsteroids[i*2].direction, smallAsteroids[i*2].geometry.boundingSphere.radius);
+							smallAsteroids[i*2+1].alive = true;
+							smallAsteroids[i*2+1].visible = true;
+							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
+							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
+									
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
@@ -784,6 +846,16 @@
 					//only check alive asteroids
 					if (smallAsteroids[i].alive) {
 						if (smallAsteroids[i].position.distanceTo(enemy.position) < 70) {
+							
+							smallAsteroids[i].alive = false;
+							smallAsteroids[i].visible = false;
+							initExplosionPieces(smallAsteroids[i].position);
+							smallAsteroidsRemaining -= 1;
+							if(smallAsteroidsRemaining < 1)
+								initLevel();
+
+							debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
@@ -1273,21 +1345,26 @@
 			//set bullet to alive and visibility to true
 			bulletArray[bulletCounter].alive = true;
 			bulletArray[bulletCounter].visible = true;
+			bulletTexPlaneCopy[bulletCounter].visible = true;
 			//spawn bullet at player's location
-			bulletArray[bulletCounter].position.copy(ship.position);
+			bulletArray[bulletCounter].position.copy(ship.position);	
 			//reset the bullet direction vector to unit length of 1 to avoid accumulation
-			bulletArray[bulletCounter].direction.set(0, 0, -1);
-			//rotate the vector by our camera's rotation quaternion
-			bulletArray[bulletCounter].direction.applyQuaternion(camera.quaternion);
+			bulletArray[bulletCounter].direction.set(0, 0, 1);
+			//get our camera's direction and copy it into current bullet's direction
+			camera.getWorldDirection( bulletArray[bulletCounter].direction );
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
-			bulletArray[bulletCounter].translateOnAxis(bulletArray[bulletCounter].direction, 15);
+			bulletArray[bulletCounter].direction.multiplyScalar(15);
+			bulletArray[bulletCounter].position.add(bulletArray[bulletCounter].direction);
+			bulletArray[bulletCounter].direction.divideScalar(15);
 			
 			//update bulletCounter for next time
 			bulletCounter += 1;
 			//bulletArray[] index size (bulletCounter) can't exceed MAX_BULLETS
 			if(bulletCounter >= MAX_BULLETS)
 				bulletCounter = 0;
+			
+			bulletFlipper = true;
 
 		}
 		
@@ -1298,18 +1375,14 @@
 			enemyBulletArray[enemyBulletCounter].visible = true;
 			//spawn enemyBullet at enemy's location
 			enemyBulletArray[enemyBulletCounter].position.copy(enemy.position);
-			///reset the enemyBullet direction vector to unit length of 1 to avoid accumulation
-			///enemyBulletArray[enemyBulletCounter].direction.set(0, 0, -1);
-			//enemy gets direction of player and fires at us
-			//enemyBulletArray[enemyBulletCounter].direction.subVectors(ship.position, enemy.position);
-			//enemyBulletArray[enemyBulletCounter].direction.normalize();
-			
 			//enemy picks a random direction to fire in
 			enemyBulletArray[enemyBulletCounter].direction.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 			enemyBulletArray[enemyBulletCounter].direction.normalize();
 			//now the enemyBullet is pointing in the right direction, move it out away from the enemy a little,
 			//so it doesn't start right inside the enemy's saucer
-			enemyBulletArray[enemyBulletCounter].translateOnAxis(enemyBulletArray[enemyBulletCounter].direction, 15);
+			enemyBulletArray[enemyBulletCounter].direction.multiplyScalar(15);
+			enemyBulletArray[enemyBulletCounter].position.add(enemyBulletArray[enemyBulletCounter].direction);
+			enemyBulletArray[enemyBulletCounter].direction.divideScalar(15);
 			
 			//update enemyBulletCounter for next time
 			enemyBulletCounter += 1;
