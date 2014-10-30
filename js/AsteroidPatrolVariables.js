@@ -144,6 +144,7 @@ sun.position.set(-700, 700, 700);
 sun.lookAt(scene.position);
 scene.add(sun);
 
+
 var arenaHalfSize = 400;
 var gridLineSpacing = 50;
 //calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
@@ -635,6 +636,7 @@ enemy.add(enemyBody);
 
 // GAME VARIABLES ////////////////////////////////////////////////////////////////////////////////////
 
+var PI_2 = Math.PI * 2;
 var enemyDirection = new THREE.Vector3();
 var enemySpeed = 70;
 var enemyMoveTargetLocation = new THREE.Vector3();
@@ -651,20 +653,41 @@ var TOP_WALL = 5; var BOTTOM_WALL = 6;
 
 //bullets
 var MAX_BULLETS = 20;
-var bulletSpeed = 400;
+var bulletSpeed = 400;//400
 var bulletCounter = 0;
-var bulletGeometry = new THREE.SphereGeometry(3);
+var spinCounter = 0;
+//bullet 'billboards' (always facing player)
+var bulletTexture = new THREE.ImageUtils.loadTexture('images/lensflare.png');
 var bulletMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(255,0,0)'
+	color: 'rgb(0,0,255)',
+	transparent: true,
+	opacity: 0.7,
+	//depthWrite: false,
+	map: bulletTexture
 });
+var bulletCopyMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(255,255,255)',
+	transparent: true,
+	opacity: 1.0,
+	//depthWrite: false,
+	map: bulletTexture
+});
+var bulletGeometry = new THREE.PlaneGeometry(50, 50);
+
 var bulletArray = [];
+var bulletTexPlaneCopy = [];
 for (var i = 0; i < MAX_BULLETS; i++) {
 	bulletArray[i] = new THREE.Mesh(bulletGeometry, bulletMaterial);
+	bulletTexPlaneCopy[i] = new THREE.Mesh(bulletGeometry, bulletCopyMaterial);
 	scene.add(bulletArray[i]);
 	bulletArray[i].visible = false;
 	bulletArray[i].alive = false;
-	bulletArray[i].direction = new THREE.Vector3(0, 0, 0);
+	bulletArray[i].direction = new THREE.Vector3();
+	scene.add(bulletTexPlaneCopy[i]);
+	bulletTexPlaneCopy[i].visible = false;
+	bulletTexPlaneCopy[i].direction = new THREE.Vector3();
 }
+var bulletFlipper = true;
 var bulletRay = new THREE.Ray();
 var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
@@ -675,10 +698,13 @@ var canShoot = true;
 var ENEMY_MAX_BULLETS = 10;
 var enemyBulletSpeed = 300;
 var enemyBulletCounter = 0;
-var enemyBulletGeometry = new THREE.SphereGeometry(3);
 var enemyBulletMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(0,0,255)'
+	color: 'rgb(150,0,255)',
+	transparent: true,
+	map: bulletTexture
 });
+var enemyBulletGeometry = new THREE.PlaneGeometry(50, 50);
+
 var enemyBulletArray = [];
 for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
 	enemyBulletArray[i] = new THREE.Mesh(enemyBulletGeometry, enemyBulletMaterial);
