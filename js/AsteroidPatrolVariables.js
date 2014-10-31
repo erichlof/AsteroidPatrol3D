@@ -510,11 +510,13 @@ var enemySaucerMaterial = new THREE.MeshPhongMaterial({
 	color: 'rgb(150,0,255)'
 });
 var enemySaucer = new THREE.Mesh(enemySaucerGeometry, enemySaucerMaterial);
-enemySaucer.scale.set(0.5, 0.15, 0.5);
+enemySaucer.scale.set(0.5, 0.15, 0.5);//this makes the boundingSphere radius 25
 enemySaucer.updateMatrix();
 enemySaucer.matrixAutoUpdate = false;
 enemySaucer.geometry.center();
 enemySaucer.geometry.computeBoundingSphere();
+//give a little extra padding so our shots will more easily hit the moving UFO
+enemySaucer.geometry.boundingSphere.radius = 30;
 enemy.add(enemySaucer);
 
 //Enemy Saucer Tripod Feet (Spheres)
@@ -659,17 +661,15 @@ var spinCounter = 0;
 //bullet 'billboards' (always facing player)
 var bulletTexture = new THREE.ImageUtils.loadTexture('images/lensflare.png');
 var bulletMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(0,0,255)',
+	color: 'rgb(0,120,255)',
 	transparent: true,
 	opacity: 0.7,
-	//depthWrite: false,
 	map: bulletTexture
 });
 var bulletCopyMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(255,255,255)',
+	color: 'rgb(200,255,255)',
 	transparent: true,
 	opacity: 1.0,
-	//depthWrite: false,
 	map: bulletTexture
 });
 var bulletGeometry = new THREE.PlaneGeometry(50, 50);
@@ -685,7 +685,7 @@ for (var i = 0; i < MAX_BULLETS; i++) {
 	bulletArray[i].direction = new THREE.Vector3();
 	scene.add(bulletTexPlaneCopy[i]);
 	bulletTexPlaneCopy[i].visible = false;
-	bulletTexPlaneCopy[i].direction = new THREE.Vector3();
+	//bulletTexPlaneCopy[i].direction = new THREE.Vector3();
 }
 var bulletFlipper = true;
 var bulletRay = new THREE.Ray();
@@ -696,22 +696,34 @@ var canShoot = true;
 
 //enemy bullets
 var ENEMY_MAX_BULLETS = 10;
-var enemyBulletSpeed = 300;
+var enemyBulletSpeed = 300;//300
 var enemyBulletCounter = 0;
 var enemyBulletMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(150,0,255)',
 	transparent: true,
+	opacity: 0.7,
+	map: bulletTexture
+});
+var enemyBulletCopyMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(255,200,255)',
+	transparent: true,
+	opacity: 1.0,
 	map: bulletTexture
 });
 var enemyBulletGeometry = new THREE.PlaneGeometry(50, 50);
 
 var enemyBulletArray = [];
+var enemyBulletTexPlaneCopy = [];
 for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
 	enemyBulletArray[i] = new THREE.Mesh(enemyBulletGeometry, enemyBulletMaterial);
+	enemyBulletTexPlaneCopy[i] = new THREE.Mesh(enemyBulletGeometry, enemyBulletCopyMaterial);
 	scene.add(enemyBulletArray[i]);
 	enemyBulletArray[i].visible = false;
 	enemyBulletArray[i].alive = false;
-	enemyBulletArray[i].direction = new THREE.Vector3(0, 0, 0);
+	enemyBulletArray[i].direction = new THREE.Vector3();
+	scene.add(enemyBulletTexPlaneCopy[i]);
+	enemyBulletTexPlaneCopy[i].visible = false;
+	//enemyBulletTexPlaneCopy[i].direction = new THREE.Vector3();
 }
 var enemyBulletRay = new THREE.Ray();
 var enemyBulletRayCollisionPoint = new THREE.Vector3();
