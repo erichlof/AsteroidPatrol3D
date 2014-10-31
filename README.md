@@ -35,6 +35,12 @@ To Do
 * Add 3D spatial sound FX to surround the player from all angles
 
 
+October 31, 2014 Progress Note
+--------------------------------
+
+Added simple AI to Enemy UFO.  Like the orginal arcade, it appears at random times, navigates a path from one side of the arena to the other, and then disappears.  It shoots laser bullets in random directions.  Its laser bullets can break apart asteroids if they hit them, and the enemy UFO can smash into asteroids if it gets too close.  I also made the laser bullets look like balls of plasma energy.  I achieved this effect by rapidly alternating different-colored textures on transparent square polygons and then rotating the final image always towards the player's camera.  This is also known as 'billboarding'.  Next TODO will be randomly changing the asteroid colors and materials, so that their re-appearance every level seems a little fresher.
+
+
 October 17, 2014 Progress Note
 --------------------------------
 
@@ -63,9 +69,3 @@ September 19, 2014 Progress Note
 --------------------------------
 
 Added stars that gently move against the background when your ship accelerates.  Developed algorithm to procedurally generate asteroid vertex deformation, so that every asteroid looks slightly different from each other.  In the next update I will add the ability to rapid-fire multiple shots. 
-
-
-July 12, 2014 Progress Note
----------------------------
-
-Sorry for the lack of updates - busy summer :) . Added multiple Large asteroids by creating an array[] called largeAsteroids[].  Each asteroid in this group has its own position, speed, rotation, collision bounding-sphere, etc.  Next order of business will be to have the Large asteroids break apart into 2 Medium asteroids, which will each break apart into 2 Small asteroids.  Also asteroid object-creation will be necessary each level (1 or 2 more asteroids added to each new level, to increase difficulty), as well as asteroid object-deletion when an asteroid is shot.
