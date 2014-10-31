@@ -370,10 +370,8 @@
 			}
 			//if thrust button is pressed, apply thrust force to ship in the same direction that the camera is facing
 			if (joystick.button2Pressed || keyboard.pressed('space')) {
-				//reset the thrustVector to unit length of 1 to avoid accumulation
-				thrustVector.set(0, 0, -1);
-				//rotate thrustVector by our camera's rotation quaternion
-				thrustVector.applyQuaternion(camera.quaternion);
+				//get the camera's direction and copy it into thrustVector
+				camera.getWorldDirection(thrustVector);
 				//now thrustVector has the right direction, but it needs magnitude also...
 				//20 is the 'strength' of the thruster; this is multiplied by framerate so it will run consistently on different systems
 				thrustVector.multiplyScalar(20 * frameTime);
@@ -427,12 +425,6 @@
 					//so this ray can be used for ray-boundingSphere collision detection.
 					bulletRay.set(bulletArray[i].position, bulletArray[i].direction);
 					
-					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
-					bulletTexPlaneCopy[i].lookAt(camera.position);
-					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
-					
-					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2);
-					
 					bulletArray[i].localToWorld(bulletArray[i].position);
 					//record the current bullet location
 					oldBulletSpherePos.copy(bulletArray[i].position);
@@ -441,10 +433,6 @@
 					//now that we have moved it, record the new bullet location
 					newBulletSpherePos.copy(bulletArray[i].position);
 					
-					///bulletTexPlaneCopy[i].localToWorld(bulletTexPlaneCopy[i].position);
-					///bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
-					///bulletTexPlaneCopy[i].translateOnAxis(bulletArray[i].direction, 10);
-					
 					//rotate the 'billboard' bullet object so that it always face our camera
 					bulletArray[i].worldToLocal(bulletArray[i].position);
 					bulletArray[i].lookAt(camera.position);
@@ -452,9 +440,10 @@
 					if (spinCounter > PI_2) spinCounter -= PI_2;
 					bulletArray[i].rotateZ(spinCounter);
 					
-					//bulletTexPlaneCopy[i].worldToLocal(bulletTexPlaneCopy[i].position);
-					//bulletTexPlaneCopy[i].lookAt(camera.position);
-					//bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
+					bulletTexPlaneCopy[i].lookAt(camera.position);
+					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
 					
 					//loop through smallAsteroids and check for collisions with our bullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -637,18 +626,31 @@
 					
 						enemyBulletArray[i].alive = false;
 						enemyBulletArray[i].visible = false;
+						enemyBulletTexPlaneCopy[i].visible = false;
 					}
 				}
 				//if enemyBullet is alive, update it
 				if (enemyBulletArray[i].alive){
 					
 					enemyBulletRay.set(enemyBulletArray[i].position, enemyBulletArray[i].direction);
-					oldEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					
 					enemyBulletArray[i].localToWorld(enemyBulletArray[i].position);
+					//record the current bullet location
+					oldEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					//move bullet along bullet direction vector, at the rate of bulletSpeed times the framerate
 					enemyBulletArray[i].translateOnAxis(enemyBulletArray[i].direction, enemyBulletSpeed * frameTime);
+					//now that we have moved it, record the new bullet location
 					newEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
+					
+					//rotate the 'billboard' bullet object so that it always face our camera
 					enemyBulletArray[i].worldToLocal(enemyBulletArray[i].position);
 					enemyBulletArray[i].lookAt(camera.position);
+					enemyBulletArray[i].rotateZ(spinCounter);
+					
+					enemyBulletTexPlaneCopy[i].position.copy(enemyBulletArray[i].position);
+					enemyBulletTexPlaneCopy[i].lookAt(camera.position);
+					enemyBulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					enemyBulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
 					
 					//loop through smallAsteroids and check for collisions with enemyBullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -666,6 +668,7 @@
 
 									enemyBulletArray[i].alive = false;
 									enemyBulletArray[i].visible = false;
+									enemyBulletTexPlaneCopy[i].visible = false;
 									
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
@@ -702,6 +705,7 @@
 
 									enemyBulletArray[i].alive = false;
 									enemyBulletArray[i].visible = false;
+									enemyBulletTexPlaneCopy[i].visible = false;
 								
 									mediumAsteroids[c].alive = false;
 									mediumAsteroids[c].visible = false;
@@ -746,6 +750,7 @@
 
 									enemyBulletArray[i].alive = false;
 									enemyBulletArray[i].visible = false;
+									enemyBulletTexPlaneCopy[i].visible = false;
 								
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
@@ -1373,9 +1378,11 @@
 			//set enemyBullet to alive and visibility to true
 			enemyBulletArray[enemyBulletCounter].alive = true;
 			enemyBulletArray[enemyBulletCounter].visible = true;
+			enemyBulletTexPlaneCopy[enemyBulletCounter].visible = true;
 			//spawn enemyBullet at enemy's location
 			enemyBulletArray[enemyBulletCounter].position.copy(enemy.position);
 			//enemy picks a random direction to fire in
+			//enemyBulletArray[enemyBulletCounter].direction.set(0, 0, 1);
 			enemyBulletArray[enemyBulletCounter].direction.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 			enemyBulletArray[enemyBulletCounter].direction.normalize();
 			//now the enemyBullet is pointing in the right direction, move it out away from the enemy a little,
