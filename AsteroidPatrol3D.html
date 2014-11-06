@@ -54,7 +54,7 @@
 	<script src="js/threex.geometricglowmesh.js"></script>
 	<script src="js/webaudioxGameSounds.js"></script>
 	
-	<script id="vertexShader" type="x-shader/x-vertex">
+	<script id="SunVertexShader" type="x-shader/x-vertex">
 		
 		varying vec2 vUv;
 
@@ -67,7 +67,7 @@
 
 	</script>
 		
-	<script id="fragmentShader" type="x-shader/x-fragment">
+	<script id="SunFragmentShader" type="x-shader/x-fragment">
 
 		uniform float time;
 		uniform vec2 resolution;
@@ -101,6 +101,73 @@
 			if(dist > 0.9)
 				gl_FragColor.a = 0.0;
 			
+		}
+
+	</script>
+	
+	<script id="ExplosionVertexShader" type="x-shader/x-vertex">
+		
+		varying vec2 vUv;
+
+		void main()
+		{
+			vUv = uv;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
+		}
+
+	</script>
+		
+	<script id="ExplosionFragmentShader" type="x-shader/x-fragment">
+
+		uniform float time;
+		uniform vec2 resolution;
+		uniform float explosionTransparency;
+		
+		varying vec2 vUv;
+		
+		float snoise(vec3 uv, float res)
+		{
+			const vec3 s = vec3(1e0, 1e2, 1e3);
+
+			uv *= res;
+
+			vec3 uv0 = floor(mod(uv, res))*s;
+			vec3 uv1 = floor(mod(uv+vec3(1.0), res))*s;
+
+			vec3 f = fract(uv);
+			f = f*f*(3.0-2.0*f);
+
+			vec4 v = vec4(uv0.x+uv0.y+uv0.z, uv1.x+uv0.y+uv0.z,
+					  uv0.x+uv1.y+uv0.z, uv1.x+uv1.y+uv0.z);
+
+			vec4 r = fract(sin(v*1e-1)*1e3);
+			float r0 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+			r = fract(sin((v + uv1.z - uv0.z)*1e-1)*1e3);
+			float r1 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+			return mix(r0, r1, f.z)*2.0 -1.0;
+		}
+
+		void main( void )
+		{
+			vec2 p = -1.0 + 2.0 * vUv;
+			float dist = length(p);
+			
+			float color = 4.0 - (6.0 * dist);//6.0
+
+			vec3 coord = vec3(atan(p.x,p.y)/6.28, dist*0.4, 0.5);
+
+			for(int i = 1; i <= 4; i++)
+			{
+				float power = pow(2.0, float(i));
+				color += (1.5 / power) * snoise(coord + vec3(0.0, -time*0.1, time*0.1), power*18.0);
+			}
+			gl_FragColor.rgb = vec3( color, pow(max(color,0.0),2.0)*0.4, pow(max(color,0.0),3.0)*0.15 );
+			gl_FragColor.a = explosionTransparency - dist;
+			if(dist > 0.7)
+				gl_FragColor.a = 0.0;
 		}
 
 	</script>
@@ -272,7 +339,7 @@
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				
-				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, explosionMaterial);
+				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidExplosionMaterial);
 				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				explosionPieces[i].direction.normalize();
@@ -470,7 +537,7 @@
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									
-									initExplosionPieces(bulletRayCollisionPoint);
+									initExplosion(bulletRayCollisionPoint);
 									
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
@@ -522,7 +589,7 @@
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(bulletRayCollisionPoint);
+									initExplosion(bulletRayCollisionPoint);
 									
 								}
 
@@ -564,7 +631,7 @@
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(bulletRayCollisionPoint);
+									initExplosion(bulletRayCollisionPoint);
 									
 									/*	
 									//the following is optional:
@@ -604,7 +671,7 @@
 								enemySpawnTimer.reset();
 								enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
 									
-								initEnemyExplosionPieces(bulletRayCollisionPoint);
+								initEnemyExplosion(bulletRayCollisionPoint);
 							}
 
 						}//end if (bulletRayCollisionPoint) {
@@ -673,7 +740,7 @@
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									
-									initExplosionPieces(enemyBulletRayCollisionPoint);
+									initExplosion(enemyBulletRayCollisionPoint);
 									
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
@@ -724,7 +791,7 @@
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(enemyBulletRayCollisionPoint);
+									initExplosion(enemyBulletRayCollisionPoint);
 									
 								}
 
@@ -765,7 +832,7 @@
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
-									initExplosionPieces(enemyBulletRayCollisionPoint);
+									initExplosion(enemyBulletRayCollisionPoint);
 									
 								}
 
@@ -790,7 +857,7 @@
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
-							initExplosionPieces(largeAsteroids[i].position);
+							initExplosion(largeAsteroids[i].position);
 							//spawn 2 new medium asteroids
 							mediumAsteroids[i*2].alive = true;
 							mediumAsteroids[i*2].visible = true;
@@ -806,7 +873,7 @@
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
 									
-							initEnemyExplosionPieces(enemy.position);
+							initEnemyExplosion(enemy.position);
 						}
 					}
 				}
@@ -822,7 +889,7 @@
 							
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
-							initExplosionPieces(mediumAsteroids[i].position);
+							initExplosion(mediumAsteroids[i].position);
 							//spawn 2 new small asteroids
 							smallAsteroids[i*2].alive = true;
 							smallAsteroids[i*2].visible = true;
@@ -838,7 +905,7 @@
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
 									
-							initEnemyExplosionPieces(enemy.position);
+							initEnemyExplosion(enemy.position);
 						}
 					}
 				}
@@ -854,7 +921,7 @@
 							
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
-							initExplosionPieces(smallAsteroids[i].position);
+							initExplosion(smallAsteroids[i].position);
 							smallAsteroidsRemaining -= 1;
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
@@ -866,7 +933,7 @@
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
 									
-							initEnemyExplosionPieces(enemy.position);
+							initEnemyExplosion(enemy.position);
 						}
 					}
 				}
@@ -996,6 +1063,14 @@
 			sun.position.y += 700;
 			sun.position.z += 700;
 			sunUniforms.time.value = performance.now() * 0.001;
+			
+			box.rotation.y += frameTime;
+			//pyramid.rotation.x += frameTime;
+			//pyramid.rotation.y += frameTime;
+			
+			//test code for rotating sprites
+			//crossHairsSprite.material.rotation += 2 * frameTime;
+			
 			
 			//ENEMY UFO SAUCER CODE///////////
 			//if the UFO is not spawned yet, 
@@ -1134,10 +1209,22 @@
 				
 			}
 			
-			// if explosion has occurred, update the exploding pieces
+			// if explosion has occurred, update the exploding pieces and exploding animation
 			if (isExploding) {
 				
-				explosionScale += 150.0 * frameTime;
+				//update explosionBillboard
+				explosionBillboardUniforms.time.value = sunUniforms.time.value;
+				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.scale.x += 1000 * frameTime;
+				explosionBillboard.scale.y += 1000 * frameTime;
+				if(explosionBillboard.scale.x > 1000)
+					explosionBillboard.scale.x = 1000;
+				if(explosionBillboard.scale.y > 1000)
+					explosionBillboard.scale.y = 1000;
+				explosionBillboardUniforms.explosionTransparency.value -= 2.0 * frameTime;
+				
+				//update explosionSphere
+				explosionScale += 150.0 * frameTime;//150.0
 				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
 				explosionSphere.material.opacity -= 1.5 * frameTime;
 				
@@ -1154,18 +1241,34 @@
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						explosionPieces[i].visible = false;
 					}
+					explosionBillboard.scale.set(1.0, 1.0, 1.0);
+					explosionBillboard.visible = false;
+					explosionBillboardUniforms.explosionTransparency.value = 1.0;
+					
 					explosionScale = 1.0;
 					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
 					explosionSphere.visible = false;
 					explosionSphere.material.opacity = 0.3;
 					
 					explosionPieces[0].material.opacity = 1.0;
+					
 					isExploding = false;
 				}
 				
 			}//end if (isExploding)
 			
 			if (enemyIsExploding) {
+				
+				//update explosionBillboard
+				explosionBillboardUniforms.time.value = sunUniforms.time.value;
+				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.scale.x += 1000 * frameTime;
+				explosionBillboard.scale.y += 1000 * frameTime;
+				if(explosionBillboard.scale.x > 1000)
+					explosionBillboard.scale.x = 1000;
+				if(explosionBillboard.scale.y > 1000)
+					explosionBillboard.scale.y = 1000;
+				explosionBillboardUniforms.explosionTransparency.value -= 2.0 * frameTime;
 				
 				explosionScale += 150.0 * frameTime;
 				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
@@ -1195,12 +1298,6 @@
 				
 			}//end if (enemyIsExploding)
 			
-			box.rotation.y += frameTime;
-			//pyramid.rotation.x += frameTime;
-			//pyramid.rotation.y += frameTime;
-			
-			//test code for rotating sprites
-			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
 			//move and spin largeAsteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -1400,13 +1497,22 @@
 		}
 		
 		
-		function initExplosionPieces ( location ) {
+		function initExplosion ( location ) {
 			
+			//setup explosionBillboard
+			explosionBillboard.position.copy(location);
+			explosionBillboard.scale.set(1.0, 1.0, 1.0)
+			explosionBillboard.visible = true;
+			explosionBillboardUniforms.explosionTransparency.value = 1.0;
+			
+			//setup explosionSphere
 			explosionSphere.position.copy(location);
 			explosionScale = 1.0;
 			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
-			explosionSphere.visible = true;
+			explosionSphere.visible = true;//true
 			explosionSphere.material.opacity = 0.3;
+			
+			//setup explosionPieces
 			//only need to update 1 piece's material - they all share the same material
 			explosionPieces[0].material.opacity = 1.0;
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
@@ -1418,13 +1524,20 @@
 			explosionTimer.reset();
 		}
 		
-		function initEnemyExplosionPieces ( location ) {
+		function initEnemyExplosion ( location ) {
 			
+			//setup explosionBillboard
+			explosionBillboard.position.copy(location);
+			explosionBillboard.scale.set(1.0, 1.0, 1.0)
+			explosionBillboard.visible = true;
+			explosionBillboardUniforms.explosionTransparency.value = 1.0;
+			//setup explosionSphere
 			explosionSphere.position.copy(location);
 			explosionScale = 1.0;
 			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
 			explosionSphere.visible = true;
 			explosionSphere.material.opacity = 0.3;
+			//setup explosionPieces
 			//only need to update 1 piece's material - they all share the same material
 			enemyExplosionPieces[0].material.opacity = 1.0;
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
