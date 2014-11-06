@@ -39,6 +39,8 @@ function onWindowResize() {
 
 	sunUniforms.resolution.value.x = window.innerWidth;
 	sunUniforms.resolution.value.y = window.innerHeight;
+	explosionBillboardUniforms.resolution.value.x = window.innerWidth;
+	explosionBillboardUniforms.resolution.value.y = window.innerHeight;
 	
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
@@ -120,29 +122,45 @@ var planetMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	map: planetTexture
 });
-var planetGeometry = new THREE.PlaneGeometry(800, 800);
+var planetGeometry = new THREE.PlaneBufferGeometry(800, 800);
 var planet = new THREE.Mesh(planetGeometry, planetMaterial);
 planet.position.copy(camera.position).addScalar(-900);
 planet.lookAt(camera.position);
 scene.add(planet);
 
 // Sun
-var sunGeometry = new THREE.PlaneGeometry(1200, 1200);
+var sunGeometry = new THREE.PlaneBufferGeometry(1200, 1200);
 var sunUniforms = {
 	time: { type: "f", value: 1.0 },
 	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
 };	
 var sunMaterial = new THREE.ShaderMaterial( {
 	transparent: true,
-	//opacity: 0.2,
 	uniforms: sunUniforms,
-	vertexShader: document.getElementById( 'vertexShader' ).textContent,
-	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+	vertexShader: document.getElementById( 'SunVertexShader' ).textContent,
+	fragmentShader: document.getElementById( 'SunFragmentShader' ).textContent
 } );
 var sun = new THREE.Mesh(sunGeometry, sunMaterial);
 sun.position.set(-700, 700, 700);
 sun.lookAt(scene.position);
 scene.add(sun);
+
+// Explosion Billboards
+var explosionBillboardGeometry = new THREE.PlaneBufferGeometry(1, 1);
+var explosionBillboardUniforms = {
+	time: { type: "f", value: 1.0 },
+	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+	explosionTransparency: { type: "f", value: 1.0 }
+};	
+var explosionBillboardMaterial = new THREE.ShaderMaterial( {
+	transparent: true,
+	uniforms: explosionBillboardUniforms,
+	vertexShader: document.getElementById( 'ExplosionVertexShader' ).textContent,
+	fragmentShader: document.getElementById( 'ExplosionFragmentShader' ).textContent
+} );
+var explosionBillboard = new THREE.Mesh(explosionBillboardGeometry, explosionBillboardMaterial);
+explosionBillboard.visible = false;
+scene.add(explosionBillboard);
 
 
 var arenaHalfSize = 400;
@@ -385,17 +403,17 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 });
 */
 
-//Explosion Pieces
+//Asteroid Explosion Pieces
 /*
 //brown rock
-var explosionMaterial = new THREE.MeshBasicMaterial({
+var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(100,45,15)',
 	emissive: 'rgb(30,15,5)'
 });
 */
 
 //dark grey rock
-var explosionMaterial = new THREE.MeshBasicMaterial({
+var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(40,40,40)',
@@ -404,7 +422,7 @@ var explosionMaterial = new THREE.MeshBasicMaterial({
 
 /*
 //high-contrast, 'snowy' comet-like rock
-var explosionMaterial = new THREE.MeshBasicMaterial({
+var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(240,240,240)',
@@ -413,7 +431,7 @@ var explosionMaterial = new THREE.MeshBasicMaterial({
 */
 /*
 //red, mars-like rock
-var explosionMaterial = new THREE.MeshBasicMaterial({
+var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(100,10,0)',
@@ -422,7 +440,7 @@ var explosionMaterial = new THREE.MeshBasicMaterial({
 */
 /*
 //blue, transparent water-ice rock
-var explosionMaterial = new THREE.MeshBasicMaterial({
+var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(0,150,255)',
@@ -672,7 +690,7 @@ var bulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var bulletGeometry = new THREE.PlaneGeometry(50, 50);
+var bulletGeometry = new THREE.PlaneBufferGeometry(50, 50);
 
 var bulletArray = [];
 var bulletTexPlaneCopy = [];
@@ -710,7 +728,7 @@ var enemyBulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var enemyBulletGeometry = new THREE.PlaneGeometry(50, 50);
+var enemyBulletGeometry = new THREE.PlaneBufferGeometry(50, 50);
 
 var enemyBulletArray = [];
 var enemyBulletTexPlaneCopy = [];
