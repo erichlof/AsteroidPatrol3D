@@ -358,42 +358,35 @@ var mediumAsteroids = [];
 var smallAsteroids = [];
 
 var testSphere = new THREE.Sphere();
+
 //Asteroid Materials
-/*
+var asteroidMaterials = [];
 //brown rock
-var asteroidMaterial = new THREE.MeshLambertMaterial({
+asteroidMaterials[0] = new THREE.MeshLambertMaterial({
 	color: 'rgb(100,45,15)',
 	emissive: 'rgb(30,15,5)',
 	shading: THREE.FlatShading
 });
-*/
-
 //dark grey rock
-var asteroidMaterial = new THREE.MeshLambertMaterial({
+asteroidMaterials[1] = new THREE.MeshLambertMaterial({
 	color: 'rgb(40,40,40)',
 	emissive: 'rgb(20,20,20)',
 	shading: THREE.FlatShading
 });
-
-/*
 //high-contrast, 'snowy' comet-like rock
-var asteroidMaterial = new THREE.MeshLambertMaterial({
+asteroidMaterials[2] = new THREE.MeshLambertMaterial({
 	color: 'rgb(240,240,240)',
 	emissive: 'rgb(20,20,20)',
 	shading: THREE.FlatShading
 });
-*/
-/*
 //red, mars-like rock
-var asteroidMaterial = new THREE.MeshLambertMaterial({
+asteroidMaterials[3] = new THREE.MeshLambertMaterial({
 	color: 'rgb(100,10,0)',
 	emissive: 'rgb(30,5,0)',
 	shading: THREE.FlatShading
 });
-*/
-/*
 //blue, transparent water-ice rock
-var asteroidMaterial = new THREE.MeshLambertMaterial({
+asteroidMaterials[4] = new THREE.MeshLambertMaterial({
 	transparent: true,
 	opacity: 0.85,
 	color: 'rgb(0,150,255)',
@@ -401,52 +394,43 @@ var asteroidMaterial = new THREE.MeshLambertMaterial({
 	side: THREE.DoubleSide,
 	shading: THREE.FlatShading
 });
-*/
 
 //Asteroid Explosion Pieces
-/*
+var asteroidExplosionMaterials = [];
 //brown rock
-var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
+asteroidExplosionMaterials[0] = new THREE.MeshBasicMaterial({
 	color: 'rgb(100,45,15)',
 	emissive: 'rgb(30,15,5)'
 });
-*/
-
 //dark grey rock
-var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
+asteroidExplosionMaterials[1] = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(40,40,40)',
 	emissive: 'rgb(20,20,20)'
 });
-
-/*
 //high-contrast, 'snowy' comet-like rock
-var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
+asteroidExplosionMaterials[2] = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(240,240,240)',
 	emissive: 'rgb(20,20,20)'
 });
-*/
-/*
 //red, mars-like rock
-var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
+asteroidExplosionMaterials[3] = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(100,10,0)',
 	emissive: 'rgb(30,5,0)'
 });
-*/
-/*
 //blue, transparent water-ice rock
-var asteroidExplosionMaterial = new THREE.MeshBasicMaterial({
+asteroidExplosionMaterials[4] = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 1.0,
 	color: 'rgb(0,150,255)',
 	emissive: 'rgb(0,75,120)'
 });
-*/
+
 
 //enemy saucer explosion pieces material
 var enemyExplosionMaterial = new THREE.MeshBasicMaterial({
@@ -670,7 +654,8 @@ var whichSide = 0;
 var FRONT_WALL = 1; var BACK_WALL = 2;
 var RIGHT_WALL = 3; var LEFT_WALL = 4;
 var TOP_WALL = 5; var BOTTOM_WALL = 6;
-
+var randMaterialIndex = 0;
+var previousRandMaterialIndex = 0;
 //bullets
 var MAX_BULLETS = 20;
 var bulletSpeed = 400;//400
