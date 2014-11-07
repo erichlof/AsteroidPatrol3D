@@ -201,13 +201,24 @@
 
 			}
 			
-			//for debug collisions
-			//level = 4;
 			level += 1;
-			numberOfLargeAsteroids = Math.floor( level * 3 + 2 );
+			numberOfLargeAsteroids = Math.floor( level * 3 );// + 2
+			//for debug levels progression
+			//numberOfLargeAsteroids = 1;
+			//end debug levels progression
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
 			smallAsteroidsRemaining = numberOfSmallAsteroids;
+			
+			//randomly choose an asteroidMaterial at level start.
+			//also make sure the newly chosen material isn't the same as the last level
+			while (randMaterialIndex == previousRandMaterialIndex) {
+				randMaterialIndex = Math.floor( Math.random() * 5 );
+			}
+			//always set beginning level to basic asteroidMaterial
+			if (level == 1) randMaterialIndex = 0;
+			//record the previous randomly chosen material so that the next level will look different
+			previousRandMaterialIndex = randMaterialIndex;
 			
 			debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 			numberOfLargeAsteroidsCreated = 0;
@@ -220,7 +231,7 @@
 					largeAsteroidGeometry.vertices[v].add(deformVec);
 				}
 
-				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterial);
+				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
 				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
@@ -269,7 +280,7 @@
 					mediumAsteroidGeometry.vertices[v].add(deformVec);
 				}
 
-				mediumAsteroids[i] = new THREE.Mesh(mediumAsteroidGeometry, asteroidMaterial);
+				mediumAsteroids[i] = new THREE.Mesh(mediumAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
 				mediumAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				mediumAsteroids[i].geometry.computeFaceNormals();
@@ -308,7 +319,7 @@
 					smallAsteroidGeometry.vertices[v].add(deformVec);
 				}
 
-				smallAsteroids[i] = new THREE.Mesh(smallAsteroidGeometry, asteroidMaterial);
+				smallAsteroids[i] = new THREE.Mesh(smallAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
 				smallAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				smallAsteroids[i].geometry.computeFaceNormals();
@@ -339,7 +350,7 @@
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				
-				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidExplosionMaterial);
+				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidExplosionMaterials[randMaterialIndex]);
 				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				explosionPieces[i].direction.normalize();
@@ -1413,7 +1424,7 @@
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
 		*/
-			debugText4.innerHTML = "whichSide: " + whichSide;
+			debugText4.innerHTML = "randMaterialIndex: " + randMaterialIndex;
 
 		} //end function animate()
 		
