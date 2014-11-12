@@ -432,6 +432,12 @@ asteroidExplosionMaterials[4] = new THREE.MeshBasicMaterial({
 });
 
 
+var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
+var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
+var numberOfExplosionPieces = 100;
+var isExploding = false;
+var explosionTimer = new THREEx.GameTimer(4);
+
 //enemy saucer explosion pieces material
 var enemyExplosionMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
@@ -439,16 +445,20 @@ var enemyExplosionMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(150,0,255)',
 	emissive: 'rgb(59,0,100)'
 });
-
-var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
-var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
-var numberOfExplosionPieces = 100;
-var isExploding = false;
-var explosionTimer = new THREEx.GameTimer(4);
-
 var enemyExplosionPieces = [];
 var enemyIsExploding = false;
 var enemyExplosionTimer = new THREEx.GameTimer(4);
+
+//Player explosion pieces material
+var playerExplosionMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 1.0,
+	color: 'rgb(0,0,255)',
+	emissive: 'rgb(0,0,100)'
+});
+var playerExplosionPieces = [];
+var playerIsExploding = false;
+var playerExplosionTimer = new THREEx.GameTimer(4);
 
 var explosionSphereGeometry = new THREE.SphereGeometry(5,10,10);
 var explosionSphereMaterial = new THREE.MeshBasicMaterial({
@@ -481,6 +491,7 @@ var collisionSphereRadiusSquared = 0;
 // Sunlight
 var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
 sunLight.position.set(-1, 1, 1);
+sunLight.lookAt(scene.position);
 scene.add(sunLight);
 
 // HUD SPRITES
@@ -640,7 +651,7 @@ enemy.add(enemyBody);
 
 // GAME VARIABLES ////////////////////////////////////////////////////////////////////////////////////
 
-var PI_2 = Math.PI * 2;
+var TWO_PI = Math.PI * 2;
 var enemyDirection = new THREE.Vector3();
 var enemySpeed = 70;
 var enemyMoveTargetLocation = new THREE.Vector3();
@@ -649,6 +660,7 @@ var enemySpawnTimer = new THREEx.GameTimer();
 var enemyChangeDirectionTimer = new THREEx.GameTimer();
 var enemyShootTimer = new THREEx.GameTimer();
 var enemyAlive = false;
+var playerAlive = false;
 var randomPick = 0;
 var whichSide = 0;
 var FRONT_WALL = 1; var BACK_WALL = 2;
@@ -752,6 +764,9 @@ asteroidCopy1.speed = 0;
 asteroidCopy2.speed = 0;
 
 var frameTime = 0;
+var playingDeathAnimation = false;
+var deathAnimationTimer = new THREEx.GameTimer(5);
+var cameraAngle = 0;
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
