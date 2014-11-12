@@ -27,9 +27,8 @@ To Do
 
 * Add score to the top of the screen
 * Offer '1up' free life when player reaches a certain amount of points
-* Allow Player to crash into Asteroids/UFO, and be shot by UFO
 * Add 'ships remaining' in the top corner using simple shapes to represent ships
-* Slightly increase the difficulty each level
+* Slightly increase the difficulty each level (speed of asteroids)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Add 3D spatial sound FX to surround the player from all angles
