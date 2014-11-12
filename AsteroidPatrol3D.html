@@ -194,9 +194,11 @@
 				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
 					scene.remove( smallAsteroids[i] );
 				}
+				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {	
 					scene.remove( explosionPieces[i] );
 					scene.remove( enemyExplosionPieces[i] );
+					scene.remove( playerExplosionPieces[i] );
 				}
 
 			}
@@ -349,7 +351,7 @@
 
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
-				
+
 				explosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, asteroidExplosionMaterials[randMaterialIndex]);
 				explosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				explosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -359,11 +361,11 @@
 				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				explosionPieces[i].visible = false;
 				scene.add(explosionPieces[i]);
-				
+
 			}
 			//build enemy explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
-				
+
 				enemyExplosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, enemyExplosionMaterial);
 				enemyExplosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
 				enemyExplosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -373,19 +375,34 @@
 				enemyExplosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				enemyExplosionPieces[i].visible = false;
 				scene.add(enemyExplosionPieces[i]);
-				
+
+			}
+			//build player explosion pieces
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+
+				playerExplosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, playerExplosionMaterial);
+				playerExplosionPieces[i].scale.set( (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2, (Math.random() * 2 - 1) + 2 );
+				playerExplosionPieces[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+				playerExplosionPieces[i].direction.normalize();
+				playerExplosionPieces[i].speed = Math.random() * 400 + 200;
+				playerExplosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+				playerExplosionPieces[i].position.set(500, 500, 500);//place outside arena for now
+				playerExplosionPieces[i].visible = false;
+				scene.add(playerExplosionPieces[i]);
+
 			}
 	
+			playerAlive = true;
 			placeShip();
 			
 			isExploding = false;
 			enemyIsExploding = false;
 			
 			enemySpawnTimer.reset();
-			enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 			
 			enemyShootTimer.reset();
-			enemyShootTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+			enemyShootTimer.setAlarm( 1 );
 			
 			//setup controls parameters
 			//controls.movementSpeed = 100;
@@ -421,7 +438,7 @@
 				joystick._pressed = true;
 
 			//check if joystick Stick is being moved
-			if (joystick._pressed) {
+			if (joystick._pressed && playerAlive) {
 
 				if (mouseControl) {
 					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 2);
@@ -439,7 +456,7 @@
 				canShoot = true;
 			}
 			//if firebutton IS pressed, check to see if we can shoot
-			if (joystick.button1Pressed) {
+			if (joystick.button1Pressed && playerAlive) {
 				if (canShoot) {
 					shootBullet();
 					//turn off shooting so we don't rapid fire
@@ -447,7 +464,7 @@
 				}
 			}
 			//if thrust button is pressed, apply thrust force to ship in the same direction that the camera is facing
-			if (joystick.button2Pressed || keyboard.pressed('space')) {
+			if ( playerAlive && (joystick.button2Pressed || keyboard.pressed('space')) ) {
 				//get the camera's direction and copy it into thrustVector
 				camera.getWorldDirection(thrustVector);
 				//now thrustVector has the right direction, but it needs magnitude also...
@@ -465,7 +482,7 @@
 			}
 			else{ //no thrust is being applied, so slow the ship down gradually
 				//Although no air drag friction exists in space, this makes handling the ship easier
-				if (shipSpeed > 1) {
+				if (shipSpeed > 1 && playerAlive) {
 					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
 					//in order to point in the opposing direction
 					frictionVector.copy(shipVelocity).negate().normalize();
@@ -476,7 +493,7 @@
 					//record the current speed of the ship, which equals the length of its velocity vector
 					shipSpeed = shipVelocity.length();
 				}
-				else if (shipSpeed <= 1) 
+				else if (shipSpeed <= 1 || !playerAlive) 
 					shipSpeed = 0;
 			}
 			
@@ -515,12 +532,12 @@
 					bulletArray[i].worldToLocal(bulletArray[i].position);
 					bulletArray[i].lookAt(camera.position);
 					spinCounter += 6 * frameTime;
-					if (spinCounter > PI_2) spinCounter -= PI_2;
+					if (spinCounter > TWO_PI) spinCounter -= TWO_PI;
 					bulletArray[i].rotateZ(spinCounter);
 					
 					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
 					bulletTexPlaneCopy[i].lookAt(camera.position);
-					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
 					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
 					
 					//loop through smallAsteroids and check for collisions with our bullets
@@ -680,7 +697,7 @@
 								enemyAlive = false;
 								enemy.visible = false;
 								enemySpawnTimer.reset();
-								enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+								enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
 								initEnemyExplosion(bulletRayCollisionPoint);
 							}
@@ -727,8 +744,37 @@
 					
 					enemyBulletTexPlaneCopy[i].position.copy(enemyBulletArray[i].position);
 					enemyBulletTexPlaneCopy[i].lookAt(camera.position);
-					enemyBulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * PI_2);
+					enemyBulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
 					enemyBulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
+					
+					//first check if enemy's bullets have hit player
+					//only check if player is alive
+					if (playerAlive) {
+						
+						testSphere.radius = 50;
+						testSphere.center.copy(ship.position);
+						enemyBulletRayCollisionPoint = enemyBulletRay.intersectSphere(testSphere);
+
+						if (enemyBulletRayCollisionPoint) {
+							
+							if (enemyBulletRayCollisionPoint.distanceToSquared(enemyBulletArray[i].position) < 
+									newEnemyBulletSpherePos.distanceToSquared(oldEnemyBulletSpherePos)){
+
+									enemyBulletArray[i].alive = false;
+									enemyBulletArray[i].visible = false;
+									enemyBulletTexPlaneCopy[i].visible = false;
+									
+									initPlayerExplosion(ship.position);
+									playerAlive = false;
+									ship.visible = false;
+									shipSpeed = 0;
+									playingDeathAnimation = true;
+							
+							}
+
+						}
+						
+					}
 					
 					//loop through smallAsteroids and check for collisions with enemyBullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -857,6 +903,7 @@
 				
 			}//end for (var i = 0; i < ENEMY_MAX_BULLETS; i++)
 			
+			
 			//L radius = 75, M radius = 45, S radius = 23, enemy radius = 50
 			//loop through largeAsteroids and check for collisions with Enemy UFO and also with Player
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -882,13 +929,41 @@
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
 							initEnemyExplosion(enemy.position);
 						}
 					}
 				}
-			}
+				
+				//only check for collisions if player is alive
+				if (playerAlive) {
+					//only check alive asteroids
+					if (largeAsteroids[i].alive) {
+						if (largeAsteroids[i].position.distanceTo(ship.position) < 120) {
+							
+							largeAsteroids[i].alive = false;
+							largeAsteroids[i].visible = false;
+							initExplosion(largeAsteroids[i].position);
+							//spawn 2 new medium asteroids
+							mediumAsteroids[i*2].alive = true;
+							mediumAsteroids[i*2].visible = true;
+							mediumAsteroids[i*2].position.copy(largeAsteroids[i].position);
+							mediumAsteroids[i*2].translateOnAxis(mediumAsteroids[i*2].direction, mediumAsteroids[i*2].geometry.boundingSphere.radius);
+							mediumAsteroids[i*2+1].alive = true;
+							mediumAsteroids[i*2+1].visible = true;
+							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
+							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
+									
+							playerAlive = false;
+							ship.visible = false;
+							shipSpeed = 0;
+							initPlayerExplosion(ship.position);
+							playingDeathAnimation = true;
+						}
+					}
+				}
+			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
 			
 			//loop through mediumAsteroids and check for collisions with Enemy UFO and also with Player
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
@@ -914,13 +989,41 @@
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
 							initEnemyExplosion(enemy.position);
 						}
 					}
 				}
-			}
+				
+				//only check for collisions if player is alive
+				if (playerAlive) {
+					//only check alive asteroids
+					if (mediumAsteroids[i].alive) {
+						if (mediumAsteroids[i].position.distanceTo(ship.position) < 90) {
+							
+							mediumAsteroids[i].alive = false;
+							mediumAsteroids[i].visible = false;
+							initExplosion(mediumAsteroids[i].position);
+							//spawn 2 new small asteroids
+							smallAsteroids[i*2].alive = true;
+							smallAsteroids[i*2].visible = true;
+							smallAsteroids[i*2].position.copy(mediumAsteroids[i].position);
+							smallAsteroids[i*2].translateOnAxis(smallAsteroids[i*2].direction, smallAsteroids[i*2].geometry.boundingSphere.radius);
+							smallAsteroids[i*2+1].alive = true;
+							smallAsteroids[i*2+1].visible = true;
+							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
+							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
+									
+							playerAlive = false;
+							ship.visible = false;
+							shipSpeed = 0;
+							initPlayerExplosion(ship.position);
+							playingDeathAnimation = true;
+						}
+					}
+				}
+			}//end for (var i = 0; i < numberOfMediumAsteroids; i++) {
 			
 			//loop through smallAsteroids and check for collisions with Enemy UFO and also with Player
 			for (var i = 0; i < numberOfSmallAsteroids; i++) {
@@ -942,11 +1045,54 @@
 							enemyAlive = false;
 							enemy.visible = false;
 							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
 							initEnemyExplosion(enemy.position);
 						}
 					}
+				}
+				
+				//only check for collisions if player is alive
+				if (playerAlive) {
+					//only check alive asteroids
+					if (smallAsteroids[i].alive) {
+						if (smallAsteroids[i].position.distanceTo(ship.position) < 70) {
+							
+							smallAsteroids[i].alive = false;
+							smallAsteroids[i].visible = false;
+							initExplosion(smallAsteroids[i].position);
+							smallAsteroidsRemaining -= 1;
+							if(smallAsteroidsRemaining < 1)
+								initLevel();
+
+							debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+
+							playerAlive = false;
+							ship.visible = false;
+							shipSpeed = 0;
+							initPlayerExplosion(ship.position);
+							playingDeathAnimation = true;
+						}
+					}
+				}
+			}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
+			
+			//check if player and UFO have collided
+			//only check if both ships are alive
+			if (enemyAlive && playerAlive) {
+				if ( enemy.position.distanceTo(ship.position) < 100 ) {
+				
+					enemyAlive = false;
+					enemy.visible = false;
+					enemySpawnTimer.reset();
+					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
+					initEnemyExplosion(enemy.position);
+					playerAlive = false;
+					ship.visible = false;
+					shipSpeed = 0;
+					initPlayerExplosion(ship.position);
+					playingDeathAnimation = true;
+					
 				}
 			}
 			
@@ -1035,7 +1181,7 @@
 			
 			
 			//move the ship along its normalized axis vector, at the rate of shipSpeed times the framerate
-			ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
+			if (playerAlive) ship.translateOnAxis(normalizedShipDirection, shipSpeed * frameTime);
 			//if player ship leaves the boundaries of the game arena,
 			//warp the ship to opposite side of arena, like old Asteroids 'screen-wrap'
 			if (ship.position.x > arenaHalfSize){
@@ -1129,7 +1275,7 @@
 					
 					enemySpawnTimer.reset();
 					enemyChangeDirectionTimer.reset();
-					enemyChangeDirectionTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+					enemyChangeDirectionTimer.setAlarm( 1 );
 				}
 					
 			}//end if (!enemyAlive)
@@ -1163,7 +1309,7 @@
 					enemyDirection.subVectors(enemyMoveTargetLocation, enemy.position);
 					enemyDirection.normalize();
 					enemyChangeDirectionTimer.reset();
-					enemyChangeDirectionTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+					enemyChangeDirectionTimer.setAlarm( Math.random() * (2 / level) + 0.5 );
 					
 				}
 				
@@ -1173,7 +1319,9 @@
 					
 					enemyShootBullet();
 					enemyShootTimer.reset();
-					enemyShootTimer.setAlarm( Math.floor(Math.random() * 2 + 1) );
+					//as the levels progress, the resulting alarm number below will get smaller and smaller, 
+					//resulting in faster rapid-fire from the enemy
+					enemyShootTimer.setAlarm( Math.random() * (2 / level) + 0.5 );
 					
 				}
 				
@@ -1190,12 +1338,32 @@
 					enemyAlive = false;
 					enemy.visible = false;
 					enemySpawnTimer.reset();
-					enemySpawnTimer.setAlarm( Math.floor(Math.random() * 5 + 10) );
+					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 				}
 				
 			}
 				
+			if (playingDeathAnimation) {
+				
+				cameraAngle += frameTime;
+				if (cameraAngle >= TWO_PI) 
+					cameraAngle -= TWO_PI;
+
+				camera.position.x = ship.position.x + Math.sin(cameraAngle) * 400;
+				camera.position.y = ship.position.y + 100;
+				camera.position.z = ship.position.z + Math.cos(cameraAngle) * 400;
+				camera.lookAt(ship.position);
 			
+				deathAnimationTimer.run(frameTime);
+
+				if (deathAnimationTimer.alarmSounding) {
+					playerAlive = true;
+					ship.visible = true;
+					deathAnimationTimer.reset();
+					playingDeathAnimation = false;
+					placeShip();
+				}
+			}
 			
 			
 			if (playingWarpAnimation) {
@@ -1275,9 +1443,9 @@
 				explosionBillboard.lookAt(camera.position);
 				explosionBillboard.scale.x += 1000 * frameTime;
 				explosionBillboard.scale.y += 1000 * frameTime;
-				if(explosionBillboard.scale.x > 1000)
+				if (explosionBillboard.scale.x > 1000)
 					explosionBillboard.scale.x = 1000;
-				if(explosionBillboard.scale.y > 1000)
+				if (explosionBillboard.scale.y > 1000)
 					explosionBillboard.scale.y = 1000;
 				explosionBillboardUniforms.explosionTransparency.value -= 2.0 * frameTime;
 				
@@ -1308,6 +1476,45 @@
 				}
 				
 			}//end if (enemyIsExploding)
+			
+			if (playerIsExploding) {
+				
+				//update explosionBillboard
+				explosionBillboardUniforms.time.value = sunUniforms.time.value;
+				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.scale.x += 1000 * frameTime;
+				explosionBillboard.scale.y += 1000 * frameTime;
+				if (explosionBillboard.scale.x > 1000)
+					explosionBillboard.scale.x = 1000;
+				if (explosionBillboard.scale.y > 1000)
+					explosionBillboard.scale.y = 1000;
+				explosionBillboardUniforms.explosionTransparency.value -= 2.0 * frameTime;
+				
+				explosionScale += 150.0 * frameTime;
+				explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+				explosionSphere.material.opacity -= 1.5 * frameTime;
+				
+				playerExplosionPieces[0].material.opacity -= 0.8 * frameTime;
+				for (var i = 0; i < numberOfExplosionPieces; i++) {
+					playerExplosionPieces[i].translateOnAxis(playerExplosionPieces[i].direction, playerExplosionPieces[i].speed * frameTime);
+				}
+				
+				playerExplosionTimer.run(frameTime);
+				
+				if (playerExplosionTimer.alarmSounding) {
+					for (var i = 0; i < numberOfExplosionPieces; i++) {
+						playerExplosionPieces[i].visible = false;
+					}
+					explosionScale = 1.0;
+					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
+					explosionSphere.visible = false;
+					explosionSphere.material.opacity = 0.3;
+					
+					playerExplosionPieces[0].material.opacity = 1.0;
+					playerIsExploding = false;
+				}
+				
+			}//end if (playerIsExploding)
 			
 			
 			//move and spin largeAsteroids
@@ -1414,7 +1621,7 @@
 			}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
 			
 			//update the controls
-			controls.update(frameTime);
+			if (playerAlive) controls.update(frameTime);
 			//render the scene with our camera
 			renderer.render(scene, camera);
 			
@@ -1451,6 +1658,12 @@
 				}
 				
 			}
+			
+			shipSpeed = 0;
+			thrustVector.set(0,0,0);
+			frictionVector.set(0,0,0);
+			shipVelocity.set(0,0,0);
+			
 		}
 		
 		function shootBullet() {
@@ -1558,6 +1771,31 @@
 			
 			enemyIsExploding = true;
 			enemyExplosionTimer.reset();
+		}
+		
+		function initPlayerExplosion ( location ) {
+			
+			//setup explosionBillboard
+			explosionBillboard.position.copy(location);
+			explosionBillboard.scale.set(1.0, 1.0, 1.0)
+			explosionBillboard.visible = true;
+			explosionBillboardUniforms.explosionTransparency.value = 1.0;
+			//setup explosionSphere
+			explosionSphere.position.copy(location);
+			explosionScale = 1.0;
+			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
+			explosionSphere.visible = true;
+			explosionSphere.material.opacity = 0.3;
+			//setup explosionPieces
+			//only need to update 1 piece's material - they all share the same material
+			playerExplosionPieces[0].material.opacity = 1.0;
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				playerExplosionPieces[i].position.copy(location);
+				playerExplosionPieces[i].visible = true;
+			}
+			
+			playerIsExploding = true;
+			playerExplosionTimer.reset();
 		}
 		
 		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
