@@ -434,7 +434,7 @@ asteroidExplosionMaterials[4] = new THREE.MeshBasicMaterial({
 
 var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
 var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
-var numberOfExplosionPieces = 100;
+var numberOfExplosionPieces = 100;//100
 var isExploding = false;
 var explosionTimer = new THREEx.GameTimer(4);
 
@@ -767,6 +767,7 @@ var frameTime = 0;
 var playingDeathAnimation = false;
 var deathAnimationTimer = new THREEx.GameTimer(5);
 var cameraAngle = 0;
+var cameraDistance = 50;//0
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
