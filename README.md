@@ -25,13 +25,17 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add score to the top of the screen
-* Offer '1up' free life when player reaches a certain amount of points
-* Add 'ships remaining' in the top corner using simple shapes to represent ships
+* Add 'ships remaining' in the top corner using simple 2D shapes to represent ships
 * Slightly increase the difficulty each level (speed of asteroids)
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
 * Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Add 3D spatial sound FX to surround the player from all angles
+
+
+November 15, 2014 Progress Note
+--------------------------------
+
+Now the player can crash into asteroids and be shot by the UFO saucer.  When player's ship is destroyed, the ships remaining goes down by one and an orbital camera death animation is played for 4 seconds.  Also I added a scoring system that reflects the original arcade: Large Asteroids - 20 points, Medium Asteroids - 50 points, Small Asteroids - 100 points, UFO - 500 points.  Each time the player accumulates 10,000 points, an extra ship/life is rewarded. Next update will have a 2D graphical representation of ships remaining, maybe using the old Atari arcade ship as a bitmap and placing ships remaining all in a row in the corner of the screen.  Also, I'm trying to fine-tune the difficulty progression as the player advances each level.  There should be a balance between too easy (being able to just coast through without dying ever) and too hard (not being able to reach the 1up 10,000 point goal before all ships remaining are depleted).   
 
 
 October 31, 2014 Progress Note
