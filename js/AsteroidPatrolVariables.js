@@ -35,8 +35,18 @@ var renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
-function onWindowResize() {
+var fontAspect = 0;
 
+function onWindowResize() {
+	
+	fontAspect = (window.innerWidth / 175) * (window.innerHeight / 200);
+	if (fontAspect > 20) fontAspect = 20;
+	if (fontAspect < 10) fontAspect = 10;
+	
+	fontAspect *= 2;
+	document.getElementById("score").style.fontSize = fontAspect + "px";
+	document.getElementById("lives").style.fontSize = fontAspect + "px";
+	
 	sunUniforms.resolution.value.x = window.innerWidth;
 	sunUniforms.resolution.value.y = window.innerHeight;
 	explosionBillboardUniforms.resolution.value.x = window.innerWidth;
@@ -765,9 +775,9 @@ asteroidCopy2.speed = 0;
 
 var frameTime = 0;
 var playingDeathAnimation = false;
-var deathAnimationTimer = new THREEx.GameTimer(5);
-var cameraAngle = 0;
-var cameraDistance = 50;//0
+var deathAnimationTimer = new THREEx.GameTimer(4);
+var cutsceneCameraAngle = 0;
+var cutsceneCameraDistance = 50;//0
 var playingWarpAnimation = false;
 var fovIncrementAmount = 600;
 var aspectIncrementAmount = -8;
@@ -783,7 +793,12 @@ var tryAgain = false;
 var check = 0;
 var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
-
+var score = 9000;
+var extraLifeScore = 10000;
+var livesRemaining = 2;
+var gameOver = false;
+var scoreText = document.getElementById("score");
+var livesRemainingText = document.getElementById("lives");
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
