@@ -44,6 +44,14 @@
 	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
 		Debug Info
 	</div>
+	
+	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+		0
+	</div>
+	
+	<div id="lives" style="position:fixed; right:3%; top:12%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+		2
+	</div>
 
 	<!-- <script src="js/three.min.js"></script> -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
@@ -175,6 +183,7 @@
 	<script src="js/AsteroidPatrolVariables.js"></script>
 	
 	<script>
+		onWindowResize();
 		initLevel();
 		animate();
 
@@ -571,6 +580,13 @@
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
 									
+									score += 100;
+									if (score >= extraLifeScore) {
+										livesRemaining += 1;
+										extraLifeScore += 10000;
+										livesRemainingText.innerHTML = livesRemaining;
+									}
+									scoreText.innerHTML = score;
 									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
@@ -618,6 +634,13 @@
 									smallAsteroids[c*2+1].translateOnAxis(smallAsteroids[c*2+1].direction, smallAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
 									initExplosion(bulletRayCollisionPoint);
+									score += 50;
+									if (score >= extraLifeScore) {
+										livesRemaining += 1;
+										extraLifeScore += 10000;
+										livesRemainingText.innerHTML = livesRemaining;
+									}
+									scoreText.innerHTML = score;
 									
 								}
 
@@ -660,6 +683,13 @@
 									mediumAsteroids[c*2+1].translateOnAxis(mediumAsteroids[c*2+1].direction, mediumAsteroids[c*2+1].geometry.boundingSphere.radius);
 									
 									initExplosion(bulletRayCollisionPoint);
+									score += 20;
+									if (score >= extraLifeScore) {
+										livesRemaining += 1;
+										extraLifeScore += 10000;
+										livesRemainingText.innerHTML = livesRemaining;
+									}
+									scoreText.innerHTML = score;
 									
 									/*	
 									//the following is optional:
@@ -700,6 +730,13 @@
 								enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
 								initEnemyExplosion(bulletRayCollisionPoint);
+								score += 500;
+								if (score >= extraLifeScore) {
+									livesRemaining += 1;
+									extraLifeScore += 10000;
+									livesRemainingText.innerHTML = livesRemaining;
+								}
+								scoreText.innerHTML = score;
 							}
 
 						}//end if (bulletRayCollisionPoint) {
@@ -768,6 +805,14 @@
 									playerAlive = false;
 									ship.visible = false;
 									shipSpeed = 0;
+								
+									livesRemaining -= 1;
+									if(livesRemaining < 0){
+										livesRemaining = 0;
+										gameOver = true;
+									}
+									livesRemainingText.innerHTML = livesRemaining;
+									
 									playingDeathAnimation = true;
 							
 							}
@@ -958,6 +1003,22 @@
 							playerAlive = false;
 							ship.visible = false;
 							shipSpeed = 0;
+							
+							score += 20;
+							if (score >= extraLifeScore) {
+								livesRemaining += 1;
+								extraLifeScore += 10000;
+								livesRemainingText.innerHTML = livesRemaining;
+							}
+							scoreText.innerHTML = score;
+					
+							livesRemaining -= 1;
+							if(livesRemaining < 0){
+								livesRemaining = 0;
+								gameOver = true;
+							}
+							livesRemainingText.innerHTML = livesRemaining;
+							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
 						}
@@ -1018,6 +1079,22 @@
 							playerAlive = false;
 							ship.visible = false;
 							shipSpeed = 0;
+							
+							score += 50;
+							if (score >= extraLifeScore) {
+								livesRemaining += 1;
+								extraLifeScore += 10000;
+								livesRemainingText.innerHTML = livesRemaining;
+							}
+							scoreText.innerHTML = score;
+					
+							livesRemaining -= 1;
+							if(livesRemaining < 0){
+								livesRemaining = 0;
+								gameOver = true;
+							}
+							livesRemainingText.innerHTML = livesRemaining;
+							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
 						}
@@ -1046,7 +1123,7 @@
 							enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-									
+							
 							initEnemyExplosion(enemy.position);
 						}
 					}
@@ -1070,6 +1147,22 @@
 							playerAlive = false;
 							ship.visible = false;
 							shipSpeed = 0;
+							
+							score += 100;
+							if (score >= extraLifeScore) {
+								livesRemaining += 1;
+								extraLifeScore += 10000;
+								livesRemainingText.innerHTML = livesRemaining;
+							}
+							scoreText.innerHTML = score;
+					
+							livesRemaining -= 1;
+							if(livesRemaining < 0){
+								livesRemaining = 0;
+								gameOver = true;
+							}
+							livesRemainingText.innerHTML = livesRemaining;
+							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
 						}
@@ -1090,6 +1183,22 @@
 					playerAlive = false;
 					ship.visible = false;
 					shipSpeed = 0;
+					
+					score += 500;
+					if (score >= extraLifeScore) {
+						livesRemaining += 1;
+						extraLifeScore += 10000;
+						livesRemainingText.innerHTML = livesRemaining;
+					}
+					scoreText.innerHTML = score;
+					
+					livesRemaining -= 1;
+					if(livesRemaining < 0){
+						livesRemaining = 0;
+						gameOver = true;
+					}
+					livesRemainingText.innerHTML = livesRemaining;
+					
 					initPlayerExplosion(ship.position);
 					playingDeathAnimation = true;
 					
@@ -1345,14 +1454,14 @@
 				
 			if (playingDeathAnimation) {
 				
-				cameraDistance += frameTime * 50;
-				cameraAngle += frameTime;
-				if (cameraAngle >= TWO_PI) 
-					cameraAngle -= TWO_PI;
+				cutsceneCameraDistance += frameTime * 50;
+				cutsceneCameraAngle += frameTime;
+				if (cutsceneCameraAngle >= TWO_PI) 
+					cutsceneCameraAngle -= TWO_PI;
 
-				camera.position.x = ship.position.x + Math.sin(cameraAngle) * cameraDistance;
-				camera.position.y = ship.position.y + (cameraDistance * 0.5);
-				camera.position.z = ship.position.z + Math.cos(cameraAngle) * cameraDistance;
+				camera.position.x = ship.position.x + Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.position.y = ship.position.y + (cutsceneCameraDistance * 0.5);
+				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.lookAt(ship.position);
 			
 				deathAnimationTimer.run(frameTime);
@@ -1361,8 +1470,8 @@
 					playerAlive = true;
 					ship.visible = true;
 					deathAnimationTimer.reset();
-					cameraAngle = 0;
-					cameraDistance = 50;//0
+					cutsceneCameraAngle = 0;
+					cutsceneCameraDistance = 50;//0
 					playingDeathAnimation = false;
 					placeShip();
 				}
