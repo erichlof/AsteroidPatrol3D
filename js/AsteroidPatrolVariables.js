@@ -37,6 +37,7 @@ document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
+var livesRemaining = 2;
 function onWindowResize() {
 	
 	fontAspect = (window.innerWidth / 175) * (window.innerHeight / 200);
@@ -45,7 +46,7 @@ function onWindowResize() {
 	
 	fontAspect *= 2;
 	document.getElementById("score").style.fontSize = fontAspect + "px";
-	document.getElementById("lives").style.fontSize = fontAspect + "px";
+	//document.getElementById("lives").style.fontSize = fontAspect + "px";
 	
 	sunUniforms.resolution.value.x = window.innerWidth;
 	sunUniforms.resolution.value.y = window.innerHeight;
@@ -55,6 +56,17 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 	
+	//update HUD Sprites X positions
+	crossHairsSprite.position.x = crosshairPositionX * camera.aspect;
+	tempPercent = 93;//93
+	for (var i = 0; i < livesRemaining; i++) {    //93
+		livesRemainingPercentX[i] = tempPercent;
+		//each shipRemaining icon moves 4 units to the left
+		tempPercent -= 6 - ( window.innerWidth * 0.002 );
+		livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
+		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
+	}
+
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	controls.handleResize();
 			
@@ -508,13 +520,41 @@ scene.add(sunLight);
 var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
 var crossHairsMaterial = new THREE.SpriteMaterial( { map: crossHairsTexture, depthTest: false } );
 crossHairsSprite = new THREE.Sprite(crossHairsMaterial);
-//move crossHairsSprite back a little so we can see it
-crossHairsSprite.position.set(0, 0, -1.5);
 //scale the crossHairsSprite
 crossHairsSprite.scale.set(0.5, 0.5, 0.5);
+//position sprites by percent X:(100 is all the way to the right, 0 is left, 50 is centered)
+//                            Y:(100 is all the way to the top, 0 is bottom, 50 is centered)
+var crosshairPercentX = 50;
+var crosshairPercentY = 50;
+var crosshairPositionX = (crosshairPercentX / 100) * 2 - 1;
+var crosshairPositionY = (crosshairPercentY / 100) * 2 - 1;
+//move crossHairsSprite back 1.5 units along the -Z axis so we can see it
+crossHairsSprite.position.set(crosshairPositionX * camera.aspect, crosshairPositionY, -1.5);
 //add crossHairsSprite as a child of our camera object, so it will stay in camera's view
 camera.add(crossHairsSprite);
 
+var livesRemainingTexture = THREE.ImageUtils.loadTexture('images/AsteroidShip.png');
+var livesRemainingMaterial = new THREE.SpriteMaterial( {
+	color: 'rgb(200,200,255)',
+	map: livesRemainingTexture, 
+	depthTest: false 
+} );
+var livesRemainingSprites = [];
+var livesRemainingPercentX = [];
+var livesRemainingPercentY = 83;
+var livesRemainingPositionX = [];
+var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
+for (var i = 0; i < 10; i++) {
+	livesRemainingSprites[i] = new THREE.Sprite(livesRemainingMaterial);
+	//livesRemainingSprites[i].material.rotation = -0.4;
+	livesRemainingSprites[i].scale.set(0.12, 0.12, 0.12);
+	livesRemainingPercentX[i] = 93;
+	livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
+	livesRemainingSprites[i].position.set(livesRemainingPositionX[i] * camera.aspect, livesRemainingPositionY, -1.5);
+	camera.add(livesRemainingSprites[i]);
+	if (i >= livesRemaining) livesRemainingSprites[i].visible = false;
+}
+livesRemainingSprites[0].material.rotation = 0.5;
 
 
 //Enemy UFO Object
@@ -793,12 +833,12 @@ var tryAgain = false;
 var check = 0;
 var impulseAmount = 0;
 var numOfAsteroidCollisions = 0;
-var score = 9000;
+var score = 0;
 var extraLifeScore = 10000;
-var livesRemaining = 2;
 var gameOver = false;
 var scoreText = document.getElementById("score");
-var livesRemainingText = document.getElementById("lives");
+//var livesRemainingText = document.getElementById("lives");
+var tempPercent = 0;
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
