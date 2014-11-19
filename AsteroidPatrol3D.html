@@ -48,10 +48,6 @@
 	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 		0
 	</div>
-	
-	<div id="lives" style="position:fixed; right:3%; top:12%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
-		2
-	</div>
 
 	<!-- <script src="js/three.min.js"></script> -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
@@ -582,9 +578,11 @@
 									
 									score += 100;
 									if (score >= extraLifeScore) {
+										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										livesRemainingText.innerHTML = livesRemaining;
+										//livesRemainingText.innerHTML = livesRemaining;
+										onWindowResize();
 									}
 									scoreText.innerHTML = score;
 									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
@@ -636,9 +634,11 @@
 									initExplosion(bulletRayCollisionPoint);
 									score += 50;
 									if (score >= extraLifeScore) {
+										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										livesRemainingText.innerHTML = livesRemaining;
+										//livesRemainingText.innerHTML = livesRemaining;
+										onWindowResize();
 									}
 									scoreText.innerHTML = score;
 									
@@ -685,9 +685,11 @@
 									initExplosion(bulletRayCollisionPoint);
 									score += 20;
 									if (score >= extraLifeScore) {
+										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										livesRemainingText.innerHTML = livesRemaining;
+										//livesRemainingText.innerHTML = livesRemaining;
+										onWindowResize();
 									}
 									scoreText.innerHTML = score;
 									
@@ -732,9 +734,11 @@
 								initEnemyExplosion(bulletRayCollisionPoint);
 								score += 500;
 								if (score >= extraLifeScore) {
+									livesRemainingSprites[livesRemaining].visible = true;
 									livesRemaining += 1;
 									extraLifeScore += 10000;
-									livesRemainingText.innerHTML = livesRemaining;
+									//livesRemainingText.innerHTML = livesRemaining;
+									onWindowResize();
 								}
 								scoreText.innerHTML = score;
 							}
@@ -811,7 +815,9 @@
 										livesRemaining = 0;
 										gameOver = true;
 									}
-									livesRemainingText.innerHTML = livesRemaining;
+									livesRemainingSprites[livesRemaining].visible = false;
+									crossHairsSprite.visible = false;
+									onWindowResize();
 									
 									playingDeathAnimation = true;
 							
@@ -1006,9 +1012,11 @@
 							
 							score += 20;
 							if (score >= extraLifeScore) {
+								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								livesRemainingText.innerHTML = livesRemaining;
+								//livesRemainingText.innerHTML = livesRemaining;
+								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1017,7 +1025,9 @@
 								livesRemaining = 0;
 								gameOver = true;
 							}
-							livesRemainingText.innerHTML = livesRemaining;
+							livesRemainingSprites[livesRemaining].visible = false;
+							crossHairsSprite.visible = false;
+							onWindowResize();
 							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
@@ -1082,9 +1092,11 @@
 							
 							score += 50;
 							if (score >= extraLifeScore) {
+								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								livesRemainingText.innerHTML = livesRemaining;
+								//livesRemainingText.innerHTML = livesRemaining;
+								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1093,7 +1105,9 @@
 								livesRemaining = 0;
 								gameOver = true;
 							}
-							livesRemainingText.innerHTML = livesRemaining;
+							livesRemainingSprites[livesRemaining].visible = false;
+							crossHairsSprite.visible = false;
+							onWindowResize();
 							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
@@ -1150,9 +1164,11 @@
 							
 							score += 100;
 							if (score >= extraLifeScore) {
+								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								livesRemainingText.innerHTML = livesRemaining;
+								//livesRemainingText.innerHTML = livesRemaining;
+								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1161,7 +1177,9 @@
 								livesRemaining = 0;
 								gameOver = true;
 							}
-							livesRemainingText.innerHTML = livesRemaining;
+							livesRemainingSprites[livesRemaining].visible = false;
+							crossHairsSprite.visible = false;
+							onWindowResize();
 							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
@@ -1186,9 +1204,11 @@
 					
 					score += 500;
 					if (score >= extraLifeScore) {
+						livesRemainingSprites[livesRemaining].visible = true;
 						livesRemaining += 1;
 						extraLifeScore += 10000;
-						livesRemainingText.innerHTML = livesRemaining;
+						//livesRemainingText.innerHTML = livesRemaining;
+						//onWindowResize();
 					}
 					scoreText.innerHTML = score;
 					
@@ -1197,7 +1217,9 @@
 						livesRemaining = 0;
 						gameOver = true;
 					}
-					livesRemainingText.innerHTML = livesRemaining;
+					livesRemainingSprites[livesRemaining].visible = false;
+					crossHairsSprite.visible = false;
+					onWindowResize();
 					
 					initPlayerExplosion(ship.position);
 					playingDeathAnimation = true;
@@ -1469,6 +1491,7 @@
 				if (deathAnimationTimer.alarmSounding) {
 					playerAlive = true;
 					ship.visible = true;
+					crossHairsSprite.visible = true;
 					deathAnimationTimer.reset();
 					cutsceneCameraAngle = 0;
 					cutsceneCameraDistance = 50;//0
@@ -1763,15 +1786,15 @@
 				placingShip = false;
 				ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 700 - 350);
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {
-					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 100) 
+					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 200)
 						placingShip = true;
 				}
 				for (var i = 0; i < numberOfMediumAsteroids; i++) {
-					if (mediumAsteroids[i].alive && ship.position.distanceTo(mediumAsteroids[i].position) < 70) 
+					if (mediumAsteroids[i].alive && ship.position.distanceTo(mediumAsteroids[i].position) < 150)
 						placingShip = true;
 				}
 				for (var i = 0; i < numberOfSmallAsteroids; i++) {
-					if (smallAsteroids[i].alive && ship.position.distanceTo(smallAsteroids[i].position) < 50) 
+					if (smallAsteroids[i].alive && ship.position.distanceTo(smallAsteroids[i].position) < 100)
 						placingShip = true;
 				}
 				
