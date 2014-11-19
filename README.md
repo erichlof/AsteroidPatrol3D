@@ -25,10 +25,9 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add 'ships remaining' in the top corner using simple 2D shapes to represent ships
 * Slightly increase the difficulty each level (speed of asteroids)
+* Add a simple radar in the bottom corner of the screen to warn against surrounding asteroids
 * Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
-* Possibly add a radar in the corner of the screen to warn against surrounding asteroids
 * Add 3D spatial sound FX to surround the player from all angles
 
 
