@@ -46,7 +46,8 @@ function onWindowResize() {
 	
 	fontAspect *= 2;
 	document.getElementById("score").style.fontSize = fontAspect + "px";
-	//document.getElementById("lives").style.fontSize = fontAspect + "px";
+	fontAspect *= 3;
+	document.getElementById("level").style.fontSize = fontAspect + "px";
 	
 	sunUniforms.resolution.value.x = window.innerWidth;
 	sunUniforms.resolution.value.y = window.innerHeight;
@@ -530,6 +531,7 @@ var crosshairPositionX = (crosshairPercentX / 100) * 2 - 1;
 var crosshairPositionY = (crosshairPercentY / 100) * 2 - 1;
 //move crossHairsSprite back 1.5 units along the -Z axis so we can see it
 crossHairsSprite.position.set(crosshairPositionX * camera.aspect, crosshairPositionY, -1.5);
+crossHairsSprite.visible = false;
 //add crossHairsSprite as a child of our camera object, so it will stay in camera's view
 camera.add(crossHairsSprite);
 
@@ -816,6 +818,8 @@ asteroidCopy2.speed = 0;
 var frameTime = 0;
 var playingDeathAnimation = false;
 var deathAnimationTimer = new THREEx.GameTimer(4);
+var playingBeginLevelIntro = false;
+var beginLevelTimer = new THREEx.GameTimer(3);
 var cutsceneCameraAngle = 0;
 var cutsceneCameraDistance = 50;//0
 var playingWarpAnimation = false;
@@ -836,9 +840,12 @@ var numOfAsteroidCollisions = 0;
 var score = 0;
 var extraLifeScore = 10000;
 var gameOver = false;
-var scoreText = document.getElementById("score");
-//var livesRemainingText = document.getElementById("lives");
+var gameOverTimer = new THREEx.GameTimer(4);
+
 var tempPercent = 0;
+var scoreText = document.getElementById("score");
+var levelText = document.getElementById("level");
+
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
