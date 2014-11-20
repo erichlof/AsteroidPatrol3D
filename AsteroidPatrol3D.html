@@ -17,7 +17,7 @@
 <body>
 	<div id="container"></div>
 
-	<div id="help" style="position:fixed; left:40%; top:3%; color:grey;">
+	<div id="help" style="position:fixed; left:5%; top:3%; color:grey;">
 		Asteroid Patrol 3D
 	</div>
 	
@@ -30,7 +30,7 @@
 	</div>
 
 	<div id="debug1" style="position:fixed; left:5%; top:3%; color:grey;">
-		Debug Info
+		
 	</div>
 
 	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
@@ -42,11 +42,19 @@
 	</div>
 
 	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
-		Debug Info
+		
 	</div>
 	
 	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
-		0
+
+	</div>
+	
+	<div id="level" style="position:fixed; left:35%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+
+	</div>
+	
+	<div id="gameover" style="position:fixed; left:35%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+
 	</div>
 
 	<!-- <script src="js/three.min.js"></script> -->
@@ -208,11 +216,15 @@
 
 			}
 			
+			if (level == 0) 
+				scoreText.innerHTML = score;
+			
 			level += 1;
+			crossHairsSprite.visible = false;
 			numberOfLargeAsteroids = Math.floor( level * 3 );// + 2
 			//for debug levels progression
-			//numberOfLargeAsteroids = 1;
-			//end debug levels progression
+				numberOfLargeAsteroids = 1;
+			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
 			smallAsteroidsRemaining = numberOfSmallAsteroids;
@@ -227,7 +239,7 @@
 			//record the previous randomly chosen material so that the next level will look different
 			previousRandMaterialIndex = randMaterialIndex;
 			
-			debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+			debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 			numberOfLargeAsteroidsCreated = 0;
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -397,11 +409,10 @@
 
 			}
 	
-			playerAlive = true;
-			placeShip();
+			playingBeginLevelIntro = true;
 			
-			isExploding = false;
-			enemyIsExploding = false;
+			levelText.innerHTML = "Level " + level;
+			playerAlive = false;
 			
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
@@ -581,11 +592,10 @@
 										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										//livesRemainingText.innerHTML = livesRemaining;
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
-									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -637,7 +647,6 @@
 										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										//livesRemainingText.innerHTML = livesRemaining;
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
@@ -688,7 +697,6 @@
 										livesRemainingSprites[livesRemaining].visible = true;
 										livesRemaining += 1;
 										extraLifeScore += 10000;
-										//livesRemainingText.innerHTML = livesRemaining;
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
@@ -737,7 +745,6 @@
 									livesRemainingSprites[livesRemaining].visible = true;
 									livesRemaining += 1;
 									extraLifeScore += 10000;
-									//livesRemainingText.innerHTML = livesRemaining;
 									onWindowResize();
 								}
 								scoreText.innerHTML = score;
@@ -854,7 +861,7 @@
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
 									
-									debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -1015,7 +1022,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//livesRemainingText.innerHTML = livesRemaining;
 								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
@@ -1095,7 +1101,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//livesRemainingText.innerHTML = livesRemaining;
 								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
@@ -1131,7 +1136,7 @@
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
 
-							debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							enemyAlive = false;
 							enemy.visible = false;
@@ -1156,7 +1161,7 @@
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
 
-							debugText1.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							playerAlive = false;
 							ship.visible = false;
@@ -1167,7 +1172,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//livesRemainingText.innerHTML = livesRemaining;
 								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
@@ -1207,7 +1211,6 @@
 						livesRemainingSprites[livesRemaining].visible = true;
 						livesRemaining += 1;
 						extraLifeScore += 10000;
-						//livesRemainingText.innerHTML = livesRemaining;
 						//onWindowResize();
 					}
 					scoreText.innerHTML = score;
@@ -1473,6 +1476,29 @@
 				}
 				
 			}
+			
+			if (playingBeginLevelIntro) {
+				
+				beginLevelTimer.run(frameTime);
+				
+				if (beginLevelTimer.alarmSounding) {
+					levelText.innerHTML = "";
+					beginLevelTimer.reset();
+					playingBeginLevelIntro = false;
+					//just in case deathAnimation is playing because we crashed
+					//into the last small asteroid from the previous level to advance
+					//to the next level
+					if(playingDeathAnimation){
+						ship.visible = true;
+						crossHairsSprite.visible = true;
+						deathAnimationTimer.reset();
+						cutsceneCameraAngle = 0;
+						cutsceneCameraDistance = 50;//0
+						playingDeathAnimation = false;
+					}
+					placeShip();
+				}
+			}
 				
 			if (playingDeathAnimation) {
 				
@@ -1489,10 +1515,10 @@
 				deathAnimationTimer.run(frameTime);
 
 				if (deathAnimationTimer.alarmSounding) {
-					playerAlive = true;
 					ship.visible = true;
 					crossHairsSprite.visible = true;
 					deathAnimationTimer.reset();
+					deathAnimationTimer.setAlarm(4);
 					cutsceneCameraAngle = 0;
 					cutsceneCameraDistance = 50;//0
 					playingDeathAnimation = false;
@@ -1771,8 +1797,9 @@
 			debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
-		*/
 			debugText4.innerHTML = "randMaterialIndex: " + randMaterialIndex;
+		*/
+			
 
 		} //end function animate()
 		
@@ -1804,6 +1831,15 @@
 			thrustVector.set(0,0,0);
 			frictionVector.set(0,0,0);
 			shipVelocity.set(0,0,0);
+			
+			crossHairsSprite.visible = true;
+			playerAlive = true;
+			//reset explosions so they don't hang over stuck mid-animation 
+			// from previous level / previous life
+			isExploding = false;
+			enemyIsExploding = false;
+			playerIsExploding = false;
+			explosionSphere.visible = false;
 			
 		}
 		
@@ -2010,7 +2046,7 @@
 					body1.hasCollided = true;
 					body2.hasCollided = true;
 					numOfAsteroidCollisions += 1;
-					debugText2.innerHTML = "numOfAsteroidCollisions: " + Math.floor(numOfAsteroidCollisions);
+					//debugText2.innerHTML = "numOfAsteroidCollisions: " + Math.floor(numOfAsteroidCollisions);
 				
 				}//end else if (check == 1) { //collision
 				
