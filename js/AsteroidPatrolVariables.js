@@ -37,17 +37,18 @@ document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
-var livesRemaining = 2;
+var livesRemaining = 2;//2
 function onWindowResize() {
 	
 	fontAspect = (window.innerWidth / 175) * (window.innerHeight / 200);
 	if (fontAspect > 20) fontAspect = 20;
-	if (fontAspect < 10) fontAspect = 10;
+	if (fontAspect < 5) fontAspect = 5;
 	
 	fontAspect *= 2;
 	document.getElementById("score").style.fontSize = fontAspect + "px";
 	fontAspect *= 3;
 	document.getElementById("level").style.fontSize = fontAspect + "px";
+	document.getElementById("gameover").style.fontSize = fontAspect + "px";
 	
 	sunUniforms.resolution.value.x = window.innerWidth;
 	sunUniforms.resolution.value.y = window.innerHeight;
@@ -840,12 +841,13 @@ var numOfAsteroidCollisions = 0;
 var score = 0;
 var extraLifeScore = 10000;
 var gameOver = false;
+var playingGameOverAnimation = false;
 var gameOverTimer = new THREEx.GameTimer(4);
 
 var tempPercent = 0;
 var scoreText = document.getElementById("score");
 var levelText = document.getElementById("level");
-
+var gameOverText = document.getElementById("gameover");
 
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
