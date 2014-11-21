@@ -53,7 +53,7 @@
 
 	</div>
 	
-	<div id="gameover" style="position:fixed; left:35%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+	<div id="gameover" style="position:fixed; left:25%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 
 	</div>
 
@@ -194,9 +194,9 @@
 
 		function initLevel() {
 			
-			//if we are on a later level, first clean up all of the old asteroid objects
-			//and explosion pieces
-			if(level > 0){
+			//if we are on a later level or gameOver has been triggered,
+			//  first clean up all of the old asteroid objects and explosion pieces
+			if (level > 0 || gameOver) {
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
@@ -213,6 +213,8 @@
 					scene.remove( enemyExplosionPieces[i] );
 					scene.remove( playerExplosionPieces[i] );
 				}
+				
+				gameOver = false;
 
 			}
 			
@@ -221,9 +223,9 @@
 			
 			level += 1;
 			crossHairsSprite.visible = false;
-			numberOfLargeAsteroids = Math.floor( level * 3 );// + 2
+			numberOfLargeAsteroids = Math.floor( level * 2 + 1 );
 			//for debug levels progression
-				numberOfLargeAsteroids = 1;
+			//numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
@@ -1515,17 +1517,58 @@
 				deathAnimationTimer.run(frameTime);
 
 				if (deathAnimationTimer.alarmSounding) {
-					ship.visible = true;
-					crossHairsSprite.visible = true;
-					deathAnimationTimer.reset();
-					deathAnimationTimer.setAlarm(4);
-					cutsceneCameraAngle = 0;
-					cutsceneCameraDistance = 50;//0
-					playingDeathAnimation = false;
-					placeShip();
+					if (gameOver) {
+						playingGameOverAnimation = true;
+						gameOverText.innerHTML = "GAME OVER";
+						cutsceneCameraAngle = 0;
+						cutsceneCameraDistance = 50;
+						playingDeathAnimation = false;
+						deathAnimationTimer.reset();
+					}
+					else if (!gameOver) {
+						ship.visible = true;
+						crossHairsSprite.visible = true;
+						deathAnimationTimer.reset();
+						cutsceneCameraAngle = 0;
+						cutsceneCameraDistance = 50;
+						playingDeathAnimation = false;
+						placeShip();
+					}
 				}
+				
 			}
 			
+			if (playingGameOverAnimation) {
+				
+				cutsceneCameraDistance = 500;
+				cutsceneCameraAngle -= frameTime * 2;
+				if (cutsceneCameraAngle <= 0) 
+					cutsceneCameraAngle += TWO_PI;
+
+				camera.position.x = Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.position.y = (cutsceneCameraDistance * 0.5);
+				camera.position.z = Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.lookAt(scene.position);
+				
+				gameOverTimer.run(frameTime);
+				
+				if(gameOverTimer.alarmSounding){
+					playingGameOverAnimation = false;
+					gameOverTimer.reset();
+					cutsceneCameraAngle = 0;
+					cutsceneCameraDistance = 50;
+					gameOverText.innerHTML = "";
+					level = 0;
+					score = 0;
+					livesRemaining = 2;
+					livesRemainingSprites[0].visible = true;
+					livesRemainingSprites[1].visible = true;
+					extraLifeScore = 10000;
+					onWindowResize();
+					initLevel();
+				}
+				
+			}
 			
 			if (playingWarpAnimation) {
 				
