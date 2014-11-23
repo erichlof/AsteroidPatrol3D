@@ -820,7 +820,7 @@ var frameTime = 0;
 var playingDeathAnimation = false;
 var deathAnimationTimer = new THREEx.GameTimer(4);
 var playingBeginLevelIntro = false;
-var beginLevelTimer = new THREEx.GameTimer(3);
+var beginLevelTimer = new THREEx.GameTimer(4);//3
 var cutsceneCameraAngle = 0;
 var cutsceneCameraDistance = 50;//0
 var playingWarpAnimation = false;
@@ -853,3 +853,37 @@ var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
+
+//disable clicking and selecting/highlighting text of help, score, level, 
+//   and gameOver banner texts
+
+document.getElementById("help").style.cursor = "default";
+document.getElementById("help").style.webkitUserSelect = "none";
+document.getElementById("help").style.MozUserSelect = "none";
+document.getElementById("help").style.msUserSelect = "none";
+document.getElementById("help").style.userSelect = "none";
+document.getElementById("help1").style.cursor = "default";
+document.getElementById("help1").style.webkitUserSelect = "none";
+document.getElementById("help1").style.MozUserSelect = "none";
+document.getElementById("help1").style.msUserSelect = "none";
+document.getElementById("help1").style.userSelect = "none";
+document.getElementById("help2").style.cursor = "default";
+document.getElementById("help2").style.webkitUserSelect = "none";
+document.getElementById("help2").style.MozUserSelect = "none";
+document.getElementById("help2").style.msUserSelect = "none";
+document.getElementById("help2").style.userSelect = "none";
+document.getElementById("score").style.cursor = "default";
+document.getElementById("score").style.webkitUserSelect = "none";
+document.getElementById("score").style.MozUserSelect = "none";
+document.getElementById("score").style.msUserSelect = "none";
+document.getElementById("score").style.userSelect = "none";
+document.getElementById("level").style.cursor = "default";
+document.getElementById("level").style.webkitUserSelect = "none";
+document.getElementById("level").style.MozUserSelect = "none";
+document.getElementById("level").style.msUserSelect = "none";
+document.getElementById("level").style.userSelect = "none";
+document.getElementById("gameover").style.cursor = "default";
+document.getElementById("gameover").style.webkitUserSelect = "none";
+document.getElementById("gameover").style.MozUserSelect = "none";
+document.getElementById("gameover").style.msUserSelect = "none";
+document.getElementById("gameover").style.userSelect = "none";
