@@ -17,7 +17,7 @@
 <body>
 	<div id="container"></div>
 
-	<div id="help" style="position:fixed; left:5%; top:3%; color:grey;">
+	<div id="help" style="position:fixed; left:5%; top:3%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 		Asteroid Patrol 3D
 	</div>
 	
@@ -34,7 +34,7 @@
 	</div>
 
 	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
-		Debug Info
+	
 	</div>
 
 	<div id="debug3" style="position:fixed; left:5%; top:9%; color:grey;">
@@ -225,7 +225,7 @@
 			crossHairsSprite.visible = false;
 			numberOfLargeAsteroids = Math.floor( level * 2 + 1 );
 			//for debug levels progression
-			//numberOfLargeAsteroids = 1;
+			numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
@@ -241,7 +241,7 @@
 			//record the previous randomly chosen material so that the next level will look different
 			previousRandMaterialIndex = randMaterialIndex;
 			
-			debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+			debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 			numberOfLargeAsteroidsCreated = 0;
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -412,6 +412,7 @@
 			}
 	
 			playingBeginLevelIntro = true;
+			cutsceneCameraDistance = 600;
 			
 			levelText.innerHTML = "Level " + level;
 			playerAlive = false;
@@ -597,7 +598,7 @@
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
-									debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -863,7 +864,7 @@
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
 									
-									debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -1138,7 +1139,7 @@
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
 
-							debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							enemyAlive = false;
 							enemy.visible = false;
@@ -1160,10 +1161,7 @@
 							smallAsteroids[i].visible = false;
 							initExplosion(smallAsteroids[i].position);
 							smallAsteroidsRemaining -= 1;
-							if(smallAsteroidsRemaining < 1)
-								initLevel();
-
-							debugText3.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							playerAlive = false;
 							ship.visible = false;
@@ -1345,7 +1343,8 @@
 				playingWarpAnimation = true;
 			}
 			//set camera position from ship position
-			camera.position.copy(ship.position);
+			if (!playingBeginLevelIntro && !playingGameOverAnimation)
+				camera.position.copy(ship.position);
 			
 			skyBox.position.copy(camera.position);
 			
@@ -1481,28 +1480,39 @@
 			
 			if (playingBeginLevelIntro) {
 				
+				cutsceneCameraDistance -= frameTime * 150;
+				cutsceneCameraAngle -= frameTime;
+				if (cutsceneCameraAngle <= 0) 
+					cutsceneCameraAngle += TWO_PI;
+
+				camera.position.x = Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.position.y = (cutsceneCameraDistance * 0.5);
+				camera.position.z = Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.lookAt(scene.position);
+				
 				beginLevelTimer.run(frameTime);
 				
 				if (beginLevelTimer.alarmSounding) {
 					levelText.innerHTML = "";
 					beginLevelTimer.reset();
 					playingBeginLevelIntro = false;
+					cutsceneCameraAngle = 0;
+					cutsceneCameraDistance = 50;
 					//just in case deathAnimation is playing because we crashed
 					//into the last small asteroid from the previous level to advance
 					//to the next level
-					if(playingDeathAnimation){
+					if (playingDeathAnimation) {
 						ship.visible = true;
 						crossHairsSprite.visible = true;
 						deathAnimationTimer.reset();
-						cutsceneCameraAngle = 0;
-						cutsceneCameraDistance = 50;//0
 						playingDeathAnimation = false;
 					}
+					
 					placeShip();
 				}
 			}
 				
-			if (playingDeathAnimation) {
+			if (playingDeathAnimation && !playingBeginLevelIntro) {
 				
 				cutsceneCameraDistance += frameTime * 50;
 				cutsceneCameraAngle += frameTime;
@@ -1519,6 +1529,8 @@
 				if (deathAnimationTimer.alarmSounding) {
 					if (gameOver) {
 						playingGameOverAnimation = true;
+						camera.position.set(-500,500,-500);
+						camera.lookAt(scene.position);
 						gameOverText.innerHTML = "GAME OVER";
 						cutsceneCameraAngle = 0;
 						cutsceneCameraDistance = 50;
@@ -1527,20 +1539,24 @@
 					}
 					else if (!gameOver) {
 						ship.visible = true;
-						crossHairsSprite.visible = true;
+						//crossHairsSprite.visible = true;
 						deathAnimationTimer.reset();
 						cutsceneCameraAngle = 0;
 						cutsceneCameraDistance = 50;
 						playingDeathAnimation = false;
-						placeShip();
+						if(smallAsteroidsRemaining < 1) {
+							initLevel();
+						}
+						else placeShip();
 					}
+					
 				}
 				
 			}
 			
 			if (playingGameOverAnimation) {
-				
-				cutsceneCameraDistance = 500;
+				/*
+				cutsceneCameraDistance = 600;
 				cutsceneCameraAngle -= frameTime * 2;
 				if (cutsceneCameraAngle <= 0) 
 					cutsceneCameraAngle += TWO_PI;
@@ -1549,14 +1565,14 @@
 				camera.position.y = (cutsceneCameraDistance * 0.5);
 				camera.position.z = Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.lookAt(scene.position);
-				
+				*/
 				gameOverTimer.run(frameTime);
 				
 				if(gameOverTimer.alarmSounding){
 					playingGameOverAnimation = false;
 					gameOverTimer.reset();
-					cutsceneCameraAngle = 0;
-					cutsceneCameraDistance = 50;
+					//cutsceneCameraAngle = 0;
+					//cutsceneCameraDistance = 50;
 					gameOverText.innerHTML = "";
 					level = 0;
 					score = 0;
@@ -1849,6 +1865,7 @@
 		
 		function placeShip() {
 			
+			//TODO if level == 1, start in positive Z area of arena so we can see the whole thing better
 			placingShip = true;
 			
 			while ( placingShip ) {
