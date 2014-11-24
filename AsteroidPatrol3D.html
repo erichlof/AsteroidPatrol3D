@@ -411,11 +411,13 @@
 
 			}
 	
+			playerAlive = false;
+			placeShip();
 			playingBeginLevelIntro = true;
+			
 			cutsceneCameraDistance = 600;
 			
 			levelText.innerHTML = "Level " + level;
-			playerAlive = false;
 			
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
@@ -1416,7 +1418,7 @@
 			}//end if (!enemyAlive)
 			
 			//if UFO is alive, update it
-			if (enemyAlive) {
+			if (enemyAlive && !playingBeginLevelIntro) {
 				
 				enemyChangeDirectionTimer.run(frameTime);
 				
@@ -1476,19 +1478,22 @@
 					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 				}
 				
-			}
+			}// end if (enemyAlive && !playingBeginLevelIntro)
 			
 			if (playingBeginLevelIntro) {
 				
 				cutsceneCameraDistance -= frameTime * 150;
-				cutsceneCameraAngle -= frameTime;
+				if (cutsceneCameraDistance < 0)
+					cutsceneCameraDistance = 0;
+				
+				cutsceneCameraAngle -= frameTime * 1.0;
 				if (cutsceneCameraAngle <= 0) 
 					cutsceneCameraAngle += TWO_PI;
 
-				camera.position.x = Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
-				camera.position.y = (cutsceneCameraDistance * 0.5);
-				camera.position.z = Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
-				camera.lookAt(scene.position);
+				camera.position.x = ship.position.x + Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.position.y = ship.position.y + (cutsceneCameraDistance * 0.5);
+				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
+				camera.lookAt(ship.position);
 				
 				beginLevelTimer.run(frameTime);
 				
@@ -1508,7 +1513,9 @@
 						playingDeathAnimation = false;
 					}
 					
-					placeShip();
+					playerAlive = true;
+					crossHairsSprite.visible = true;
+
 				}
 			}
 				
@@ -1547,7 +1554,11 @@
 						if(smallAsteroidsRemaining < 1) {
 							initLevel();
 						}
-						else placeShip();
+						else {
+							placeShip();
+							playerAlive = true;
+							crossHairsSprite.visible = true;
+						} 
 					}
 					
 				}
@@ -1742,109 +1753,110 @@
 				
 			}//end if (playerIsExploding)
 			
-			
-			//move and spin largeAsteroids
-			for (var i = 0; i < numberOfLargeAsteroids; i++) {
-				
-				if(largeAsteroids[i].alive){
-					//change to world coordinate system to do position translations
-					largeAsteroids[i].localToWorld(largeAsteroids[i].position);
-					//now move asteroid along its initial randomly-picked path
-					largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, largeAsteroids[i].speed * frameTime);
+			if (!playingBeginLevelIntro) {
+				//move and spin largeAsteroids
+				for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
-					//change to local coordinate system so that asteroid rotates around its own center
-					largeAsteroids[i].worldToLocal(largeAsteroids[i].position);
-					//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
-					largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
+					if(largeAsteroids[i].alive){
+						//change to world coordinate system to do position translations
+						largeAsteroids[i].localToWorld(largeAsteroids[i].position);
+						//now move asteroid along its initial randomly-picked path
+						largeAsteroids[i].translateOnAxis(largeAsteroids[i].direction, largeAsteroids[i].speed * frameTime);
 
-					//keep large asteroids inside the arena
-					if (largeAsteroids[i].position.x > arenaHalfSize + largeAsteroidRadius)
-						largeAsteroids[i].position.x = -arenaHalfSize - largeAsteroidRadius;
+						//change to local coordinate system so that asteroid rotates around its own center
+						largeAsteroids[i].worldToLocal(largeAsteroids[i].position);
+						//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
+						largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 
-					if (largeAsteroids[i].position.x < -arenaHalfSize - largeAsteroidRadius)
-						largeAsteroids[i].position.x = arenaHalfSize + largeAsteroidRadius;
+						//keep large asteroids inside the arena
+						if (largeAsteroids[i].position.x > arenaHalfSize + largeAsteroidRadius)
+							largeAsteroids[i].position.x = -arenaHalfSize - largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.y > arenaHalfSize + largeAsteroidRadius)
-						largeAsteroids[i].position.y = -arenaHalfSize - largeAsteroidRadius;
+						if (largeAsteroids[i].position.x < -arenaHalfSize - largeAsteroidRadius)
+							largeAsteroids[i].position.x = arenaHalfSize + largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.y < -arenaHalfSize - largeAsteroidRadius)
-						largeAsteroids[i].position.y = arenaHalfSize + largeAsteroidRadius;
+						if (largeAsteroids[i].position.y > arenaHalfSize + largeAsteroidRadius)
+							largeAsteroids[i].position.y = -arenaHalfSize - largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.z > arenaHalfSize + largeAsteroidRadius)
-						largeAsteroids[i].position.z = -arenaHalfSize - largeAsteroidRadius;
+						if (largeAsteroids[i].position.y < -arenaHalfSize - largeAsteroidRadius)
+							largeAsteroids[i].position.y = arenaHalfSize + largeAsteroidRadius;
 
-					if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
-						largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
+						if (largeAsteroids[i].position.z > arenaHalfSize + largeAsteroidRadius)
+							largeAsteroids[i].position.z = -arenaHalfSize - largeAsteroidRadius;
 
-				}//end if(largeAsteroids[i].alive)
-				
-			}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
-			
-			//move and spin mediumAsteroids
-			for (var i = 0; i < numberOfMediumAsteroids; i++) {
-				
-				if(mediumAsteroids[i].alive){
-					
-					mediumAsteroids[i].localToWorld(mediumAsteroids[i].position);
-					mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumAsteroids[i].speed * frameTime);
+						if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
+							largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
 
-					mediumAsteroids[i].worldToLocal(mediumAsteroids[i].position);
-					mediumAsteroids[i].rotateOnAxis(mediumAsteroids[i].rotationAxis, mediumAsteroids[i].rotationAmount * frameTime);
+					}//end if(largeAsteroids[i].alive)
 
-					if (mediumAsteroids[i].position.x > arenaHalfSize + mediumAsteroidRadius)
-						mediumAsteroids[i].position.x = -arenaHalfSize - mediumAsteroidRadius;
+				}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
-					if (mediumAsteroids[i].position.x < -arenaHalfSize - mediumAsteroidRadius)
-						mediumAsteroids[i].position.x = arenaHalfSize + mediumAsteroidRadius;
+				//move and spin mediumAsteroids
+				for (var i = 0; i < numberOfMediumAsteroids; i++) {
 
-					if (mediumAsteroids[i].position.y > arenaHalfSize + mediumAsteroidRadius)
-						mediumAsteroids[i].position.y = -arenaHalfSize - mediumAsteroidRadius;
+					if(mediumAsteroids[i].alive){
 
-					if (mediumAsteroids[i].position.y < -arenaHalfSize - mediumAsteroidRadius)
-						mediumAsteroids[i].position.y = arenaHalfSize + mediumAsteroidRadius;
+						mediumAsteroids[i].localToWorld(mediumAsteroids[i].position);
+						mediumAsteroids[i].translateOnAxis(mediumAsteroids[i].direction, mediumAsteroids[i].speed * frameTime);
 
-					if (mediumAsteroids[i].position.z > arenaHalfSize + mediumAsteroidRadius)
-						mediumAsteroids[i].position.z = -arenaHalfSize - mediumAsteroidRadius;
+						mediumAsteroids[i].worldToLocal(mediumAsteroids[i].position);
+						mediumAsteroids[i].rotateOnAxis(mediumAsteroids[i].rotationAxis, mediumAsteroids[i].rotationAmount * frameTime);
 
-					if (mediumAsteroids[i].position.z < -arenaHalfSize - mediumAsteroidRadius)
-						mediumAsteroids[i].position.z = arenaHalfSize + mediumAsteroidRadius;
-					
-				}//end if(mediumAsteroids[i].alive)
-				
-			}//end for (var i = 0; i < numberOfMediumAsteroids; i++) {
-			
-			//move and spin smallAsteroids
-			for (var i = 0; i < numberOfSmallAsteroids; i++) {
-				
-				if(smallAsteroids[i].alive){
-					
-					smallAsteroids[i].localToWorld(smallAsteroids[i].position);
-					smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallAsteroids[i].speed * frameTime);
+						if (mediumAsteroids[i].position.x > arenaHalfSize + mediumAsteroidRadius)
+							mediumAsteroids[i].position.x = -arenaHalfSize - mediumAsteroidRadius;
 
-					smallAsteroids[i].worldToLocal(smallAsteroids[i].position);
-					smallAsteroids[i].rotateOnAxis(smallAsteroids[i].rotationAxis, smallAsteroids[i].rotationAmount * frameTime);
+						if (mediumAsteroids[i].position.x < -arenaHalfSize - mediumAsteroidRadius)
+							mediumAsteroids[i].position.x = arenaHalfSize + mediumAsteroidRadius;
 
-					if (smallAsteroids[i].position.x > arenaHalfSize + smallAsteroidRadius)
-						smallAsteroids[i].position.x = -arenaHalfSize - smallAsteroidRadius;
+						if (mediumAsteroids[i].position.y > arenaHalfSize + mediumAsteroidRadius)
+							mediumAsteroids[i].position.y = -arenaHalfSize - mediumAsteroidRadius;
 
-					if (smallAsteroids[i].position.x < -arenaHalfSize - smallAsteroidRadius)
-						smallAsteroids[i].position.x = arenaHalfSize + smallAsteroidRadius;
+						if (mediumAsteroids[i].position.y < -arenaHalfSize - mediumAsteroidRadius)
+							mediumAsteroids[i].position.y = arenaHalfSize + mediumAsteroidRadius;
 
-					if (smallAsteroids[i].position.y > arenaHalfSize + smallAsteroidRadius)
-						smallAsteroids[i].position.y = -arenaHalfSize - smallAsteroidRadius;
+						if (mediumAsteroids[i].position.z > arenaHalfSize + mediumAsteroidRadius)
+							mediumAsteroids[i].position.z = -arenaHalfSize - mediumAsteroidRadius;
 
-					if (smallAsteroids[i].position.y < -arenaHalfSize - smallAsteroidRadius)
-						smallAsteroids[i].position.y = arenaHalfSize + smallAsteroidRadius;
+						if (mediumAsteroids[i].position.z < -arenaHalfSize - mediumAsteroidRadius)
+							mediumAsteroids[i].position.z = arenaHalfSize + mediumAsteroidRadius;
 
-					if (smallAsteroids[i].position.z > arenaHalfSize + smallAsteroidRadius)
-						smallAsteroids[i].position.z = -arenaHalfSize - smallAsteroidRadius;
+					}//end if(mediumAsteroids[i].alive)
 
-					if (smallAsteroids[i].position.z < -arenaHalfSize - smallAsteroidRadius)
-						smallAsteroids[i].position.z = arenaHalfSize + smallAsteroidRadius;
-					
-				}//end if(smallAsteroids[i].alive)
-				
-			}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
+				}//end for (var i = 0; i < numberOfMediumAsteroids; i++) {
+
+				//move and spin smallAsteroids
+				for (var i = 0; i < numberOfSmallAsteroids; i++) {
+
+					if(smallAsteroids[i].alive){
+
+						smallAsteroids[i].localToWorld(smallAsteroids[i].position);
+						smallAsteroids[i].translateOnAxis(smallAsteroids[i].direction, smallAsteroids[i].speed * frameTime);
+
+						smallAsteroids[i].worldToLocal(smallAsteroids[i].position);
+						smallAsteroids[i].rotateOnAxis(smallAsteroids[i].rotationAxis, smallAsteroids[i].rotationAmount * frameTime);
+
+						if (smallAsteroids[i].position.x > arenaHalfSize + smallAsteroidRadius)
+							smallAsteroids[i].position.x = -arenaHalfSize - smallAsteroidRadius;
+
+						if (smallAsteroids[i].position.x < -arenaHalfSize - smallAsteroidRadius)
+							smallAsteroids[i].position.x = arenaHalfSize + smallAsteroidRadius;
+
+						if (smallAsteroids[i].position.y > arenaHalfSize + smallAsteroidRadius)
+							smallAsteroids[i].position.y = -arenaHalfSize - smallAsteroidRadius;
+
+						if (smallAsteroids[i].position.y < -arenaHalfSize - smallAsteroidRadius)
+							smallAsteroids[i].position.y = arenaHalfSize + smallAsteroidRadius;
+
+						if (smallAsteroids[i].position.z > arenaHalfSize + smallAsteroidRadius)
+							smallAsteroids[i].position.z = -arenaHalfSize - smallAsteroidRadius;
+
+						if (smallAsteroids[i].position.z < -arenaHalfSize - smallAsteroidRadius)
+							smallAsteroids[i].position.z = arenaHalfSize + smallAsteroidRadius;
+
+					}//end if(smallAsteroids[i].alive)
+
+				}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
+			}//end if (!playingBeginLevelIntro)
 			
 			//update the controls
 			if (playerAlive) controls.update(frameTime);
@@ -1865,13 +1877,15 @@
 		
 		function placeShip() {
 			
-			//TODO if level == 1, start in positive Z area of arena so we can see the whole thing better
 			placingShip = true;
 			
 			while ( placingShip ) {
 				
 				placingShip = false;
-				ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 700 - 350);
+				if (level == 1)
+					ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 300 + 50);
+				else ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 700 - 350);
+				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {
 					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 200)
 						placingShip = true;
@@ -1884,6 +1898,8 @@
 					if (smallAsteroids[i].alive && ship.position.distanceTo(smallAsteroids[i].position) < 100)
 						placingShip = true;
 				}
+				if (enemyAlive && ship.position.distanceTo(enemy.position) < 200)
+						placingShip = true;
 				
 			}
 			
@@ -1892,8 +1908,9 @@
 			frictionVector.set(0,0,0);
 			shipVelocity.set(0,0,0);
 			
-			crossHairsSprite.visible = true;
-			playerAlive = true;
+			//crossHairsSprite.visible = true;
+			//playerAlive = true;
+			
 			//reset explosions so they don't hang over stuck mid-animation 
 			// from previous level / previous life
 			isExploding = false;
