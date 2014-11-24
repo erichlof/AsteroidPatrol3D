@@ -26,9 +26,9 @@ To Do
 -----
 
 * Slightly increase the difficulty each level (speed of asteroids)
-* Add a simple radar in the bottom corner of the screen to warn against surrounding asteroids
-* Possibly add a player ship model and pull the camera back and slightly up, for a 3rd-person playing experience
+* Add a simple radar in the top corner of the screen to warn against surrounding asteroids
 * Add 3D spatial sound FX to surround the player from all angles
+* Add buttons to turn sound on/off and adjust volume
 
 
 November 15, 2014 Progress Note
