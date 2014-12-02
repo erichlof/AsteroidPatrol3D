@@ -59,6 +59,7 @@
 
 	<!-- <script src="js/three.min.js"></script> -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
+	<!-- <script src="js/BoxHelper.js"></script> -->
 	<script src="js/threex.keyboardstate.js"></script>
 	<script src="js/threex.FirstPersonControls.js"></script>
 	<script src="js/virtualButtonJoystick.js"></script>
@@ -194,9 +195,11 @@
 
 		function initLevel() {
 			
+			level += 1;
+			
 			//if we are on a later level or gameOver has been triggered,
 			//  first clean up all of the old asteroid objects and explosion pieces
-			if (level > 0 || gameOver) {
+			if (level > 1 || gameOver) {
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
@@ -214,18 +217,21 @@
 					scene.remove( playerExplosionPieces[i] );
 				}
 				
+				largeAsteroidGeometry.dispose();
+				mediumAsteroidGeometry.dispose();
+				smallAsteroidGeometry.dispose();
 				gameOver = false;
 
 			}
 			
-			if (level == 0) 
+			if (level == 1) 
 				scoreText.innerHTML = score;
 			
-			level += 1;
+			
 			crossHairsSprite.visible = false;
 			numberOfLargeAsteroids = Math.floor( level * 2 + 1 );
 			//for debug levels progression
-			//numberOfLargeAsteroids = 1;
+			numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
@@ -427,8 +433,8 @@
 			
 			//setup controls parameters
 			//controls.movementSpeed = 100;
-			box.position.set(0,0,-150);
-			box.rotation.y = 0.6;
+			//box.position.set(0,0,-150);
+			//box.rotation.y = 0.6;
 
 		} //end function initLevel()
 		
@@ -439,7 +445,11 @@
 			requestAnimationFrame(animate);
 			//store how much time has passed since the last animation frame
 			frameTime = clock.getDelta();
-
+			
+			//update the controls
+			if (playerAlive) 
+				controls.update(frameTime);
+			
 			if (keyboard.pressed("M")) {
 
 				mouseControl = true;
@@ -790,7 +800,7 @@
 					//now that we have moved it, record the new bullet location
 					newEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
 					
-					//rotate the 'billboard' bullet object so that it always face our camera
+					//rotate the 'billboard' bullet object so that it always faces our camera
 					enemyBulletArray[i].worldToLocal(enemyBulletArray[i].position);
 					enemyBulletArray[i].lookAt(camera.position);
 					enemyBulletArray[i].rotateZ(spinCounter);
@@ -1345,8 +1355,22 @@
 				playingWarpAnimation = true;
 			}
 			//set camera position from ship position
-			if (!playingBeginLevelIntro && !playingGameOverAnimation)
+			if (!playingBeginLevelIntro && !playingGameOverAnimation) {
 				camera.position.copy(ship.position);
+				//rotate the ship inside the radar mini-cam so it is 
+				// looking where the main camera is
+				shipSphere.lookAt(controls.target);	
+			}
+			//set camera2 (radar cam) position from ship position
+			if (!playingGameOverAnimation) {	
+				camera2.position.copy(ship.position);
+				//camera2.lookAt(controls.target);
+				camera2.quaternion.copy(camera.quaternion);
+				camera2.translateZ(200);	
+			}
+			
+			
+			shipSphere.position.copy(ship.position);
 			
 			skyBox.position.copy(camera.position);
 			
@@ -1358,7 +1382,7 @@
 			sun.position.z += 700;
 			sunUniforms.time.value = performance.now() * 0.001;
 			
-			box.rotation.y += frameTime;
+			//box.rotation.y += frameTime;
 			//pyramid.rotation.x += frameTime;
 			//pyramid.rotation.y += frameTime;
 			
@@ -1495,6 +1519,10 @@
 				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.lookAt(ship.position);
 				
+				camera2.position.copy(camera.position);
+				camera2.quaternion.copy(camera.quaternion);
+				camera2.translateZ(200);
+				
 				beginLevelTimer.run(frameTime);
 				
 				if (beginLevelTimer.alarmSounding) {
@@ -1609,7 +1637,7 @@
 				}
 				if(camera.fov < 65){
 					camera.fov = 65;
-					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
 					playingWarpAnimation = false;
@@ -1858,13 +1886,31 @@
 				}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
 			}//end if (!playingBeginLevelIntro)
 			
-			//update the controls
-			if (playerAlive) controls.update(frameTime);
-			//render the scene with our camera
+			//with different viewports
+			
+			//set up the main viewport over the entire area of the webpage
+			renderer.setViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			
+			//render the main scene with our camera
 			renderer.render(scene, camera);
 			
+			//enable scissor test
+			renderer.enableScissorTest( true );
+			//this will essentially cut out a rectangular piece from the top left corner of the webpage
+			renderer.setScissor( 0, SCREEN_HEIGHT - SCREEN_HEIGHT_DIV_BY_FOUR, SCREEN_WIDTH_DIV_BY_FOUR, SCREEN_HEIGHT_DIV_BY_FOUR );
+			
+			//now tell renderer to draw inside the radar mini-screen viewport
+			renderer.setViewport(0, SCREEN_HEIGHT - SCREEN_HEIGHT_DIV_BY_FOUR, SCREEN_WIDTH_DIV_BY_FOUR, SCREEN_HEIGHT_DIV_BY_FOUR );
+			
+			//render the radar scene with radar camera (camera2)
+			renderer.render(radarScene, camera2);
+			
+			//reset scissor test (disable it)
+			renderer.enableScissorTest( false );
+			
+		/*
 			//helpful real-time debug text, so we can monitor game variables
-		/*	
+			
 			debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
@@ -1938,6 +1984,9 @@
 			bulletArray[bulletCounter].position.add(bulletArray[bulletCounter].direction);
 			bulletArray[bulletCounter].direction.divideScalar(15);
 			
+			//get the white 'flipboard' texture plane's position from the newly spawned Bullet
+			bulletTexPlaneCopy[bulletCounter].position.copy(bulletArray[bulletCounter].position);
+			
 			//update bulletCounter for next time
 			bulletCounter += 1;
 			//bulletArray[] index size (bulletCounter) can't exceed MAX_BULLETS
@@ -1965,6 +2014,9 @@
 			enemyBulletArray[enemyBulletCounter].direction.multiplyScalar(15);
 			enemyBulletArray[enemyBulletCounter].position.add(enemyBulletArray[enemyBulletCounter].direction);
 			enemyBulletArray[enemyBulletCounter].direction.divideScalar(15);
+			
+			//get the white 'flipboard' texture plane's position from the newly spawned enemyBullet
+			enemyBulletTexPlaneCopy[enemyBulletCounter].position.copy(enemyBulletArray[enemyBulletCounter].position);
 			
 			//update enemyBulletCounter for next time
 			enemyBulletCounter += 1;
