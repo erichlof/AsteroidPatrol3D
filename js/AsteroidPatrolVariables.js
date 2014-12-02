@@ -2,9 +2,17 @@
 // GLOBAL VARIABLES
 */
 
+var SCREEN_WIDTH = window.innerWidth;
+var SCREEN_HEIGHT = window.innerHeight;
+var SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
+var SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 3000);
+var camera = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
 scene.add(camera);
+var radarScene = new THREE.Scene();
+var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
+radarScene.add(camera2);
+
 var clock = new THREE.Clock();
 
 var keyboard = new THREEx.KeyboardState();
@@ -32,15 +40,22 @@ var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
-var livesRemaining = 2;//2
+var livesRemaining = 2;
+
 function onWindowResize() {
 	
-	fontAspect = (window.innerWidth / 175) * (window.innerHeight / 200);
+	SCREEN_WIDTH = window.innerWidth;
+	SCREEN_HEIGHT = window.innerHeight;
+	
+	SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
+	SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
+	
+	fontAspect = (SCREEN_WIDTH / 175) * (SCREEN_HEIGHT / 200);
 	if (fontAspect > 20) fontAspect = 20;
 	if (fontAspect < 5) fontAspect = 5;
 	
@@ -50,13 +65,15 @@ function onWindowResize() {
 	document.getElementById("level").style.fontSize = fontAspect + "px";
 	document.getElementById("gameover").style.fontSize = fontAspect + "px";
 	
-	sunUniforms.resolution.value.x = window.innerWidth;
-	sunUniforms.resolution.value.y = window.innerHeight;
-	explosionBillboardUniforms.resolution.value.x = window.innerWidth;
-	explosionBillboardUniforms.resolution.value.y = window.innerHeight;
+	sunUniforms.resolution.value.x = SCREEN_WIDTH;
+	sunUniforms.resolution.value.y = SCREEN_HEIGHT;
+	explosionBillboardUniforms.resolution.value.x = SCREEN_WIDTH;
+	explosionBillboardUniforms.resolution.value.y = SCREEN_HEIGHT;
 	
-	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 	camera.updateProjectionMatrix();
+	camera2.aspect = SCREEN_WIDTH_DIV_BY_FOUR / SCREEN_HEIGHT_DIV_BY_FOUR;
+	camera2.updateProjectionMatrix();
 	
 	//update HUD Sprites X positions
 	crossHairsSprite.position.x = crosshairPositionX * camera.aspect;
@@ -64,12 +81,12 @@ function onWindowResize() {
 	for (var i = 0; i < livesRemaining; i++) {    //93
 		livesRemainingPercentX[i] = tempPercent;
 		//each shipRemaining icon moves 4 units to the left
-		tempPercent -= 6 - ( window.innerWidth * 0.002 );
+		tempPercent -= 6 - ( SCREEN_WIDTH * 0.002 );
 		livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
 	}
 
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	controls.handleResize();
 			
 }
@@ -156,7 +173,7 @@ scene.add(planet);
 var sunGeometry = new THREE.PlaneBufferGeometry(1200, 1200);
 var sunUniforms = {
 	time: { type: "f", value: 1.0 },
-	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+	resolution: { type: "v2", value: new THREE.Vector2(SCREEN_WIDTH, SCREEN_HEIGHT) }
 };	
 var sunMaterial = new THREE.ShaderMaterial( {
 	transparent: true,
@@ -173,7 +190,7 @@ scene.add(sun);
 var explosionBillboardGeometry = new THREE.PlaneBufferGeometry(1, 1);
 var explosionBillboardUniforms = {
 	time: { type: "f", value: 1.0 },
-	resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+	resolution: { type: "v2", value: new THREE.Vector2(SCREEN_WIDTH, SCREEN_HEIGHT) },
 	explosionTransparency: { type: "f", value: 1.0 }
 };	
 var explosionBillboardMaterial = new THREE.ShaderMaterial( {
@@ -359,16 +376,26 @@ for (var i = 0; i < 17; i++) {
 //var wireframe = new THREE.WireframeHelper(pyramid, 0x222222);
 //scene.add(wireframe);
 
-var boxGeometry = new THREE.BoxGeometry(20, 20, 20);
+var boxGeometry = new THREE.BoxGeometry(800, 800, 800);
 var boxMaterial = new THREE.MeshBasicMaterial({
 	transparent: true,
 	opacity: 0,
 	color: 'rgb(0,0,0)'
 });
+
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
-scene.add(box);
-var helper = new THREE.BoxHelper(box);
-scene.add(helper);
+radarScene.add(box);
+var boxHelper = new THREE.BoxHelper(box); //TODO set color using new BoxHelper's constructor
+radarScene.add(boxHelper);
+
+//test radar mini-cam objects
+var shipSphereGeometry = new THREE.SphereGeometry(20,6,6);
+var shipSphereMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(255,255,255)',
+	wireframe: true
+});
+var shipSphere = new THREE.Mesh(shipSphereGeometry, shipSphereMaterial);
+radarScene.add(shipSphere);
 
 var level = 0;
 var placingShip = true;
@@ -740,7 +767,7 @@ var bulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var bulletGeometry = new THREE.PlaneBufferGeometry(50, 50);
+var bulletGeometry = new THREE.PlaneBufferGeometry(80, 80);//50,50
 
 var bulletArray = [];
 var bulletTexPlaneCopy = [];
@@ -778,7 +805,7 @@ var enemyBulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var enemyBulletGeometry = new THREE.PlaneBufferGeometry(50, 50);
+var enemyBulletGeometry = new THREE.PlaneBufferGeometry(80, 80);//50,50
 
 var enemyBulletArray = [];
 var enemyBulletTexPlaneCopy = [];
