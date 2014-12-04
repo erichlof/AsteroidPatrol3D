@@ -7,10 +7,10 @@ var SCREEN_HEIGHT = window.innerHeight;
 var SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
 var SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
+var camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);//50
 scene.add(camera);
 var radarScene = new THREE.Scene();
-var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
+var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);//65
 radarScene.add(camera2);
 
 var clock = new THREE.Clock();
@@ -77,8 +77,9 @@ function onWindowResize() {
 	
 	//update HUD Sprites X positions
 	crossHairsSprite.position.x = crosshairPositionX * camera.aspect;
-	tempPercent = 93;//93
-	for (var i = 0; i < livesRemaining; i++) {    //93
+	
+	tempPercent = 97;
+	for (var i = 0; i < livesRemaining; i++) {
 		livesRemainingPercentX[i] = tempPercent;
 		//each shipRemaining icon moves 4 units to the left
 		tempPercent -= 6 - ( SCREEN_WIDTH * 0.002 );
@@ -267,6 +268,7 @@ pyramidDownGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2
 pyramidUpGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( -Math.PI / 2) );
 
 var pyramidMaterial = new THREE.MeshLambertMaterial({
+	shading: THREE.FlatShading,
 	color: 'rgb(30,30,30)'
 });
 
@@ -385,17 +387,166 @@ var boxMaterial = new THREE.MeshBasicMaterial({
 
 var box = new THREE.Mesh(boxGeometry, boxMaterial);
 radarScene.add(box);
-var boxHelper = new THREE.BoxHelper(box); //TODO set color using new BoxHelper's constructor
+var boxHelper = new THREE.BoxHelper(box);
+boxHelper.material.color.set( 'rgb(100,100,100)' );
 radarScene.add(boxHelper);
+/*
+//ArrowHelper
+var arrowOrigin = new THREE.Vector3(0,0,0);
+var arrowDirection = new THREE.Vector3(0,1,0);
+var arrow = new THREE.ArrowHelper(arrowDirection,arrowOrigin,20, 'blue');
+arrow.setColor(0xff00ff);
+scene.add(arrow);
+*/
+/*
+//AxisHelper
+var axis = new THREE.AxisHelper(100);
+var xStart = 'rgb(255,0,0)';  var xEnd = 0xffffff;
+var yStart = 'rgb(0,255,0)';  var yEnd = 0xffffff;
+var zStart = 'rgb(0,0,255)';  var zEnd = 0xffffff;
+axis.setColors(xStart,xEnd,yStart,yEnd,zStart,zEnd);
+scene.add(axis);
+*/
+/*
+//BoundingBoxHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.BoundingBoxHelper(box, 0xffffff);
+helper.update();
+helper.setColor('red');
+scene.add(helper);
+*/
+/*
+//BoxHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.BoxHelper(box, 'green');
+scene.add(helper);
+*/
+/*
+//CameraHelper
+var testCamera = new THREE.PerspectiveCamera(30, SCREEN_WIDTH / SCREEN_HEIGHT, 100, 300);
+scene.add(testCamera);
+var cameraHelper = new THREE.CameraHelper(testCamera);
+var frustum = 0xffff00; var cone = 'green'; var up = 'blue'; var target = 'purple'; var cross = 'white';
+cameraHelper.setColors(0xffff00, 0xffffff, 0xff0000, 0x00ff00, 0x0000ff);
+scene.add(cameraHelper);
+*/
+/*
+//EdgesHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.EdgesHelper(box, 'red');
+helper.setColor(0xffff00);
+scene.add(helper);
+*/
+/*
+//FaceNormalsHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.FaceNormalsHelper(box, 10, 'red', 1);
+//helper.setColor(0xffff00);
+scene.add(helper);
+*/
+/*
+//GridHelper
+var helper = new THREE.GridHelper(200, 10, 'red', 'blue');
+helper.setColors(0xffff00,0x00ff00);
+scene.add(helper);
+*/
+/*
+//VertexNormalsHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.VertexNormalsHelper(box, 10, 'blue', 1);
+//helper.setColor(0xffff00);
+scene.add(helper);
+*/
+/*
+//VertexTangentsHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.VertexTangentsHelper(box,10,0xffffff,1);
+helper.update();
+//helper.setColor(0xffff00);
+scene.add(helper);
+*/
+/*
+//WireframeHelper
+var boxGeometry = new THREE.BoxGeometry(200, 200, 200);
+var boxMaterial = new THREE.MeshBasicMaterial({
+	transparent: true,
+	opacity: 0,
+	color: 'rgb(0,0,0)'
+});
+var box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
+var helper = new THREE.WireframeHelper(box, 'blue');
+helper.setColor(0xffff00);
+scene.add(helper);
+*/
 
-//test radar mini-cam objects
-var shipSphereGeometry = new THREE.SphereGeometry(20,6,6);
-var shipSphereMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(255,255,255)',
+
+//Radar mini-cam objects
+
+var radarShipGeometry = new THREE.CylinderGeometry(0,20,100,4,1,false);
+var radarShipMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(0,0,255)',
 	wireframe: true
 });
-var shipSphere = new THREE.Mesh(shipSphereGeometry, shipSphereMaterial);
-radarScene.add(shipSphere);
+//facing away from us
+radarShipGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
+radarShipGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( Math.PI / 4) );
+var radarShip = new THREE.Mesh(radarShipGeometry, radarShipMaterial);
+radarShip.scale.set(2, 0.5, 1);
+radarScene.add(radarShip);
+
+var radarEnemyGeometry = new THREE.SphereGeometry(30,6,1);
+var radarEnemyMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(150,0,255)',
+	wireframe: true
+});
+var radarEnemy = new THREE.Mesh(radarEnemyGeometry, radarEnemyMaterial);
+radarEnemy.scale.set(1, 0.3, 1);
+radarEnemy.position.set(2000,2000,2000);
+radarScene.add(radarEnemy);
+
 
 var level = 0;
 var placingShip = true;
@@ -550,7 +701,7 @@ var crossHairsTexture = THREE.ImageUtils.loadTexture('images/crosshairs01.png');
 var crossHairsMaterial = new THREE.SpriteMaterial( { map: crossHairsTexture, depthTest: false } );
 crossHairsSprite = new THREE.Sprite(crossHairsMaterial);
 //scale the crossHairsSprite
-crossHairsSprite.scale.set(0.5, 0.5, 0.5);
+crossHairsSprite.scale.set(0.3, 0.3, 0.3);
 //position sprites by percent X:(100 is all the way to the right, 0 is left, 50 is centered)
 //                            Y:(100 is all the way to the top, 0 is bottom, 50 is centered)
 var crosshairPercentX = 50;
@@ -578,9 +729,9 @@ for (var i = 0; i < 10; i++) {
 	livesRemainingSprites[i] = new THREE.Sprite(livesRemainingMaterial);
 	//livesRemainingSprites[i].material.rotation = -0.4;
 	livesRemainingSprites[i].scale.set(0.12, 0.12, 0.12);
-	livesRemainingPercentX[i] = 93;
+	livesRemainingPercentX[i] = 93;//93
 	livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
-	livesRemainingSprites[i].position.set(livesRemainingPositionX[i] * camera.aspect, livesRemainingPositionY, -1.5);
+	livesRemainingSprites[i].position.set(livesRemainingPositionX[i] * camera.aspect, livesRemainingPositionY, -2.2);//-1.5
 	camera.add(livesRemainingSprites[i]);
 	if (i >= livesRemaining) livesRemainingSprites[i].visible = false;
 }
@@ -589,8 +740,9 @@ livesRemainingSprites[0].material.rotation = 0.5;
 
 //Enemy UFO Object
 var enemy = new THREE.Object3D();
+enemy.position.set(2000,2000,2000);
 scene.add(enemy);
-enemy.visible = false;
+//enemy.visible = false;
 
 //Enemy Saucer
 var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
