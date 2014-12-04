@@ -17,7 +17,7 @@
 <body>
 	<div id="container"></div>
 
-	<div id="help" style="position:fixed; left:5%; top:3%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+	<div id="help" style="position:fixed; left:5%; bottom:9%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 		Asteroid Patrol 3D
 	</div>
 	
@@ -37,11 +37,11 @@
 	
 	</div>
 
-	<div id="debug3" style="position:fixed; left:5%; top:9%; color:grey;">
+	<div id="debug3" style="position:fixed; left:5%; bottom:6%; color:grey;">
 		Debug Info
 	</div>
 
-	<div id="debug4" style="position:fixed; left:5%; top:12%; color:grey;">
+	<div id="debug4" style="position:fixed; left:5%; bottom:3%; color:grey;">
 		
 	</div>
 	
@@ -419,6 +419,7 @@
 	
 			playerAlive = false;
 			placeShip();
+			radarShip.visible = true;
 			playingBeginLevelIntro = true;
 			
 			cutsceneCameraDistance = 600;
@@ -472,8 +473,8 @@
 			if (joystick._pressed && playerAlive) {
 
 				if (mouseControl) {
-					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 2);
-					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
+					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 3);//2
+					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);//3
 				} else {
 					//joystick left and right will turn the camera in that direction
 					controls.lon = joystick.oldLon + (joystick.deltaX() / 3); // - 90
@@ -750,7 +751,8 @@
 								bulletTexPlaneCopy[i].visible = false;
 									
 								enemyAlive = false;
-								enemy.visible = false;
+								//enemy.visible = false;
+								enemy.position.set(0, -10000, 0);
 								enemySpawnTimer.reset();
 								enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
@@ -842,6 +844,7 @@
 									onWindowResize();
 									
 									playingDeathAnimation = true;
+								
 							
 							}
 
@@ -1000,7 +1003,7 @@
 							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
 									
 							enemyAlive = false;
-							enemy.visible = false;
+							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
@@ -1052,6 +1055,7 @@
 							
 							initPlayerExplosion(ship.position);
 							playingDeathAnimation = true;
+						
 						}
 					}
 				}
@@ -1079,7 +1083,7 @@
 							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
 									
 							enemyAlive = false;
-							enemy.visible = false;
+							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 									
@@ -1154,7 +1158,7 @@
 							debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							enemyAlive = false;
-							enemy.visible = false;
+							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 							
@@ -1210,7 +1214,7 @@
 				if ( enemy.position.distanceTo(ship.position) < 100 ) {
 				
 					enemyAlive = false;
-					enemy.visible = false;
+					//enemy.visible = false;
 					enemySpawnTimer.reset();
 					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 					initEnemyExplosion(enemy.position);
@@ -1357,20 +1361,21 @@
 			//set camera position from ship position
 			if (!playingBeginLevelIntro && !playingGameOverAnimation) {
 				camera.position.copy(ship.position);
-				//rotate the ship inside the radar mini-cam so it is 
-				// looking where the main camera is
-				shipSphere.lookAt(controls.target);	
+					
 			}
 			//set camera2 (radar cam) position from ship position
 			if (!playingGameOverAnimation) {	
 				camera2.position.copy(ship.position);
-				//camera2.lookAt(controls.target);
 				camera2.quaternion.copy(camera.quaternion);
-				camera2.translateZ(200);	
+				camera2.translateZ(500);
+				camera2.translateY(200);
 			}
 			
-			
-			shipSphere.position.copy(ship.position);
+			//rotate the ship inside the radar mini-cam so it is 
+			// looking where the main camera is
+			radarShip.quaternion.copy(camera.quaternion);
+			//radarShip.lookAt(controls.target);
+			radarShip.position.copy(ship.position);
 			
 			skyBox.position.copy(camera.position);
 			
@@ -1398,7 +1403,7 @@
 				// if the target alarm time has been reached,
 				if (enemySpawnTimer.alarmSounding) {
 					enemyAlive = true;
-					enemy.visible = true;
+					//enemy.visible = true;
 					randomPick = Math.floor(Math.random() * 6 + 1);
 					if (randomPick == 1) {
 						enemy.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, -399);
@@ -1492,12 +1497,17 @@
 				enemy.worldToLocal(enemy.position);
 				enemy.rotateY(2 * frameTime);
 				
+				//copy Enemy's position to the radar screen
+				radarEnemy.position.copy(enemy.position);
+				
 				if (enemy.position.x > 420 || enemy.position.x < -420 || 
 				   	enemy.position.y > 420 || enemy.position.y < -420 ||
 				    	enemy.position.z > 420 || enemy.position.z < -420 ) {
 					
 					enemyAlive = false;
-					enemy.visible = false;
+					//enemy.visible = false;
+					enemy.position.set(0, -10000, 0);
+					radarEnemy.position.set(0, 10000, 0);
 					enemySpawnTimer.reset();
 					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 				}
@@ -1521,7 +1531,11 @@
 				
 				camera2.position.copy(camera.position);
 				camera2.quaternion.copy(camera.quaternion);
-				camera2.translateZ(200);
+				camera2.translateZ(500);
+				camera2.translateY(200);
+				
+				radarShip.rotation.x = 0;
+				radarShip.rotation.z = 0;
 				
 				beginLevelTimer.run(frameTime);
 				
@@ -1586,6 +1600,7 @@
 							placeShip();
 							playerAlive = true;
 							crossHairsSprite.visible = true;
+							radarShip.visible = true;
 						} 
 					}
 					
@@ -1980,9 +1995,10 @@
 			camera.getWorldDirection( bulletArray[bulletCounter].direction );
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
-			bulletArray[bulletCounter].direction.multiplyScalar(15);
+			bulletArray[bulletCounter].direction.multiplyScalar(30);
 			bulletArray[bulletCounter].position.add(bulletArray[bulletCounter].direction);
-			bulletArray[bulletCounter].direction.divideScalar(15);
+			//bulletArray[bulletCounter].direction.divideScalar(30);
+			bulletArray[bulletCounter].direction.normalize();
 			
 			//get the white 'flipboard' texture plane's position from the newly spawned Bullet
 			bulletTexPlaneCopy[bulletCounter].position.copy(bulletArray[bulletCounter].position);
@@ -2013,7 +2029,8 @@
 			//so it doesn't start right inside the enemy's saucer
 			enemyBulletArray[enemyBulletCounter].direction.multiplyScalar(15);
 			enemyBulletArray[enemyBulletCounter].position.add(enemyBulletArray[enemyBulletCounter].direction);
-			enemyBulletArray[enemyBulletCounter].direction.divideScalar(15);
+			//enemyBulletArray[enemyBulletCounter].direction.divideScalar(15);
+			enemyBulletArray[enemyBulletCounter].direction.normalize();
 			
 			//get the white 'flipboard' texture plane's position from the newly spawned enemyBullet
 			enemyBulletTexPlaneCopy[enemyBulletCounter].position.copy(enemyBulletArray[enemyBulletCounter].position);
@@ -2077,6 +2094,9 @@
 			
 			enemyIsExploding = true;
 			enemyExplosionTimer.reset();
+			
+			enemy.position.set(0, -10000, 0);
+			radarEnemy.position.set(0, 10000, 0);
 		}
 		
 		function initPlayerExplosion ( location ) {
@@ -2100,6 +2120,7 @@
 				playerExplosionPieces[i].visible = true;
 			}
 			
+			radarShip.visible = false;
 			playerIsExploding = true;
 			playerExplosionTimer.reset();
 		}
