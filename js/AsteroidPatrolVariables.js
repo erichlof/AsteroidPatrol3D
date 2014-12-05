@@ -4,8 +4,8 @@
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
-var SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
-var SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
+var SCREEN_WIDTH_DIVISION = SCREEN_WIDTH / 4;
+var SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;//4
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
 scene.add(camera);
@@ -52,8 +52,8 @@ function onWindowResize() {
 	SCREEN_WIDTH = window.innerWidth;
 	SCREEN_HEIGHT = window.innerHeight;
 	
-	SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
-	SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
+	SCREEN_WIDTH_DIVISION = SCREEN_WIDTH / 4;
+	SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;//4
 	
 	fontAspect = (SCREEN_WIDTH / 175) * (SCREEN_HEIGHT / 200);
 	if (fontAspect > 20) fontAspect = 20;
@@ -72,7 +72,7 @@ function onWindowResize() {
 	
 	camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 	camera.updateProjectionMatrix();
-	camera2.aspect = SCREEN_WIDTH_DIV_BY_FOUR / SCREEN_HEIGHT_DIV_BY_FOUR;
+	camera2.aspect = SCREEN_WIDTH_DIVISION / SCREEN_HEIGHT_DIVISION;
 	camera2.updateProjectionMatrix();
 	
 	//update HUD Sprites X positions
@@ -392,36 +392,53 @@ boxHelper.material.color.set( 'rgb(100,100,100)' );
 radarScene.add(boxHelper);
 
 //Radar mini-cam objects
-var radarShipGeometry = new THREE.CylinderGeometry(0,20,100,4,1,false);
+var radarShipGeometry = new THREE.CylinderGeometry(0,20,120,4,1,false);
 var radarShipMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(0,0,255)',
-	wireframe: true
+	depthTest: false,
+	transparent: true,
+	opacity: 0.5,
+	color: 'rgb(0,0,255)'
 });
 //facing away from us
 radarShipGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
 radarShipGeometry.applyMatrix( new THREE.Matrix4().makeRotationZ( Math.PI / 4) );
 var radarShip = new THREE.Mesh(radarShipGeometry, radarShipMaterial);
-radarShip.scale.set(2, 0.5, 1);
+radarShip.scale.set(3, 0.5, 1);
 radarScene.add(radarShip);
 
-var radarEnemyGeometry = new THREE.SphereGeometry(30,6,1);
+var radarEnemyGeometry = new THREE.SphereGeometry(40,6,1);
 var radarEnemyMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(150,0,255)',
-	wireframe: true
+	depthTest: false,
+	transparent: true,
+	opacity: 0.5,
+	color: 'rgb(150,0,255)'
 });
 var radarEnemy = new THREE.Mesh(radarEnemyGeometry, radarEnemyMaterial);
 radarEnemy.scale.set(1, 0.3, 1);
-radarEnemy.position.set(0, 10000,0 );
+radarEnemy.position.set(0, 10000, 0);
 radarScene.add(radarEnemy);
 
-//70,40,20
 var radarLgAsteroids = [];
-var radarLgAsteroidGeometry = new THREE.SphereGeometry(70,5,4);
-var radarLgAsteroidMaterial = new THREE.MeshBasicMaterial({
-	color: 'rgb(150,150,150)',
-	wireframe: true
-});
+var radarLgAsteroidGeometry = new THREE.SphereGeometry(80,5,4);//5,4
+var radarLgAsteroidMaterial = [];
+var largeAsteroidEdges = [];
 
+var radarMedAsteroids = [];
+var radarMedAsteroidGeometry = new THREE.SphereGeometry(50,4,3);
+var radarMedAsteroidMaterial = [];
+var mediumAsteroidEdges = [];
+
+var radarSmlAsteroids = [];
+var radarSmlAsteroidGeometry = new THREE.SphereGeometry(30,2,2);
+var radarSmlAsteroidMaterial = [];
+var smallAsteroidEdges = [];
+
+var shipEdges = new THREE.EdgesHelper(radarShip);
+shipEdges.material.color.set('rgb(0,0,150)');
+radarScene.add(shipEdges);
+var enemyEdges = new THREE.EdgesHelper(radarEnemy);
+enemyEdges.material.color.set('rgb(50,0,150)');
+radarScene.add(enemyEdges);
 
 var level = 0;
 var placingShip = true;
