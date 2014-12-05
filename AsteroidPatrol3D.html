@@ -172,7 +172,7 @@
 
 			vec3 coord = vec3(atan(p.x,p.y)/6.28, dist*0.4, 0.5);
 
-			for(int i = 1; i <= 4; i++)
+			for (int i = 1; i <= 4; i++)
 			{
 				float power = pow(2.0, float(i));
 				color += (1.5 / power) * snoise(coord + vec3(0.0, -time*0.1, time*0.1), power*18.0);
@@ -203,6 +203,7 @@
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
+					scene.remove( radarLgAsteroids[i] );
 				}
 				for (var i = 0; i < numberOfMediumAsteroids; i++) {	
 					scene.remove( mediumAsteroids[i] );
@@ -252,6 +253,10 @@
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
+				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial);
+				radarLgAsteroids[i].position.set(10000, 0, 0);
+				radarScene.add(radarLgAsteroids[i]);
+				
 				largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);
 				for (var v = 0; v < lvLength; v++) {	
 					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
@@ -294,6 +299,10 @@
 						if(i!=j && largeAsteroids[i].position.distanceTo(largeAsteroids[j].position) < 150)
 							placingLargeAsteroids = true;
 					}
+				}
+				
+				for (var j = 0; j < numberOfLargeAsteroidsCreated; j++) {
+					radarLgAsteroids[j].position.copy(largeAsteroids[j].position);
 				}
 				
 			}
@@ -619,7 +628,7 @@
 							
 						}//end if(smallAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfSmallAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfSmallAsteroids; c++) {
 					
 					//loop through mediumAsteroids and check for collisions with our bullets
 					for (var c = 0; c < numberOfMediumAsteroids; c++) {
@@ -673,7 +682,7 @@
 							
 						}//end if(mediumAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfMediumAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfMediumAsteroids; c++) {
 					
 					//loop through largeAsteroids and check for collisions with our bullets
 					for (var c = 0; c < numberOfLargeAsteroids; c++) {
@@ -696,6 +705,7 @@
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
+									radarLgAsteroids[c].position.set(10000, 0, 0);
 									
 									//spawn 2 new medium asteroids
 									mediumAsteroids[c*2].alive = true;
@@ -732,7 +742,7 @@
 							
 						}//end if(largeAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfLargeAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfLargeAsteroids; c++) {
 					
 					//check if enemy is alive
 					if (enemyAlive) {
@@ -887,7 +897,7 @@
 							
 						}//end if(smallAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfSmallAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfSmallAsteroids; c++) {
 					
 					//loop through mediumAsteroids and check for collisions with enemyBullets
 					for (var c = 0; c < numberOfMediumAsteroids; c++) {
@@ -932,7 +942,7 @@
 							
 						}//end if(mediumAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfMediumAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfMediumAsteroids; c++) {
 					
 					//loop through largeAsteroids and check for collisions with enemyBullets
 					for (var c = 0; c < numberOfLargeAsteroids; c++) {
@@ -954,6 +964,7 @@
 								
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
+									radarLgAsteroids[c].position.set(10000, 0, 0);
 									
 									//spawn 2 new medium asteroids
 									mediumAsteroids[c*2].alive = true;
@@ -973,7 +984,7 @@
 							
 						}//end if(largeAsteroids[c].alive) {
 						
-					}//end for(var c = 0; c < numberOfLargeAsteroids; c++) {
+					}//end for (var c = 0; c < numberOfLargeAsteroids; c++) {
 
 				}//end if (enemyBulletArray[i].alive){
 				
@@ -991,6 +1002,8 @@
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
+							radarLgAsteroids[i].position.set(10000, 0, 0);
+							
 							initExplosion(largeAsteroids[i].position);
 							//spawn 2 new medium asteroids
 							mediumAsteroids[i*2].alive = true;
@@ -1020,6 +1033,8 @@
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
+							radarLgAsteroids[i].position.set(10000, 0, 0);
+							
 							initExplosion(largeAsteroids[i].position);
 							//spawn 2 new medium asteroids
 							mediumAsteroids[i*2].alive = true;
@@ -1609,17 +1624,7 @@
 			}
 			
 			if (playingGameOverAnimation) {
-				/*
-				cutsceneCameraDistance = 600;
-				cutsceneCameraAngle -= frameTime * 2;
-				if (cutsceneCameraAngle <= 0) 
-					cutsceneCameraAngle += TWO_PI;
-
-				camera.position.x = Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
-				camera.position.y = (cutsceneCameraDistance * 0.5);
-				camera.position.z = Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
-				camera.lookAt(scene.position);
-				*/
+				
 				gameOverTimer.run(frameTime);
 				
 				if(gameOverTimer.alarmSounding){
@@ -1650,8 +1655,8 @@
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
 				}
-				if(camera.fov < 65){
-					camera.fov = 65;
+				if(camera.fov < 50){
+					camera.fov = 50;
 					camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
@@ -1830,6 +1835,7 @@
 						if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
 							largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
 
+						radarLgAsteroids[i].position.copy(largeAsteroids[i].position);
 					}//end if(largeAsteroids[i].alive)
 
 				}//end for (var i = 0; i < numberOfLargeAsteroids; i++) {
