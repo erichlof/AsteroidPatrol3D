@@ -7,10 +7,10 @@ var SCREEN_HEIGHT = window.innerHeight;
 var SCREEN_WIDTH_DIV_BY_FOUR = SCREEN_WIDTH / 4;
 var SCREEN_HEIGHT_DIV_BY_FOUR = SCREEN_HEIGHT / 4;
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);//50
+var camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
 scene.add(camera);
 var radarScene = new THREE.Scene();
-var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);//65
+var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);
 radarScene.add(camera2);
 
 var clock = new THREE.Clock();
@@ -81,7 +81,7 @@ function onWindowResize() {
 	tempPercent = 97;
 	for (var i = 0; i < livesRemaining; i++) {
 		livesRemainingPercentX[i] = tempPercent;
-		//each shipRemaining icon moves 4 units to the left
+		//each shipRemaining icon moves to the left
 		tempPercent -= 6 - ( SCREEN_WIDTH * 0.002 );
 		livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
@@ -115,7 +115,7 @@ scene.add( skyBox );
 // stars
 var i, r = 2500, vertex, s, starsGeometry = new THREE.Geometry();
 
-for ( i = 0; i < 1500; i ++ ) {
+for (var i = 0; i < 1500; i ++ ) {
 
 	vertex = new THREE.Vector3();
 	vertex.x = Math.random() * 2 - 1;
@@ -141,7 +141,7 @@ var starsMaterials = [
 	new THREE.PointCloudMaterial( { color: 0x777777, size: 1, sizeAttenuation: false } )
 ];
 
-for ( i = 0; i < 10; i ++ ) {
+for (var i = 0; i < 10; i ++ ) {
 
 	stars = new THREE.PointCloud( starsGeometry, starsMaterials[ i % 6 ] );
 
@@ -392,7 +392,6 @@ boxHelper.material.color.set( 'rgb(100,100,100)' );
 radarScene.add(boxHelper);
 
 //Radar mini-cam objects
-
 var radarShipGeometry = new THREE.CylinderGeometry(0,20,100,4,1,false);
 var radarShipMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(0,0,255)',
@@ -412,8 +411,16 @@ var radarEnemyMaterial = new THREE.MeshBasicMaterial({
 });
 var radarEnemy = new THREE.Mesh(radarEnemyGeometry, radarEnemyMaterial);
 radarEnemy.scale.set(1, 0.3, 1);
-radarEnemy.position.set(2000,2000,2000);
+radarEnemy.position.set(0, 10000,0 );
 radarScene.add(radarEnemy);
+
+//70,40,20
+var radarLgAsteroids = [];
+var radarLgAsteroidGeometry = new THREE.SphereGeometry(70,5,4);
+var radarLgAsteroidMaterial = new THREE.MeshBasicMaterial({
+	color: 'rgb(150,150,150)',
+	wireframe: true
+});
 
 
 var level = 0;
