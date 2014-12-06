@@ -268,11 +268,11 @@
 				radarLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					depthTest: false,
 					transparent: true,
-					opacity: 0.3,
+					opacity: 0.4,
 					color: 'rgb(0,255,0)'
 				});
 				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial[i]);
-				//radarLgAsteroids[i].position.set(10000, 0, 0);
+				radarLgAsteroids[i].colorIndex = 0;
 				radarScene.add(radarLgAsteroids[i]);
 				largeAsteroidEdges[i] = new THREE.EdgesHelper(radarLgAsteroids[i]);
 				largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
@@ -335,6 +335,7 @@
 				});
 				radarMedAsteroids[i] = new THREE.Mesh(radarMedAsteroidGeometry, radarMedAsteroidMaterial[i]);
 				radarMedAsteroids[i].scale.set(1, 0.9, 1);
+				radarMedAsteroids[i].colorIndex = 0;
 				radarScene.add(radarMedAsteroids[i]);
 				mediumAsteroidEdges[i] = new THREE.EdgesHelper(radarMedAsteroids[i]);
 				mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
@@ -392,6 +393,7 @@
 				});
 				radarSmlAsteroids[i] = new THREE.Mesh(radarSmlAsteroidGeometry, radarSmlAsteroidMaterial[i]);
 				radarSmlAsteroids[i].scale.set(1, 0.9, 1);
+				radarSmlAsteroids[i].colorIndex = 0;
 				radarScene.add(radarSmlAsteroids[i]);
 				smallAsteroidEdges[i] = new THREE.EdgesHelper(radarSmlAsteroids[i]);
 				smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
@@ -562,13 +564,18 @@
 			if ( playerAlive && (joystick.button2Pressed || keyboard.pressed('space')) ) {
 				//get the camera's direction and copy it into thrustVector
 				camera.getWorldDirection(thrustVector);
-				//now thrustVector has the right direction, but it needs magnitude also...
-				//20 is the 'strength' of the thruster; this is multiplied by framerate so it will run consistently on different systems
-				thrustVector.multiplyScalar(20 * frameTime);
-				//add this new thrust to the ship's ongoing velocity
-				shipVelocity.add(thrustVector);
+				
+				if (shipSpeed < 200) {
+					//now thrustVector has the right direction, but it needs magnitude also...
+					//40 is the 'strength' of the thruster; this is multiplied by framerate so it will run consistently on different systems
+					thrustVector.multiplyScalar(40 * frameTime);
+					//add this new thrust to the ship's ongoing velocity
+					shipVelocity.add(thrustVector);
+				}
 				//record the current speed of the ship, which equals the length of its velocity vector
 				shipSpeed = shipVelocity.length();
+				//clamp shipSpeed so we can't accelerate forever
+				if (shipSpeed > 200) shipSpeed = 200;
 				//now record just the direction and save it as a unit length vector (length of 1)
 				normalizedShipDirection.copy(shipVelocity);
 				//the following clamps this vector to a unit length of 1
@@ -581,8 +588,8 @@
 					//first set frictionVector equal to shipVelocity vector, then negate it and normalize it, 
 					//in order to point in the opposing direction
 					frictionVector.copy(shipVelocity).negate().normalize();
-					//10 is the amount of friction to apply
-					frictionVector.multiplyScalar(10 * frameTime);
+					//20 is the amount of friction to apply
+					frictionVector.multiplyScalar(20 * frameTime);
 					//add the friction back in to the ship's ongoing velocity
 					shipVelocity.add(frictionVector);
 					//record the current speed of the ship, which equals the length of its velocity vector
@@ -1087,7 +1094,41 @@
 				if (playerAlive) {
 					//only check alive asteroids
 					if (largeAsteroids[i].alive) {
-						if (largeAsteroids[i].position.distanceTo(ship.position) < 120) {
+						
+						lgAsteroidDistanceToShip = largeAsteroids[i].position.distanceTo(ship.position);
+						
+						if (radarLgAsteroids[i].colorIndex == 0 && lgAsteroidDistanceToShip < 300) {
+							radarLgAsteroids[i].colorIndex = 1;
+							radarLgAsteroids[i].material.color.set('rgb(255,255,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarLgAsteroids[i].colorIndex == 0 && lgAsteroidDistanceToShip < 220) {
+							radarLgAsteroids[i].colorIndex = 2;
+							radarLgAsteroids[i].material.color.set('rgb(255,0,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarLgAsteroids[i].colorIndex == 1 && lgAsteroidDistanceToShip < 220) {
+							radarLgAsteroids[i].colorIndex = 2;
+							radarLgAsteroids[i].material.color.set('rgb(255,0,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarLgAsteroids[i].colorIndex == 1 && lgAsteroidDistanceToShip > 300) {
+							radarLgAsteroids[i].colorIndex = 0;
+							radarLgAsteroids[i].material.color.set('rgb(0,255,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						if (radarLgAsteroids[i].colorIndex == 2 && lgAsteroidDistanceToShip > 220) {
+							radarLgAsteroids[i].colorIndex = 1;
+							radarLgAsteroids[i].material.color.set('rgb(255,255,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarLgAsteroids[i].colorIndex == 2 && lgAsteroidDistanceToShip > 300) {
+							radarLgAsteroids[i].colorIndex = 0;
+							radarLgAsteroids[i].material.color.set('rgb(0,255,0)');
+							largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						
+						if (lgAsteroidDistanceToShip < 120) {
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
@@ -1171,7 +1212,41 @@
 				if (playerAlive) {
 					//only check alive asteroids
 					if (mediumAsteroids[i].alive) {
-						if (mediumAsteroids[i].position.distanceTo(ship.position) < 90) {
+						
+						medAsteroidDistanceToShip = mediumAsteroids[i].position.distanceTo(ship.position);
+						
+						if (radarMedAsteroids[i].colorIndex == 0 && medAsteroidDistanceToShip < 280) {
+							radarMedAsteroids[i].colorIndex = 1;
+							radarMedAsteroids[i].material.color.set('rgb(255,255,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarMedAsteroids[i].colorIndex == 0 && medAsteroidDistanceToShip < 200) {
+							radarMedAsteroids[i].colorIndex = 2;
+							radarMedAsteroids[i].material.color.set('rgb(255,0,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarMedAsteroids[i].colorIndex == 1 && medAsteroidDistanceToShip < 200) {
+							radarMedAsteroids[i].colorIndex = 2;
+							radarMedAsteroids[i].material.color.set('rgb(255,0,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarMedAsteroids[i].colorIndex == 1 && medAsteroidDistanceToShip > 280) {
+							radarMedAsteroids[i].colorIndex = 0;
+							radarMedAsteroids[i].material.color.set('rgb(0,255,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						if (radarMedAsteroids[i].colorIndex == 2 && medAsteroidDistanceToShip > 200) {
+							radarMedAsteroids[i].colorIndex = 1;
+							radarMedAsteroids[i].material.color.set('rgb(255,255,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarMedAsteroids[i].colorIndex == 2 && medAsteroidDistanceToShip > 280) {
+							radarMedAsteroids[i].colorIndex = 0;
+							radarMedAsteroids[i].material.color.set('rgb(0,255,0)');
+							mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						
+						if (medAsteroidDistanceToShip < 90) {
 							
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
@@ -1250,7 +1325,41 @@
 				if (playerAlive) {
 					//only check alive asteroids
 					if (smallAsteroids[i].alive) {
-						if (smallAsteroids[i].position.distanceTo(ship.position) < 70) {
+						
+						smlAsteroidDistanceToShip = smallAsteroids[i].position.distanceTo(ship.position);
+						
+						if (radarSmlAsteroids[i].colorIndex == 0 && smlAsteroidDistanceToShip < 260) {
+							radarSmlAsteroids[i].colorIndex = 1;
+							radarSmlAsteroids[i].material.color.set('rgb(255,255,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarSmlAsteroids[i].colorIndex == 0 && smlAsteroidDistanceToShip < 200) {
+							radarSmlAsteroids[i].colorIndex = 2;
+							radarSmlAsteroids[i].material.color.set('rgb(255,0,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarSmlAsteroids[i].colorIndex == 1 && smlAsteroidDistanceToShip < 200) {
+							radarSmlAsteroids[i].colorIndex = 2;
+							radarSmlAsteroids[i].material.color.set('rgb(255,0,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+						}
+						if (radarSmlAsteroids[i].colorIndex == 1 && smlAsteroidDistanceToShip > 260) {
+							radarSmlAsteroids[i].colorIndex = 0;
+							radarSmlAsteroids[i].material.color.set('rgb(0,255,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						if (radarSmlAsteroids[i].colorIndex == 2 && smlAsteroidDistanceToShip > 200) {
+							radarSmlAsteroids[i].colorIndex = 1;
+							radarSmlAsteroids[i].material.color.set('rgb(255,255,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(150,150,0)');
+						}
+						if (radarSmlAsteroids[i].colorIndex == 2 && smlAsteroidDistanceToShip > 260) {
+							radarSmlAsteroids[i].colorIndex = 0;
+							radarSmlAsteroids[i].material.color.set('rgb(0,255,0)');
+							smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						
+						if (smlAsteroidDistanceToShip < 70) {
 							
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
@@ -1449,7 +1558,7 @@
 				camera2.position.copy(ship.position);
 				camera2.quaternion.copy(camera.quaternion);
 				camera2.translateZ(500);
-				camera2.translateY(200);
+				camera2.translateY(100);
 			}
 			
 			//rotate the ship inside the radar mini-cam so it is 
@@ -1599,6 +1708,7 @@
 			
 			if (playingBeginLevelIntro) {
 				
+				//TODO set beginLevelTimer.alarmSounding to true if below happens
 				cutsceneCameraDistance -= frameTime * 150;
 				if (cutsceneCameraDistance < 0)
 					cutsceneCameraDistance = 0;
@@ -1615,7 +1725,7 @@
 				camera2.position.copy(camera.position);
 				camera2.quaternion.copy(camera.quaternion);
 				camera2.translateZ(500);
-				camera2.translateY(200);
+				camera2.translateY(100);
 				
 				radarShip.rotation.x = 0;
 				radarShip.rotation.z = 0;
