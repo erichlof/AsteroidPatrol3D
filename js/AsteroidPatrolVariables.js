@@ -391,8 +391,9 @@ var boxHelper = new THREE.BoxHelper(box);
 boxHelper.material.color.set( 'rgb(100,100,100)' );
 radarScene.add(boxHelper);
 
+
 //Radar mini-cam objects
-var radarShipGeometry = new THREE.CylinderGeometry(0,20,120,4,1,false);
+var radarShipGeometry = new THREE.CylinderGeometry(0,20,150,4,1,false);
 var radarShipMaterial = new THREE.MeshBasicMaterial({
 	depthTest: false,
 	transparent: true,
@@ -450,6 +451,10 @@ var numberOfSmallAsteroids = 0;
 var largeAsteroids = [];
 var mediumAsteroids = [];
 var smallAsteroids = [];
+
+var lgAsteroidDistanceToShip = 0;
+var medAsteroidDistanceToShip = 0;
+var smlAsteroidDistanceToShip = 0;
 
 var testSphere = new THREE.Sphere();
 
