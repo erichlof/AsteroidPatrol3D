@@ -7,30 +7,26 @@ var SCREEN_HEIGHT = window.innerHeight;
 var SCREEN_WIDTH_DIVISION = SCREEN_WIDTH / 4;
 var SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;//4
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
+var camera = new THREE.PerspectiveCamera(55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
 scene.add(camera);
 var radarScene = new THREE.Scene();
-var camera2 = new THREE.PerspectiveCamera(65, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);
+var camera2 = new THREE.PerspectiveCamera(70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);
 radarScene.add(camera2);
 
 var clock = new THREE.Clock();
 
 var keyboard = new THREEx.KeyboardState();
+//are we in portrait smartphone view? if so, move the purple button over to the left a little..
+// if not, it can safely be moved farther right without running into the orange button
+var b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
 var joystick = new VirtualJoystick({
 	container: document.getElementById("container"),
 	mouseSupport: true,
 	add2Buttons: true,
-	//stationaryBase: true,
 	hideJoystick: true,
-	//hideButtons: false,
-	//baseX: 100,
-	//baseY: 250,
-	button1X: 320,
-	button1Y: 250,
-	button2X: 220,
-	button2Y: 250
-	//limitStickTravel: true,
-	//stickRadius: 50	
+	hideButtons: false,
+	button1PercentLeft: 80,
+	button2PercentLeft: b2PercentLeft,
 });
 var mouseControl = false;
 var canPressM = true;
@@ -430,7 +426,7 @@ var radarMedAsteroidMaterial = [];
 var mediumAsteroidEdges = [];
 
 var radarSmlAsteroids = [];
-var radarSmlAsteroidGeometry = new THREE.SphereGeometry(30,2,2);
+var radarSmlAsteroidGeometry = new THREE.SphereGeometry(30,3,2);
 var radarSmlAsteroidMaterial = [];
 var smallAsteroidEdges = [];
 
@@ -624,11 +620,11 @@ var livesRemainingPositionX = [];
 var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
 for (var i = 0; i < 10; i++) {
 	livesRemainingSprites[i] = new THREE.Sprite(livesRemainingMaterial);
-	//livesRemainingSprites[i].material.rotation = -0.4;
 	livesRemainingSprites[i].scale.set(0.12, 0.12, 0.12);
-	livesRemainingPercentX[i] = 93;//93
-	livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
-	livesRemainingSprites[i].position.set(livesRemainingPositionX[i] * camera.aspect, livesRemainingPositionY, -2.2);//-1.5
+	//livesRemainingPercentX[i] = 93;//93
+	//livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
+	livesRemainingSprites[i].position.y = livesRemainingPositionY;
+	livesRemainingSprites[i].position.z = -2.0;
 	camera.add(livesRemainingSprites[i]);
 	if (i >= livesRemaining) livesRemainingSprites[i].visible = false;
 }
@@ -896,7 +892,7 @@ var frameTime = 0;
 var playingDeathAnimation = false;
 var deathAnimationTimer = new THREEx.GameTimer(4);
 var playingBeginLevelIntro = false;
-var beginLevelTimer = new THREEx.GameTimer(4);//3
+var beginLevelTimer = new THREEx.GameTimer(6);//4
 var cutsceneCameraAngle = 0;
 var cutsceneCameraDistance = 50;//0
 var playingWarpAnimation = false;
@@ -924,11 +920,12 @@ var tempPercent = 0;
 var scoreText = document.getElementById("score");
 var levelText = document.getElementById("level");
 var gameOverText = document.getElementById("gameover");
-
+/*
 var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
+*/
 
 //disable clicking and selecting/highlighting text of help, score, level, 
 //   and gameOver banner texts
