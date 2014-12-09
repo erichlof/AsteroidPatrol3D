@@ -14,14 +14,13 @@ var VirtualJoystick = function(opts) {
 	if (this._add2Buttons) this._add1Button = false;
 	this._baseX = this._stickX = opts.baseX || 200;
 	this._baseY = this._stickY = opts.baseY || 300;
+	
+	
 	if (this._add1Button) {
 		this._strokeStyleButton1 = opts.strokeStyleButton1 || 'orange';
 		this._button1El = opts.button1Element || this._buildButton1();
-		this._button1Offset = opts.button1Offset || 300;
-		this._button1X = this._baseX - this._button1Offset;
-		this._button1Y = this._baseY;
-		this._button1X = opts.button1X || this._button1X;
-		this._button1Y = opts.button1Y || this._button1Y;
+		this._button1PercentLeft = opts.button1PercentLeft || 40;
+		this._button1PercentBottom = opts.button1PercentBottom || 1;
 			
 		if (!this._hideButtons) {
 			this._container.appendChild(this._button1El);	
@@ -34,11 +33,8 @@ var VirtualJoystick = function(opts) {
 	if (this._add2Buttons) {
 		this._strokeStyleButton1 = opts.strokeStyleButton1 || 'orange';
 		this._button1El = opts.button1Element || this._buildButton1();
-		this._button1Offset = opts.button1Offset || 300;
-		this._button1X = this._baseX - this._button1Offset;
-		this._button1Y = this._baseY;
-		this._button1X = opts.button1X || this._button1X;
-		this._button1Y = opts.button1Y || this._button1Y;
+		this._button1PercentLeft = opts.button1PercentLeft || 40;
+		this._button1PercentBottom = opts.button1PercentBottom || 1;
 
 		if (!this._hideButtons) {
 			this._container.appendChild(this._button1El);	
@@ -49,11 +45,8 @@ var VirtualJoystick = function(opts) {
 		
 		this._strokeStyleButton2 = opts.strokeStyleButton2 || 'magenta';
 		this._button2El = opts.button2Element || this._buildButton2();
-		this._button2Offset = opts.button2Offset || 400;
-		this._button2X = this._baseX - this._button2Offset;
-		this._button2Y = this._baseY;
-		this._button2X = opts.button2X || this._button2X;
-		this._button2Y = opts.button2Y || this._button2Y;
+		this._button2PercentLeft = opts.button2PercentLeft || 50;
+		this._button2PercentBottom = opts.button2PercentBottom || 1;
 		
 		if (!this._hideButtons) {
 			this._container.appendChild(this._button2El);
@@ -111,19 +104,19 @@ var VirtualJoystick = function(opts) {
 
 	if (this._add1Button) {
 		this._button1El.style.display = "";
-		this._button1El.style.left = (this._button1X - this._button1El.width / 2) + "px";
-		this._button1El.style.top = (this._button1Y - this._button1El.height / 2) + "px";
+		this._button1El.style.left = this._button1PercentLeft + "%";
+		this._button1El.style.bottom = this._button1PercentBottom + "%";
 		this._button1El.style.zIndex = "10";
 	}
 	if (this._add2Buttons) {
 		this._button1El.style.display = "";
-		this._button1El.style.left = (this._button1X - this._button1El.width / 2) + "px";
-		this._button1El.style.top = (this._button1Y - this._button1El.height / 2) + "px";
+		this._button1El.style.left = this._button1PercentLeft + "%";
+		this._button1El.style.bottom = this._button1PercentBottom + "%";
 		this._button1El.style.zIndex = "10";
 		
 		this._button2El.style.display = "";
-		this._button2El.style.left = (this._button2X - this._button2El.width / 2) + "px";
-		this._button2El.style.top = (this._button2Y - this._button2El.height / 2) + "px";
+		this._button2El.style.left = this._button2PercentLeft + "%";
+		this._button2El.style.bottom = this._button2PercentBottom + "%";
 		this._button2El.style.zIndex = "10";
 	}
 	this._transform = (opts.useCssTransform !== undefined ? opts.useCssTransform : true) ? this._getTransformProperty() : false; 
@@ -205,34 +198,6 @@ VirtualJoystick.prototype.destroy = function() {
 VirtualJoystick.touchScreenAvailable = function() {
 	return 'createTouch' in document ? true : false;
 };
-
-/**
- * microevents.js - https://github.com/jeromeetienne/microevent.js
-*/
-(function(destObj){
-	destObj.addEventListener	= function(event, fct){
-		if(this._events === undefined) 	this._events	= {};
-		this._events[event] = this._events[event]	|| [];
-		this._events[event].push(fct);
-		return fct;
-	};
-	destObj.removeEventListener	= function(event, fct){
-		if(this._events === undefined) 	this._events	= {};
-		if( event in this._events === false )	return;
-		this._events[event].splice(this._events[event].indexOf(fct), 1);
-	};
-	destObj.dispatchEvent		= function(event /* , args... */){
-		if(this._events === undefined) 	this._events	= {};
-		if( this._events[event] === undefined )	return;
-		var tmpArray	= this._events[event].slice(); 
-		for(var i = 0; i < tmpArray.length; i++){
-			var result	= tmpArray[i].apply(this, Array.prototype.slice.call(arguments, 1));
-			if( result !== undefined )	return result;
-		}
-		return undefined;
-	};
-})(VirtualJoystick.prototype);
-
 
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                                //
@@ -423,6 +388,8 @@ VirtualJoystick.prototype._onMouseDown = function(event) {
 
 VirtualJoystick.prototype._onMouseMove = function(event) {
 
+	//event.preventDefault();
+	
 	if (event.target == this._button1El) return;
 	if (event.target == this._button2El) return;
 	x = event.clientX;
