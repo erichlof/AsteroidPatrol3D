@@ -5,31 +5,45 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<title>AsteroidPatrol3D</title>
 	<style>
+
 		body {
 			background-color: rgb(0, 0, 0);
 			margin: 0;
 			padding: 0;
 			overflow: hidden;
 		}
+		
 	</style>
 </head>
 
 <body>
+	<div id="level" style="position:fixed; left:0; right:0; top:20%; text-align:center; z-index: 10;
+                               font-family:arial; font-type:bold; color:rgb(200,200,255);">
+	</div>
+	
+	<div id="gameover" style="position:fixed; left:0; right:0; top:25%; text-align:center; z-index: 10;
+                               font-family:arial; font-type:bold; color:rgb(200,200,255);">
+	</div>
+	
 	<div id="container"></div>
 
-	<div id="help" style="position:fixed; left:5%; bottom:9%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
+	<div id="help" style="position:fixed; left:2%; bottom:7%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 		Asteroid Patrol 3D
 	</div>
 	
-	<div id="help1" style="position:fixed; right:1%; bottom:8%; font-family:arial; font-size:10px; color:grey;">
+	<div id="help1" style="position:fixed; left:2%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
 		Desktop: Press 'M': MouseLook / LMouseButton: Fire / 'SPACE': Thrusters
 	</div>
 
-	<div id="help2" style="position:fixed; right:1%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
+	<div id="help2" style="position:fixed; left:2%; bottom:1%; font-family:arial; font-size:10px; color:grey;">
 		Mobile: Swipe to rotate / OrangeButton: Fire / PurpleButton: Thrusters
 	</div>
+	
+	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 
-	<div id="debug1" style="position:fixed; left:5%; top:3%; color:grey;">
+	</div>
+<!--
+	<div id="debug1" style="position:fixed; left:2%; top:3%; color:grey;">
 		
 	</div>
 
@@ -44,18 +58,8 @@
 	<div id="debug4" style="position:fixed; left:5%; bottom:3%; color:grey;">
 		
 	</div>
+-->	
 	
-	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
-
-	</div>
-	
-	<div id="level" style="position:fixed; left:35%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
-
-	</div>
-	
-	<div id="gameover" style="position:fixed; left:25%; top:20%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
-
-	</div>
 
 	<!-- <script src="js/three.min.js"></script> -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
@@ -260,7 +264,7 @@
 			//record the previous randomly chosen material so that the next level will look different
 			previousRandMaterialIndex = randMaterialIndex;
 			
-			debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+			//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 			numberOfLargeAsteroidsCreated = 0;
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -272,6 +276,7 @@
 					color: 'rgb(0,255,0)'
 				});
 				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial[i]);
+				radarLgAsteroids[i].scale.set(1, 0.9, 1);
 				radarLgAsteroids[i].colorIndex = 0;
 				radarScene.add(radarLgAsteroids[i]);
 				largeAsteroidEdges[i] = new THREE.EdgesHelper(radarLgAsteroids[i]);
@@ -288,7 +293,7 @@
 				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
-				largeAsteroids[i].geometry.computeVertexNormals();
+				largeAsteroids[i].geometry.computeVertexNormals(true);
 				largeAsteroids[i].geometry.verticesNeedUpdate = true;
 				largeAsteroids[i].geometry.normalsNeedUpdate = true;
 				largeAsteroids[i].geometry.center();
@@ -334,7 +339,7 @@
 					color: 'rgb(0,255,0)'
 				});
 				radarMedAsteroids[i] = new THREE.Mesh(radarMedAsteroidGeometry, radarMedAsteroidMaterial[i]);
-				radarMedAsteroids[i].scale.set(1, 0.9, 1);
+				radarMedAsteroids[i].scale.set(1, 0.8, 1);
 				radarMedAsteroids[i].colorIndex = 0;
 				radarScene.add(radarMedAsteroids[i]);
 				mediumAsteroidEdges[i] = new THREE.EdgesHelper(radarMedAsteroids[i]);
@@ -351,7 +356,7 @@
 				mediumAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				mediumAsteroids[i].geometry.computeFaceNormals();
-				mediumAsteroids[i].geometry.computeVertexNormals();
+				mediumAsteroids[i].geometry.computeVertexNormals(true);
 				mediumAsteroids[i].geometry.verticesNeedUpdate = true;
 				mediumAsteroids[i].geometry.normalsNeedUpdate = true;
 				mediumAsteroids[i].geometry.center();
@@ -392,7 +397,7 @@
 					color: 'rgb(0,255,0)'
 				});
 				radarSmlAsteroids[i] = new THREE.Mesh(radarSmlAsteroidGeometry, radarSmlAsteroidMaterial[i]);
-				radarSmlAsteroids[i].scale.set(1, 0.9, 1);
+				radarSmlAsteroids[i].scale.set(1, 0.8, 1);
 				radarSmlAsteroids[i].colorIndex = 0;
 				radarScene.add(radarSmlAsteroids[i]);
 				smallAsteroidEdges[i] = new THREE.EdgesHelper(radarSmlAsteroids[i]);
@@ -409,7 +414,7 @@
 				smallAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				smallAsteroids[i].geometry.computeFaceNormals();
-				smallAsteroids[i].geometry.computeVertexNormals();
+				smallAsteroids[i].geometry.computeVertexNormals(true);
 				smallAsteroids[i].geometry.verticesNeedUpdate = true;
 				smallAsteroids[i].geometry.normalsNeedUpdate = true;
 				smallAsteroids[i].geometry.center();
@@ -538,13 +543,13 @@
 			if (joystick._pressed && playerAlive) {
 
 				if (mouseControl) {
-					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 3);//2
-					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);//3
+					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 3);
+					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
 				} else {
 					//joystick left and right will turn the camera in that direction
-					controls.lon = joystick.oldLon + (joystick.deltaX() / 3); // - 90
+					controls.lon = joystick.oldLon + (joystick.deltaX() / 3);
 					//joystick up and down will tilt the camera up and down
-					controls.lat = joystick.oldLat - (joystick.deltaY() / 4); // 0 -
+					controls.lat = joystick.oldLat - (joystick.deltaY() / 3);//4
 				}
 
 			}
@@ -682,7 +687,7 @@
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
-									debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -953,7 +958,7 @@
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
 									
-									debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+									//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
 
@@ -1309,7 +1314,7 @@
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
 
-							debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							enemyAlive = false;
 							//enemy.visible = false;
@@ -1367,7 +1372,7 @@
 							
 							initExplosion(smallAsteroids[i].position);
 							smallAsteroidsRemaining -= 1;
-							debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							playerAlive = false;
 							ship.visible = false;
@@ -1708,12 +1713,12 @@
 			
 			if (playingBeginLevelIntro) {
 				
-				//TODO set beginLevelTimer.alarmSounding to true if below happens
-				cutsceneCameraDistance -= frameTime * 150;
-				if (cutsceneCameraDistance < 0)
+				cutsceneCameraDistance -= frameTime * 200;//150
+				if (cutsceneCameraDistance < 0) {
 					cutsceneCameraDistance = 0;
-				
-				cutsceneCameraAngle -= frameTime * 1.0;
+					beginLevelTimer.alarmSounding = true;
+				}
+				cutsceneCameraAngle -= frameTime * 1.2;
 				if (cutsceneCameraAngle <= 0) 
 					cutsceneCameraAngle += TWO_PI;
 
