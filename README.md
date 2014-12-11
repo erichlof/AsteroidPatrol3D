@@ -25,10 +25,16 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Slightly increase the difficulty each level (speed of asteroids)
-* Add a simple radar in the top corner of the screen to warn against surrounding asteroids
+* Add 'ghost' asteroids behind the grid boundaries to warn players before they warp their ship to other side and unknowingly crashing into those as-yet-unseen asteroids.
 * Add 3D spatial sound FX to surround the player from all angles
 * Add buttons to turn sound on/off and adjust volume
+* Slightly increase the difficulty each level (speed of asteroids and UFO)
+
+
+December 11, 2014 Progress Note
+--------------------------------
+
+The radar mini-cam in the HUD is now complete.  Also, re-worked some of the buttons placement code for mobile devices.  Now the placement of the purple/orange Thrust and Fire buttons is percentage-based and responsive to portrait and landscape modes in mobile devices (it used to be pixel-based and unresponsive).  Next TODO is adding 'ghost' asteroids behind the grid boundaries to warn players before they warp their ship to other side and unknowingly crashing into those as-yet-unseen asteroids (as in the portal openings in Valve's game 'Portal', to warn players of what they're stepping into before they teleport). Shortly after I've implemented that, I will add sound FX and some simple html 'button' elements to turn on/off game sounds and adjust the volume to preset levels (low, med, and high).  This game is in the home stretch! :)
 
 
 November 15, 2014 Progress Note
