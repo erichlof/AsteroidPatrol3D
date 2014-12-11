@@ -192,12 +192,14 @@
 	<script src="js/AsteroidPatrolVariables.js"></script>
 	
 	<script>
-		onWindowResize();
+		
 		initLevel();
 		animate();
 
 
 		function initLevel() {
+			
+			onWindowResize();
 			
 			level += 1;
 			
@@ -501,11 +503,6 @@
 			
 			enemyShootTimer.reset();
 			enemyShootTimer.setAlarm( 1 );
-			
-			//setup controls parameters
-			//controls.movementSpeed = 100;
-			//box.position.set(0,0,-150);
-			//box.rotation.y = 0.6;
 
 		} //end function initLevel()
 		
@@ -1159,7 +1156,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1277,7 +1273,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1383,7 +1378,6 @@
 								livesRemainingSprites[livesRemaining].visible = true;
 								livesRemaining += 1;
 								extraLifeScore += 10000;
-								//onWindowResize();
 							}
 							scoreText.innerHTML = score;
 					
@@ -1422,7 +1416,6 @@
 						livesRemainingSprites[livesRemaining].visible = true;
 						livesRemaining += 1;
 						extraLifeScore += 10000;
-						//onWindowResize();
 					}
 					scoreText.innerHTML = score;
 					
@@ -1777,7 +1770,7 @@
 				if (deathAnimationTimer.alarmSounding) {
 					if (gameOver) {
 						playingGameOverAnimation = true;
-						camera.position.set(-500,500,-500);
+						camera.position.set(-550,550,-550);
 						camera.lookAt(scene.position);
 						gameOverText.innerHTML = "GAME OVER";
 						cutsceneCameraAngle = 0;
@@ -1824,7 +1817,7 @@
 					livesRemainingSprites[0].visible = true;
 					livesRemainingSprites[1].visible = true;
 					extraLifeScore = 10000;
-					onWindowResize();
+					//onWindowResize();
 					initLevel();
 				}
 				
@@ -1840,8 +1833,8 @@
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
 				}
-				if(camera.fov < 50){
-					camera.fov = 50;
+				if(camera.fov < 55){
+					camera.fov = 55;
 					camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
