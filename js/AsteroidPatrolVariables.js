@@ -7,6 +7,7 @@ var SCREEN_HEIGHT = window.innerHeight;
 var SCREEN_WIDTH_DIVISION = SCREEN_WIDTH / 4;
 var SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;//4
 var scene = new THREE.Scene();
+                //if the FOV below is changed, playingWarpAnimation must be changed as well
 var camera = new THREE.PerspectiveCamera(55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000);
 scene.add(camera);
 var radarScene = new THREE.Scene();
@@ -16,16 +17,17 @@ radarScene.add(camera2);
 var clock = new THREE.Clock();
 
 var keyboard = new THREEx.KeyboardState();
-//are we in portrait smartphone view? if so, move the purple button over to the left a little..
-// if not, it can safely be moved farther right without running into the orange button
+//are we in portrait mobile view? if so, move the buttons over to the left a little..
+// if not and we are in landscape mode, they can safely be moved farther right without running into each other
 var b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
+var b1PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 76 : 80;
 var joystick = new VirtualJoystick({
 	container: document.getElementById("container"),
 	mouseSupport: true,
 	add2Buttons: true,
 	hideJoystick: true,
 	hideButtons: false,
-	button1PercentLeft: 80,
+	button1PercentLeft: b1PercentLeft,
 	button2PercentLeft: b2PercentLeft,
 });
 var mouseControl = false;
@@ -42,6 +44,11 @@ window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
 var livesRemaining = 2;
+var livesRemainingSprites = [];
+var livesRemainingPercentX = [];
+var livesRemainingPercentY = 83;
+var livesRemainingPositionX = [];
+var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
 
 function onWindowResize() {
 	
@@ -81,8 +88,15 @@ function onWindowResize() {
 		tempPercent -= 6 - ( SCREEN_WIDTH * 0.002 );
 		livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
+		livesRemainingSprites[i].position.y = livesRemainingPositionY;
+		livesRemainingSprites[i].position.z = -2.0;
 	}
-
+	
+	b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
+	joystick._button2El.style.left = b2PercentLeft + "%";
+	b1PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 76 : 80;
+	joystick._button1El.style.left = b1PercentLeft + "%";
+	
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	controls.handleResize();
 			
@@ -613,11 +627,7 @@ var livesRemainingMaterial = new THREE.SpriteMaterial( {
 	map: livesRemainingTexture, 
 	depthTest: false 
 } );
-var livesRemainingSprites = [];
-var livesRemainingPercentX = [];
-var livesRemainingPercentY = 83;
-var livesRemainingPositionX = [];
-var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
+
 for (var i = 0; i < 10; i++) {
 	livesRemainingSprites[i] = new THREE.Sprite(livesRemainingMaterial);
 	livesRemainingSprites[i].scale.set(0.12, 0.12, 0.12);
