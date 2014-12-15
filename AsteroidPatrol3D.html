@@ -207,6 +207,8 @@
 			//  first clean up all of the old asteroid objects and explosion pieces
 			if (level > 1 || gameOver) {
 				
+				//TODO remove ghostAsteroids[i] and materials
+				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
 					
@@ -271,20 +273,6 @@
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				
-				radarLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
-					depthTest: false,
-					transparent: true,
-					opacity: 0.4,
-					color: 'rgb(0,255,0)'
-				});
-				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial[i]);
-				radarLgAsteroids[i].scale.set(1, 0.9, 1);
-				radarLgAsteroids[i].colorIndex = 0;
-				radarScene.add(radarLgAsteroids[i]);
-				largeAsteroidEdges[i] = new THREE.EdgesHelper(radarLgAsteroids[i]);
-				largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
-				radarScene.add(largeAsteroidEdges[i]);
-				
 				largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);
 				for (var v = 0; v < lvLength; v++) {	
 					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
@@ -313,7 +301,36 @@
 				largeAsteroids[i].direction.normalize();
 				largeAsteroids[i].mass = 100;
 				largeAsteroids[i].speed = Math.random() * 20 + 10;
-				numberOfLargeAsteroidsCreated += 1
+				numberOfLargeAsteroidsCreated += 1;
+				
+				//create 'ghost' asteroids that will be used behind arena boundaries to 
+				//warn players before warping their ship to the other side
+				ghostLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					//depthTest: false,
+					transparent: true,
+					opacity: 0.2,
+					color: 'rgb(255,153,0)'
+				});
+				ghostLargeAsteroids[i] = new THREE.Mesh(largeAsteroids[i].geometry, ghostLgAsteroidMaterial[i]);
+				ghostLargeAsteroids[i].scale.copy(largeAsteroids[i].scale);
+				ghostLargeAsteroids[i].visible = false;
+				scene.add(ghostLargeAsteroids[i]);
+				
+				//create radar mini-cam representations of each asteroid
+				radarLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					depthTest: false,
+					transparent: true,
+					opacity: 0.4,
+					color: 'rgb(0,255,0)'
+				});
+				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial[i]);
+				radarLgAsteroids[i].scale.set(1, 0.9, 1);
+				radarLgAsteroids[i].colorIndex = 0;
+				radarScene.add(radarLgAsteroids[i]);
+				largeAsteroidEdges[i] = new THREE.EdgesHelper(radarLgAsteroids[i]);
+				largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+				radarScene.add(largeAsteroidEdges[i]);
+				
 				placingLargeAsteroids = true;
 				while (placingLargeAsteroids) {
 					placingLargeAsteroids = false;
@@ -334,20 +351,6 @@
 			//build medium asteroids
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
 				
-				radarMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
-					depthTest: false,
-					transparent: true,
-					opacity: 0.3,
-					color: 'rgb(0,255,0)'
-				});
-				radarMedAsteroids[i] = new THREE.Mesh(radarMedAsteroidGeometry, radarMedAsteroidMaterial[i]);
-				radarMedAsteroids[i].scale.set(1, 0.8, 1);
-				radarMedAsteroids[i].colorIndex = 0;
-				radarScene.add(radarMedAsteroids[i]);
-				mediumAsteroidEdges[i] = new THREE.EdgesHelper(radarMedAsteroids[i]);
-				mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
-				radarScene.add(mediumAsteroidEdges[i]);
-
 				mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);
 				for (var v = 0; v < mvLength; v++) {	
 					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
@@ -382,6 +385,21 @@
 				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
 				mediumAsteroids[i].position.set(10000, 10000, 10000);//place outside arena for now
 			
+				//create radar mini-cam representations of each asteroid
+				radarMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					depthTest: false,
+					transparent: true,
+					opacity: 0.3,
+					color: 'rgb(0,255,0)'
+				});
+				radarMedAsteroids[i] = new THREE.Mesh(radarMedAsteroidGeometry, radarMedAsteroidMaterial[i]);
+				radarMedAsteroids[i].scale.set(1, 0.8, 1);
+				radarMedAsteroids[i].colorIndex = 0;
+				radarScene.add(radarMedAsteroids[i]);
+				mediumAsteroidEdges[i] = new THREE.EdgesHelper(radarMedAsteroids[i]);
+				mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+				radarScene.add(mediumAsteroidEdges[i]);
+				
 			}
 			
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
@@ -391,20 +409,6 @@
 			
 			//build small asteroids
 			for (var i = 0; i < numberOfSmallAsteroids; i++) {
-				
-				radarSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
-					depthTest: false,
-					transparent: true,
-					opacity: 0.3,
-					color: 'rgb(0,255,0)'
-				});
-				radarSmlAsteroids[i] = new THREE.Mesh(radarSmlAsteroidGeometry, radarSmlAsteroidMaterial[i]);
-				radarSmlAsteroids[i].scale.set(1, 0.8, 1);
-				radarSmlAsteroids[i].colorIndex = 0;
-				radarScene.add(radarSmlAsteroids[i]);
-				smallAsteroidEdges[i] = new THREE.EdgesHelper(radarSmlAsteroids[i]);
-				smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
-				radarScene.add(smallAsteroidEdges[i]);
 
 				smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);
 				for (var v = 0; v < svLength; v++) {	
@@ -438,6 +442,20 @@
 				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
 				smallAsteroids[i].position.set(-10000, -10000, -10000);//place outside arena for now
 			
+				radarSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					depthTest: false,
+					transparent: true,
+					opacity: 0.3,
+					color: 'rgb(0,255,0)'
+				});
+				radarSmlAsteroids[i] = new THREE.Mesh(radarSmlAsteroidGeometry, radarSmlAsteroidMaterial[i]);
+				radarSmlAsteroids[i].scale.set(1, 0.8, 1);
+				radarSmlAsteroids[i].colorIndex = 0;
+				radarScene.add(radarSmlAsteroids[i]);
+				smallAsteroidEdges[i] = new THREE.EdgesHelper(radarSmlAsteroids[i]);
+				smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+				radarScene.add(smallAsteroidEdges[i]);
+				
 			}
 			
 			for (var i = 0; i < numberOfSmallAsteroids; i++) {
@@ -770,6 +788,7 @@
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
+									ghostLargeAsteroids[c].visible = false;
 									radarLgAsteroids[c].position.set(10000, 0, 0);
 									
 									//spawn 2 new medium asteroids
@@ -1031,6 +1050,7 @@
 								
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
+									ghostLargeAsteroids[c].visible = false;
 									radarLgAsteroids[c].position.set(10000, 0, 0);
 									
 									//spawn 2 new medium asteroids
@@ -1069,6 +1089,7 @@
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
+							ghostLargeAsteroids[i].visible = false;
 							radarLgAsteroids[i].position.set(10000, 0, 0);
 							
 							initExplosion(largeAsteroids[i].position);
@@ -1134,6 +1155,7 @@
 							
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
+							ghostLargeAsteroids[i].visible = false;
 							radarLgAsteroids[i].position.set(10000, 0, 0);
 							
 							initExplosion(largeAsteroids[i].position);
@@ -1984,6 +2006,23 @@
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
 					if(largeAsteroids[i].alive){
+						
+						//keep large asteroids inside the arena
+						if (largeAsteroids[i].position.x > (arenaHalfSize + largeAsteroidRadius) )
+							largeAsteroids[i].position.x -= (arenaFullSize + (largeAsteroidRadius * 2) );
+						else if (largeAsteroids[i].position.x < (-arenaHalfSize - largeAsteroidRadius) )
+							largeAsteroids[i].position.x += (arenaFullSize + (largeAsteroidRadius * 2) );
+
+						if (largeAsteroids[i].position.y > (arenaHalfSize + largeAsteroidRadius) )
+							largeAsteroids[i].position.y -= (arenaFullSize + (largeAsteroidRadius * 2) );
+						else if (largeAsteroids[i].position.y < (-arenaHalfSize - largeAsteroidRadius) )
+							largeAsteroids[i].position.y += (arenaFullSize + (largeAsteroidRadius * 2) );
+
+						if (largeAsteroids[i].position.z > (arenaHalfSize + largeAsteroidRadius) )
+							largeAsteroids[i].position.z -= (arenaFullSize + (largeAsteroidRadius * 2) );
+						else if (largeAsteroids[i].position.z < (-arenaHalfSize - largeAsteroidRadius) )
+							largeAsteroids[i].position.z += (arenaFullSize + (largeAsteroidRadius * 2) );
+						
 						//change to world coordinate system to do position translations
 						largeAsteroids[i].localToWorld(largeAsteroids[i].position);
 						//now move asteroid along its initial randomly-picked path
@@ -1994,25 +2033,7 @@
 						//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
 						largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 
-						//keep large asteroids inside the arena
-						if (largeAsteroids[i].position.x > arenaHalfSize + largeAsteroidRadius)
-							largeAsteroids[i].position.x = -arenaHalfSize - largeAsteroidRadius;
-
-						if (largeAsteroids[i].position.x < -arenaHalfSize - largeAsteroidRadius)
-							largeAsteroids[i].position.x = arenaHalfSize + largeAsteroidRadius;
-
-						if (largeAsteroids[i].position.y > arenaHalfSize + largeAsteroidRadius)
-							largeAsteroids[i].position.y = -arenaHalfSize - largeAsteroidRadius;
-
-						if (largeAsteroids[i].position.y < -arenaHalfSize - largeAsteroidRadius)
-							largeAsteroids[i].position.y = arenaHalfSize + largeAsteroidRadius;
-
-						if (largeAsteroids[i].position.z > arenaHalfSize + largeAsteroidRadius)
-							largeAsteroids[i].position.z = -arenaHalfSize - largeAsteroidRadius;
-
-						if (largeAsteroids[i].position.z < -arenaHalfSize - largeAsteroidRadius)
-							largeAsteroids[i].position.z = arenaHalfSize + largeAsteroidRadius;
-
+					
 						radarLgAsteroids[i].position.copy(largeAsteroids[i].position);
 						largeAsteroidEdges[i].position.copy(radarLgAsteroids[i].position);
 						
@@ -2091,7 +2112,106 @@
 					}//end if(smallAsteroids[i].alive)
 
 				}//end for (var i = 0; i < numberOfSmallAsteroids; i++) {
+				
 			}//end if (!playingBeginLevelIntro)
+			
+			
+			//ghost asteroids
+			//reset flags
+			xIsPossibleThreat = yIsPossibleThreat = zIsPossibleThreat = false;
+			
+			//which wall is the player closest too?
+			if (ship.position.x > arenaEdgeWarningSize) xIsPossibleThreat = true;
+			if (ship.position.y > arenaEdgeWarningSize) yIsPossibleThreat = true;
+			if (ship.position.z > arenaEdgeWarningSize) zIsPossibleThreat = true;
+			if (ship.position.x < -arenaEdgeWarningSize) xIsPossibleThreat = true;
+			if (ship.position.y < -arenaEdgeWarningSize) yIsPossibleThreat = true;
+			if (ship.position.z < -arenaEdgeWarningSize) zIsPossibleThreat = true;
+			
+			angleToPositiveX = Math.acos( normalizedShipDirection.dot(wallNormalPositiveX) );
+			angleToPositiveY = Math.acos( normalizedShipDirection.dot(wallNormalPositiveY) );
+			angleToPositiveZ = Math.acos( normalizedShipDirection.dot(wallNormalPositiveZ) );
+			angleToNegativeX = Math.acos( normalizedShipDirection.dot(wallNormalNegativeX) );
+			angleToNegativeY = Math.acos( normalizedShipDirection.dot(wallNormalNegativeY) );
+			angleToNegativeZ = Math.acos( normalizedShipDirection.dot(wallNormalNegativeZ) );
+			
+			//my version of sort :)
+			// find the least angle between ship direction and walls of arena to see what the ship's main direction is
+			if (angleToPositiveX < angleToPositiveY && angleToPositiveX < angleToPositiveZ && angleToPositiveX < angleToNegativeX &&
+			    angleToPositiveX < angleToNegativeY && angleToPositiveX < angleToNegativeZ)
+				mainDirection = POS_X_DIRECTION;
+			else if (angleToPositiveY < angleToPositiveX && angleToPositiveY < angleToPositiveZ && angleToPositiveY < angleToNegativeX &&
+			    	 angleToPositiveY < angleToNegativeY && angleToPositiveY < angleToNegativeZ)
+				mainDirection = POS_Y_DIRECTION;
+			else if (angleToPositiveZ < angleToPositiveX && angleToPositiveZ < angleToPositiveY && angleToPositiveZ < angleToNegativeX &&
+			    	 angleToPositiveZ < angleToNegativeY && angleToPositiveZ < angleToNegativeZ)
+				mainDirection = POS_Z_DIRECTION;
+			else if (angleToNegativeX < angleToPositiveX && angleToNegativeX < angleToPositiveY && angleToNegativeX < angleToPositiveZ &&
+			    	 angleToNegativeX < angleToNegativeY && angleToNegativeX < angleToNegativeZ)
+				mainDirection = NEG_X_DIRECTION;
+			else if (angleToNegativeY < angleToPositiveX && angleToNegativeY < angleToPositiveY && angleToNegativeY < angleToPositiveZ &&
+			    	 angleToNegativeY < angleToNegativeX && angleToNegativeY < angleToNegativeZ)
+				mainDirection = NEG_Y_DIRECTION;
+			else if (angleToNegativeZ < angleToPositiveX && angleToNegativeZ < angleToPositiveY && angleToNegativeZ < angleToPositiveZ &&
+			    	 angleToNegativeZ < angleToNegativeX && angleToNegativeZ < angleToNegativeY)
+				mainDirection = NEG_Z_DIRECTION;
+			
+			
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {
+
+				if (largeAsteroids[i].alive) {
+					//reset visibility
+					ghostLargeAsteroids[i].visible = true;
+					
+					if (mainDirection == POS_X_DIRECTION || mainDirection == NEG_X_DIRECTION || xIsPossibleThreat) {
+						
+						if (largeAsteroids[i].position.x > arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.x -= (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else if (largeAsteroids[i].position.x < -arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.x += (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else ghostLargeAsteroids[i].visible = false;
+						
+					}
+					if (mainDirection == POS_Y_DIRECTION || mainDirection == NEG_Y_DIRECTION || yIsPossibleThreat) {
+						
+						if (largeAsteroids[i].position.y > arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.y -= (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else if (largeAsteroids[i].position.y < -arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.y += (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else ghostLargeAsteroids[i].visible = false;
+						
+					}
+					if (mainDirection == POS_Z_DIRECTION || mainDirection == NEG_Z_DIRECTION || zIsPossibleThreat) {
+						
+						if (largeAsteroids[i].position.z > arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.z -= (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else if (largeAsteroids[i].position.z < -arenaEdgeWarningSize) {
+							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
+							ghostLargeAsteroids[i].position.z += (arenaFullSize + largeAsteroidDiameter);
+							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+						}
+						else ghostLargeAsteroids[i].visible = false;
+						
+					}
+					
+				}
+				
+			}
 			
 
 			//with different viewports
