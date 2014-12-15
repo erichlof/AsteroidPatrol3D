@@ -214,8 +214,10 @@ var explosionBillboard = new THREE.Mesh(explosionBillboardGeometry, explosionBil
 explosionBillboard.visible = false;
 scene.add(explosionBillboard);
 
+var arenaFullSize = 800;
+var arenaHalfSize = Math.floor(arenaFullSize / 2);
+var arenaEdgeWarningSize = 200;
 
-var arenaHalfSize = 400;
 var gridLineSpacing = 50;
 //calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
 //even when 2 grid plane sizes may differ slightly from one another.
@@ -585,6 +587,9 @@ scene.add(explosionSphere);
 var largeAsteroidRadius = 70;
 var mediumAsteroidRadius = 40;
 var smallAsteroidRadius = 20;
+var largeAsteroidDiameter = largeAsteroidRadius * 2;
+var mediumAsteroidDiameter = mediumAsteroidRadius * 2;
+var smallAsteroidDiameter = smallAsteroidRadius * 2;
 var largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);//this number needs to match html file
 var mediumAsteroidGeometry = new THREE.IcosahedronGeometry(mediumAsteroidRadius, 1);//this number needs to match html file
 var smallAsteroidGeometry = new THREE.IcosahedronGeometry(smallAsteroidRadius, 0);//this number needs to match html file
@@ -594,8 +599,37 @@ var svLength = smallAsteroidGeometry.vertices.length;
 var deformVec = new THREE.Vector3();
 var smallAsteroidsRemaining = 0;
 var collisionSphereRadiusSquared = 0;
-//var wireframe = new THREE.WireframeHelper(asteroid);
-//scene.add(wireframe);
+
+var xIsPossibleThreat = false;
+var yIsPossibleThreat = false;
+var zIsPossibleThreat = false;  
+var wallNormalPositiveX = new THREE.Vector3(-1,0,0);
+var wallNormalPositiveY = new THREE.Vector3(0,-1,0);
+var wallNormalPositiveZ = new THREE.Vector3(0,0,-1);
+var wallNormalNegativeX = new THREE.Vector3(1,0,0);
+var wallNormalNegativeY = new THREE.Vector3(0,1,0);
+var wallNormalNegativeZ = new THREE.Vector3(0,0,1);
+var angleToPositiveX = 0;
+var angleToPositiveY = 0;
+var angleToPositiveZ = 0;
+var angleToNegativeX = 0;
+var angleToNegativeY = 0;
+var angleToNegativeZ = 0;
+var POS_X_DIRECTION = 0;
+var POS_Y_DIRECTION = 1;
+var POS_Z_DIRECTION = 2;
+var NEG_X_DIRECTION = 3;
+var NEG_Y_DIRECTION = 4;
+var NEG_Z_DIRECTION = 5;
+var mainDirection = 0;
+
+
+var ghostLargeAsteroids = [];
+var ghostMediumAsteroids = [];
+var ghostSmallAsteroids = [];
+var ghostLgAsteroidMaterial = [];
+var ghostMedAsteroidMaterial = [];
+var ghostSmlAsteroidMaterial = [];
 
 // Sunlight
 var sunLight = new THREE.DirectionalLight('rgb(255,255,255)', 1);
