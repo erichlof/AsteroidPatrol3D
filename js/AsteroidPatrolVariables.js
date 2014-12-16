@@ -217,6 +217,7 @@ scene.add(explosionBillboard);
 var arenaFullSize = 800;
 var arenaHalfSize = Math.floor(arenaFullSize / 2);
 var arenaEdgeWarningSize = 200;
+var shipEdgeWarningSize = 100;
 
 var gridLineSpacing = 50;
 //calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
@@ -600,29 +601,18 @@ var deformVec = new THREE.Vector3();
 var smallAsteroidsRemaining = 0;
 var collisionSphereRadiusSquared = 0;
 
-var xIsPossibleThreat = false;
-var yIsPossibleThreat = false;
-var zIsPossibleThreat = false;  
-var wallNormalPositiveX = new THREE.Vector3(-1,0,0);
-var wallNormalPositiveY = new THREE.Vector3(0,-1,0);
-var wallNormalPositiveZ = new THREE.Vector3(0,0,-1);
-var wallNormalNegativeX = new THREE.Vector3(1,0,0);
-var wallNormalNegativeY = new THREE.Vector3(0,1,0);
-var wallNormalNegativeZ = new THREE.Vector3(0,0,1);
-var angleToPositiveX = 0;
-var angleToPositiveY = 0;
-var angleToPositiveZ = 0;
-var angleToNegativeX = 0;
-var angleToNegativeY = 0;
-var angleToNegativeZ = 0;
-var POS_X_DIRECTION = 0;
-var POS_Y_DIRECTION = 1;
-var POS_Z_DIRECTION = 2;
-var NEG_X_DIRECTION = 3;
-var NEG_Y_DIRECTION = 4;
-var NEG_Z_DIRECTION = 5;
-var mainDirection = 0;
-
+var xPosThreat = false;
+var yPosThreat = false;
+var zPosThreat = false;  
+var xNegThreat = false;
+var yNegThreat = false;
+var zNegThreat = false;
+var xIsBiggerThreat = false;
+var yIsBiggerThreat = false;
+var zIsBiggerThreat = false;
+var absPositionX = 0;
+var absPositionY = 0;
+var absPositionZ = 0;
 
 var ghostLargeAsteroids = [];
 var ghostMediumAsteroids = [];
@@ -964,8 +954,9 @@ var tempPercent = 0;
 var scoreText = document.getElementById("score");
 var levelText = document.getElementById("level");
 var gameOverText = document.getElementById("gameover");
-/*
+
 var debugText1 = document.getElementById("debug1");
+/*
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
