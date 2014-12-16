@@ -216,7 +216,7 @@ scene.add(explosionBillboard);
 
 var arenaFullSize = 800;
 var arenaHalfSize = Math.floor(arenaFullSize / 2);
-var arenaEdgeWarningSize = 200;
+var arenaEdgeWarningSize = 150;
 var shipEdgeWarningSize = 100;
 
 var gridLineSpacing = 50;
