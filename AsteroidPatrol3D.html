@@ -42,11 +42,11 @@
 	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
 
 	</div>
-<!--
-	<div id="debug1" style="position:fixed; left:2%; top:3%; color:grey;">
+
+	<div id="debug1" style="position:fixed; left:20%; top:1%; color:grey;">
 		
 	</div>
-
+<!--
 	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
 	
 	</div>
@@ -2118,94 +2118,80 @@
 			
 			//ghost asteroids
 			//reset flags
-			xIsPossibleThreat = yIsPossibleThreat = zIsPossibleThreat = false;
+			xPosThreat = yPosThreat = zPosThreat = false;
+			xNegThreat = yNegThreat = zNegThreat = false;
+			/*
+			xIsBiggerThreat = yIsBiggerThreat = zIsBiggerThreat = false;
+			
+			absPositionX = Math.abs(ship.position.x);
+			absPositionY = Math.abs(ship.position.y);
+			absPositionZ = Math.abs(ship.position.z);
+			
+			if (absPositionX > absPositionY && absPositionX > absPositionZ) xIsBiggerThreat = true;
+			if (absPositionY > absPositionX && absPositionY > absPositionZ) yIsBiggerThreat = true;
+			if (absPositionZ > absPositionX && absPositionZ > absPositionY) zIsBiggerThreat = true;
+			*/
 			
 			//which wall is the player closest too?
-			if (ship.position.x > arenaEdgeWarningSize) xIsPossibleThreat = true;
-			if (ship.position.y > arenaEdgeWarningSize) yIsPossibleThreat = true;
-			if (ship.position.z > arenaEdgeWarningSize) zIsPossibleThreat = true;
-			if (ship.position.x < -arenaEdgeWarningSize) xIsPossibleThreat = true;
-			if (ship.position.y < -arenaEdgeWarningSize) yIsPossibleThreat = true;
-			if (ship.position.z < -arenaEdgeWarningSize) zIsPossibleThreat = true;
-			
-			angleToPositiveX = Math.acos( normalizedShipDirection.dot(wallNormalPositiveX) );
-			angleToPositiveY = Math.acos( normalizedShipDirection.dot(wallNormalPositiveY) );
-			angleToPositiveZ = Math.acos( normalizedShipDirection.dot(wallNormalPositiveZ) );
-			angleToNegativeX = Math.acos( normalizedShipDirection.dot(wallNormalNegativeX) );
-			angleToNegativeY = Math.acos( normalizedShipDirection.dot(wallNormalNegativeY) );
-			angleToNegativeZ = Math.acos( normalizedShipDirection.dot(wallNormalNegativeZ) );
-			
-			//my version of sort :)
-			// find the least angle between ship direction and walls of arena to see what the ship's main direction is
-			if (angleToPositiveX < angleToPositiveY && angleToPositiveX < angleToPositiveZ && angleToPositiveX < angleToNegativeX &&
-			    angleToPositiveX < angleToNegativeY && angleToPositiveX < angleToNegativeZ)
-				mainDirection = POS_X_DIRECTION;
-			else if (angleToPositiveY < angleToPositiveX && angleToPositiveY < angleToPositiveZ && angleToPositiveY < angleToNegativeX &&
-			    	 angleToPositiveY < angleToNegativeY && angleToPositiveY < angleToNegativeZ)
-				mainDirection = POS_Y_DIRECTION;
-			else if (angleToPositiveZ < angleToPositiveX && angleToPositiveZ < angleToPositiveY && angleToPositiveZ < angleToNegativeX &&
-			    	 angleToPositiveZ < angleToNegativeY && angleToPositiveZ < angleToNegativeZ)
-				mainDirection = POS_Z_DIRECTION;
-			else if (angleToNegativeX < angleToPositiveX && angleToNegativeX < angleToPositiveY && angleToNegativeX < angleToPositiveZ &&
-			    	 angleToNegativeX < angleToNegativeY && angleToNegativeX < angleToNegativeZ)
-				mainDirection = NEG_X_DIRECTION;
-			else if (angleToNegativeY < angleToPositiveX && angleToNegativeY < angleToPositiveY && angleToNegativeY < angleToPositiveZ &&
-			    	 angleToNegativeY < angleToNegativeX && angleToNegativeY < angleToNegativeZ)
-				mainDirection = NEG_Y_DIRECTION;
-			else if (angleToNegativeZ < angleToPositiveX && angleToNegativeZ < angleToPositiveY && angleToNegativeZ < angleToPositiveZ &&
-			    	 angleToNegativeZ < angleToNegativeX && angleToNegativeZ < angleToNegativeY)
-				mainDirection = NEG_Z_DIRECTION;
-			
+			if (ship.position.x > shipEdgeWarningSize) xPosThreat = true;
+			if (ship.position.y > shipEdgeWarningSize) yPosThreat = true;
+			if (ship.position.z > shipEdgeWarningSize) zPosThreat = true;
+			if (ship.position.x < -shipEdgeWarningSize) xNegThreat = true;
+			if (ship.position.y < -shipEdgeWarningSize) yNegThreat = true;
+			if (ship.position.z < -shipEdgeWarningSize) zNegThreat = true;
 			
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
 				if (largeAsteroids[i].alive) {
 					//reset visibility
-					ghostLargeAsteroids[i].visible = true;
+					ghostLargeAsteroids[i].visible = false;
 					
-					if (mainDirection == POS_X_DIRECTION || mainDirection == NEG_X_DIRECTION || xIsPossibleThreat) {
+					if ( (xPosThreat || xNegThreat) ) {
 						
-						if (largeAsteroids[i].position.x > arenaEdgeWarningSize) {
+						if (largeAsteroids[i].position.x > arenaEdgeWarningSize && xNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.x -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else if (largeAsteroids[i].position.x < -arenaEdgeWarningSize) {
+						else if (largeAsteroids[i].position.x < -arenaEdgeWarningSize && xPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.x += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else ghostLargeAsteroids[i].visible = false;
 						
 					}
-					if (mainDirection == POS_Y_DIRECTION || mainDirection == NEG_Y_DIRECTION || yIsPossibleThreat) {
+					if ( (yPosThreat || yNegThreat) ) {
 						
-						if (largeAsteroids[i].position.y > arenaEdgeWarningSize) {
+						if (largeAsteroids[i].position.y > arenaEdgeWarningSize && yNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.y -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else if (largeAsteroids[i].position.y < -arenaEdgeWarningSize) {
+						else if (largeAsteroids[i].position.y < -arenaEdgeWarningSize && yPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.y += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else ghostLargeAsteroids[i].visible = false;
 						
 					}
-					if (mainDirection == POS_Z_DIRECTION || mainDirection == NEG_Z_DIRECTION || zIsPossibleThreat) {
+					if ( (zPosThreat || zNegThreat) ) {
 						
-						if (largeAsteroids[i].position.z > arenaEdgeWarningSize) {
+						if (largeAsteroids[i].position.z > arenaEdgeWarningSize && zNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.z -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else if (largeAsteroids[i].position.z < -arenaEdgeWarningSize) {
+						else if (largeAsteroids[i].position.z < -arenaEdgeWarningSize && zPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.z += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
+							ghostLargeAsteroids[i].visible = true;
 						}
-						else ghostLargeAsteroids[i].visible = false;
 						
 					}
 					
@@ -2236,10 +2222,11 @@
 			//reset scissor test (disable it)
 			renderer.enableScissorTest( false );
 			
-		/*
+		
 			//helpful real-time debug text, so we can monitor game variables
-			
-			debugText1.innerHTML = "collisionPointX: " + bulletRayCollisionPoint.x.toFixed(1);
+			debugText1.innerHTML = "xPos: " + xPosThreat + " yPos: " + yPosThreat + " zPos: " + zPosThreat +
+					       " xNeg: " + xNegThreat + " yNeg: " + yNegThreat + " zNeg: " + zNegThreat;	
+		/*
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
 			debugText4.innerHTML = "randMaterialIndex: " + randMaterialIndex;
