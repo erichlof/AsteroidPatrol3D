@@ -283,7 +283,7 @@
 				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
-				largeAsteroids[i].geometry.computeVertexNormals(true);
+				largeAsteroids[i].geometry.computeVertexNormals();
 				largeAsteroids[i].geometry.verticesNeedUpdate = true;
 				largeAsteroids[i].geometry.normalsNeedUpdate = true;
 				largeAsteroids[i].geometry.center();
@@ -306,11 +306,14 @@
 				//create 'ghost' asteroids that will be used behind arena boundaries to 
 				//warn players before warping their ship to the other side
 				ghostLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
-					//depthTest: false,
 					transparent: true,
-					opacity: 0.2,
-					color: 'rgb(255,153,0)'
 				});
+				if (randMaterialIndex == 0) ghostLgAsteroidMaterial[i].color.set('rgb(100,45,15)');
+				else if (randMaterialIndex == 1) ghostLgAsteroidMaterial[i].color.set('rgb(40,40,40)');
+				else if (randMaterialIndex == 2) ghostLgAsteroidMaterial[i].color.set('rgb(240,240,240)');
+				else if (randMaterialIndex == 3) ghostLgAsteroidMaterial[i].color.set('rgb(100,10,0)');
+				else if (randMaterialIndex == 4) ghostLgAsteroidMaterial[i].color.set('rgb(0,150,255)');
+				
 				ghostLargeAsteroids[i] = new THREE.Mesh(largeAsteroids[i].geometry, ghostLgAsteroidMaterial[i]);
 				ghostLargeAsteroids[i].scale.copy(largeAsteroids[i].scale);
 				ghostLargeAsteroids[i].visible = false;
@@ -361,7 +364,7 @@
 				mediumAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				mediumAsteroids[i].geometry.computeFaceNormals();
-				mediumAsteroids[i].geometry.computeVertexNormals(true);
+				mediumAsteroids[i].geometry.computeVertexNormals();
 				mediumAsteroids[i].geometry.verticesNeedUpdate = true;
 				mediumAsteroids[i].geometry.normalsNeedUpdate = true;
 				mediumAsteroids[i].geometry.center();
@@ -420,7 +423,7 @@
 				smallAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				smallAsteroids[i].geometry.computeFaceNormals();
-				smallAsteroids[i].geometry.computeVertexNormals(true);
+				smallAsteroids[i].geometry.computeVertexNormals();
 				smallAsteroids[i].geometry.verticesNeedUpdate = true;
 				smallAsteroids[i].geometry.normalsNeedUpdate = true;
 				smallAsteroids[i].geometry.center();
@@ -2120,7 +2123,7 @@
 			//reset flags
 			xPosThreat = yPosThreat = zPosThreat = false;
 			xNegThreat = yNegThreat = zNegThreat = false;
-			/*
+			
 			xIsBiggerThreat = yIsBiggerThreat = zIsBiggerThreat = false;
 			
 			absPositionX = Math.abs(ship.position.x);
@@ -2130,7 +2133,7 @@
 			if (absPositionX > absPositionY && absPositionX > absPositionZ) xIsBiggerThreat = true;
 			if (absPositionY > absPositionX && absPositionY > absPositionZ) yIsBiggerThreat = true;
 			if (absPositionZ > absPositionX && absPositionZ > absPositionY) zIsBiggerThreat = true;
-			*/
+			
 			
 			//which wall is the player closest too?
 			if (ship.position.x > shipEdgeWarningSize) xPosThreat = true;
@@ -2146,51 +2149,57 @@
 					//reset visibility
 					ghostLargeAsteroids[i].visible = false;
 					
-					if ( (xPosThreat || xNegThreat) ) {
+					if ( xPosThreat || xNegThreat ) {
 						
 						if (largeAsteroids[i].position.x > arenaEdgeWarningSize && xNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.x -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.x) - arenaEdgeWarningSize) / 300;
 						}
 						else if (largeAsteroids[i].position.x < -arenaEdgeWarningSize && xPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.x += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.x) - arenaEdgeWarningSize) / 300;
 						}
 						
 					}
-					if ( (yPosThreat || yNegThreat) ) {
+					if ( yPosThreat || yNegThreat ) {
 						
 						if (largeAsteroids[i].position.y > arenaEdgeWarningSize && yNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.y -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.y) - arenaEdgeWarningSize) / 300;
 						}
 						else if (largeAsteroids[i].position.y < -arenaEdgeWarningSize && yPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.y += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.y) - arenaEdgeWarningSize) / 300;
 						}
 						
 					}
-					if ( (zPosThreat || zNegThreat) ) {
+					if ( zPosThreat || zNegThreat ) {
 						
 						if (largeAsteroids[i].position.z > arenaEdgeWarningSize && zNegThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.z -= (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.z) - arenaEdgeWarningSize) / 300;
 						}
 						else if (largeAsteroids[i].position.z < -arenaEdgeWarningSize && zPosThreat) {
 							ghostLargeAsteroids[i].position.copy(largeAsteroids[i].position);
 							ghostLargeAsteroids[i].position.z += (arenaFullSize + largeAsteroidDiameter);
 							ghostLargeAsteroids[i].quaternion.copy(largeAsteroids[i].quaternion);
 							ghostLargeAsteroids[i].visible = true;
+							ghostLargeAsteroids[i].material.opacity = (Math.abs(largeAsteroids[i].position.z) - arenaEdgeWarningSize) / 300;
 						}
 						
 					}
@@ -2224,8 +2233,8 @@
 			
 		
 			//helpful real-time debug text, so we can monitor game variables
-			debugText1.innerHTML = "xPos: " + xPosThreat + " yPos: " + yPosThreat + " zPos: " + zPosThreat +
-					       " xNeg: " + xNegThreat + " yNeg: " + yNegThreat + " zNeg: " + zNegThreat;	
+			//debugText1.innerHTML = "xPos: " + xPosThreat + " yPos: " + yPosThreat + " zPos: " + zPosThreat +
+			//		       " xNeg: " + xNegThreat + " yNeg: " + yNegThreat + " zNeg: " + zNegThreat;	
 		/*
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
