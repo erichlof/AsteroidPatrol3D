@@ -216,8 +216,9 @@ scene.add(explosionBillboard);
 
 var arenaFullSize = 800;
 var arenaHalfSize = Math.floor(arenaFullSize / 2);
-var arenaEdgeWarningSize = 150;
-var shipEdgeWarningSize = 100;
+var arenaEdgeWarningSize = 100;//150
+var arenaEdgeWarningx3 = 300;
+var shipEdgeWarningSize = 300;
 
 var gridLineSpacing = 50;
 //calculate small amount to add to gridLineSpacing in order to make all the grid-lines correctly line up,
@@ -607,12 +608,13 @@ var zPosThreat = false;
 var xNegThreat = false;
 var yNegThreat = false;
 var zNegThreat = false;
-var xIsBiggerThreat = false;
-var yIsBiggerThreat = false;
-var zIsBiggerThreat = false;
-var absPositionX = 0;
-var absPositionY = 0;
-var absPositionZ = 0;
+var xFacingThreat = false;
+var yFacingThreat = false;
+var zFacingThreat = false;
+var cameraFacingVector = new THREE.Vector3();
+var absCameraFacingX = 0;
+var absCameraFacingY = 0;
+var absCameraFacingZ = 0;
 
 var ghostLargeAsteroids = [];
 var ghostMediumAsteroids = [];
