@@ -43,7 +43,7 @@ document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
-var livesRemaining = 2;
+var livesRemaining = 3;
 var livesRemainingSprites = [];
 var livesRemainingPercentX = [];
 var livesRemainingPercentY = 83;
@@ -217,7 +217,6 @@ scene.add(explosionBillboard);
 var arenaFullSize = 800;
 var arenaHalfSize = Math.floor(arenaFullSize / 2);
 var arenaEdgeWarningSize = 100;//150
-var arenaEdgeWarningx3 = 300;
 var shipEdgeWarningSize = 300;
 
 var gridLineSpacing = 50;
