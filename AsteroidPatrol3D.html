@@ -211,24 +211,30 @@
 				
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
 					scene.remove( largeAsteroids[i] );
+					scene.remove( ghostLargeAsteroids[i] );
 					
 					radarScene.remove( radarLgAsteroids[i] );
 					radarScene.remove( largeAsteroidEdges[i] );
 					radarLgAsteroidMaterial[i].dispose();
+					ghostLgAsteroidMaterial[i].dispose();
 				}
 				for (var i = 0; i < numberOfMediumAsteroids; i++) {	
 					scene.remove( mediumAsteroids[i] );
+					scene.remove( ghostMediumAsteroids[i] );
 					
 					radarScene.remove( radarMedAsteroids[i] );
 					radarScene.remove( mediumAsteroidEdges[i] );
 					radarMedAsteroidMaterial[i].dispose();
+					ghostMedAsteroidMaterial[i].dispose();
 				}
 				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
 					scene.remove( smallAsteroids[i] );
+					scene.remove( ghostSmallAsteroids[i] );
 					
 					radarScene.remove( radarSmlAsteroids[i] );
 					radarScene.remove( smallAsteroidEdges[i] );
 					radarSmlAsteroidMaterial[i].dispose();
+					ghostSmlAsteroidMaterial[i].dispose();
 				}
 				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {	
@@ -250,10 +256,10 @@
 			
 			
 			crossHairsSprite.visible = false;
-			numberOfLargeAsteroids = Math.floor( level * 2 + 1 );
+			numberOfLargeAsteroids = Math.floor( level * 2 );// + 1
 			
 			//for debugging levels progression
-			numberOfLargeAsteroids = 1;
+			//numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
@@ -389,7 +395,16 @@
 				mediumAsteroids[i].mass = 70;
 				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
 				mediumAsteroids[i].position.set(10000, 10000, 10000);//place outside arena for now
-			
+				
+				ghostMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					transparent: true,
+				});
+				ghostMedAsteroidMaterial[i].color.set('rgb(255,50,0)');
+				ghostMediumAsteroids[i] = new THREE.Mesh(mediumAsteroids[i].geometry, ghostMedAsteroidMaterial[i]);
+				ghostMediumAsteroids[i].scale.copy(mediumAsteroids[i].scale);
+				ghostMediumAsteroids[i].visible = false;
+				scene.add(ghostMediumAsteroids[i]);
+				
 				//create radar mini-cam representations of each asteroid
 				radarMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					depthTest: false,
@@ -446,7 +461,16 @@
 				smallAsteroids[i].mass = 30;
 				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
 				smallAsteroids[i].position.set(-10000, -10000, -10000);//place outside arena for now
-			
+				
+				ghostSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
+					transparent: true,
+				});
+				ghostSmlAsteroidMaterial[i].color.set('rgb(255,50,0)');
+				ghostSmallAsteroids[i] = new THREE.Mesh(smallAsteroids[i].geometry, ghostSmlAsteroidMaterial[i]);
+				ghostSmallAsteroids[i].scale.copy(smallAsteroids[i].scale);
+				ghostSmallAsteroids[i].visible = false;
+				scene.add(ghostSmallAsteroids[i]);
+				
 				radarSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					depthTest: false,
 					transparent: true,
@@ -691,6 +715,7 @@
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
+									ghostSmallAsteroids[c].visible = false;
 									radarSmlAsteroids[c].position.set(0, 0, -10000);
 									
 									initExplosion(bulletRayCollisionPoint);
@@ -738,6 +763,7 @@
 									//bulletArray[i].position.copy(bulletRayCollisionPoint);
 									mediumAsteroids[c].alive = false;
 									mediumAsteroids[c].visible = false;
+									ghostMediumAsteroids[c].visible = false;
 									radarMedAsteroids[c].position.set(0, 0, 10000);
 									
 									//spawn 2 new small asteroids
@@ -971,6 +997,7 @@
 									
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
+									ghostSmallAsteroids[c].visible = false;
 									radarSmlAsteroids[c].position.set(0, 0, -10000);
 									
 									initExplosion(enemyBulletRayCollisionPoint);
@@ -1009,6 +1036,7 @@
 								
 									mediumAsteroids[c].alive = false;
 									mediumAsteroids[c].visible = false;
+									ghostMediumAsteroids[c].visible = false;
 									radarMedAsteroids[c].position.set(0, 0, 10000);
 									
 									//spawn 2 new small asteroids
@@ -1213,6 +1241,7 @@
 							
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
+							ghostMediumAsteroids[i].visible = false;
 							radarMedAsteroids[i].position.set(0, 0, 10000);
 							
 							initExplosion(mediumAsteroids[i].position);
@@ -1278,6 +1307,7 @@
 							
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
+							ghostMediumAsteroids[i].visible = false;
 							radarMedAsteroids[i].position.set(0, 0, 10000);
 							
 							initExplosion(mediumAsteroids[i].position);
@@ -1329,6 +1359,7 @@
 							
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
+							ghostSmallAsteroids[i].visible = false;
 							radarSmlAsteroids[i].position.set(0, 0, -10000);
 							
 							initExplosion(smallAsteroids[i].position);
@@ -1390,6 +1421,7 @@
 							
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
+							ghostSmallAsteroids[i].visible = false;
 							radarSmlAsteroids[i].position.set(0, 0, -10000);
 							
 							initExplosion(smallAsteroids[i].position);
@@ -1840,7 +1872,7 @@
 					gameOverText.innerHTML = "";
 					level = 0;
 					score = 0;
-					livesRemaining = 2;
+					livesRemaining = 3;
 					livesRemainingSprites[0].visible = true;
 					livesRemainingSprites[1].visible = true;
 					extraLifeScore = 10000;
@@ -2121,7 +2153,7 @@
 			}//end if (!playingBeginLevelIntro)
 			
 			
-			//ghost asteroids
+			// ghost warning asteroids   ////////////////////////////////
 			//reset flags
 			xFacingThreat = yFacingThreat = zFacingThreat = false;
 			xPosThreat = yPosThreat = zPosThreat = false;
@@ -2140,15 +2172,13 @@
 			if ( absCameraFacingZ > absCameraFacingX && absCameraFacingZ > absCameraFacingY )
 				zFacingThreat = true;
 			
-			
-			//is player very close to a wall? If so, flag as possibly threatened by an asteroid near an opposing wall
+			//is player very close to a wall? If so, flag as possibly threatened by an asteroid near an opposite wall
 			if (ship.position.x > shipEdgeWarningSize) xPosThreat = true;
 			if (ship.position.y > shipEdgeWarningSize) yPosThreat = true;
 			if (ship.position.z > shipEdgeWarningSize) zPosThreat = true;
 			if (ship.position.x < -shipEdgeWarningSize) xNegThreat = true;
 			if (ship.position.y < -shipEdgeWarningSize) yNegThreat = true;
 			if (ship.position.z < -shipEdgeWarningSize) zNegThreat = true;
-			
 			
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 
@@ -2270,6 +2300,248 @@
 				}//end if (largeAsteroids[i].alive)
 				
 			}//end for (var i = 0; i < numberOfLargeAsteroids; i++)
+			
+			for (var i = 0; i < numberOfMediumAsteroids; i++) {
+
+				if (mediumAsteroids[i].alive) {
+					//reset visibility
+					ghostMediumAsteroids[i].visible = false;
+					
+					if ( xFacingThreat ) {
+						
+						if (ship.position.x < 0 && mediumAsteroids[i].position.x > arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.x -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.x) ) / 500;
+						}
+						else if (ship.position.x > 0 && mediumAsteroids[i].position.x < -arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.x += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.x) ) / 500;
+						}
+						
+					}
+					if ( yFacingThreat ) {
+						
+						if (ship.position.y < 0 && mediumAsteroids[i].position.y > arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.y -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.y) ) / 500;
+						}
+						else if (ship.position.y > 0 && mediumAsteroids[i].position.y < -arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.y += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.y) ) / 500;
+						}
+						
+					}
+					if ( zFacingThreat ) {
+						
+						if (ship.position.z < 0 && mediumAsteroids[i].position.z > arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.z -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.z) ) / 500;
+						}
+						else if (ship.position.z > 0 && mediumAsteroids[i].position.z < -arenaEdgeWarningSize) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.z += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.z) ) / 500;
+						}
+						
+					}
+					
+					//override visibility if ship is very near an opposite wall of an Asteroid that is also near its own wall
+					if ( xPosThreat || xNegThreat ) {
+						
+						if (xNegThreat && mediumAsteroids[i].position.x > 300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.x -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.x) ) / 500;
+						}
+						else if (xPosThreat && mediumAsteroids[i].position.x < -300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.x += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.x) ) / 500;
+						}
+						
+					}
+					if ( yPosThreat || yNegThreat ) {
+						
+						if (yNegThreat && mediumAsteroids[i].position.y > 300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.y -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.y) ) / 500;
+						}
+						else if (yPosThreat && mediumAsteroids[i].position.y < -300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.y += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.y) ) / 500;
+						}
+						
+					}
+					if ( zPosThreat || zNegThreat ) {
+						
+						if (zNegThreat && mediumAsteroids[i].position.z > 300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.z -= (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.z) ) / 500;
+						}
+						else if (zPosThreat && mediumAsteroids[i].position.z < -300) {
+							ghostMediumAsteroids[i].position.copy(mediumAsteroids[i].position);
+							ghostMediumAsteroids[i].position.z += (arenaFullSize + mediumAsteroidDiameter);
+							ghostMediumAsteroids[i].quaternion.copy(mediumAsteroids[i].quaternion);
+							ghostMediumAsteroids[i].visible = true;
+							ghostMediumAsteroids[i].material.opacity = (Math.abs(mediumAsteroids[i].position.z) ) / 500;
+						}
+						
+					}
+					
+				}//end if (mediumAsteroids[i].alive)
+				
+			}//end for (var i = 0; i < numberOfMediumAsteroids; i++)
+			
+			for (var i = 0; i < numberOfSmallAsteroids; i++) {
+
+				if (smallAsteroids[i].alive) {
+					//reset visibility
+					ghostSmallAsteroids[i].visible = false;
+					
+					if ( xFacingThreat ) {
+						
+						if (ship.position.x < 0 && smallAsteroids[i].position.x > arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.x -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.x) ) / 500;
+						}
+						else if (ship.position.x > 0 && smallAsteroids[i].position.x < -arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.x += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.x) ) / 500;
+						}
+						
+					}
+					if ( yFacingThreat ) {
+						
+						if (ship.position.y < 0 && smallAsteroids[i].position.y > arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.y -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.y) ) / 500;
+						}
+						else if (ship.position.y > 0 && smallAsteroids[i].position.y < -arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.y += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.y) ) / 500;
+						}
+						
+					}
+					if ( zFacingThreat ) {
+						
+						if (ship.position.z < 0 && smallAsteroids[i].position.z > arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.z -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.z) ) / 500;
+						}
+						else if (ship.position.z > 0 && smallAsteroids[i].position.z < -arenaEdgeWarningSize) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.z += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.z) ) / 500;
+						}
+						
+					}
+					
+					//override visibility if ship is very near an opposite wall of an Asteroid that is also near its own wall
+					if ( xPosThreat || xNegThreat ) {
+						
+						if (xNegThreat && smallAsteroids[i].position.x > 300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.x -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.x) ) / 500;
+						}
+						else if (xPosThreat && smallAsteroids[i].position.x < -300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.x += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.x) ) / 500;
+						}
+						
+					}
+					if ( yPosThreat || yNegThreat ) {
+						
+						if (yNegThreat && smallAsteroids[i].position.y > 300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.y -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.y) ) / 500;
+						}
+						else if (yPosThreat && smallAsteroids[i].position.y < -300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.y += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.y) ) / 500;
+						}
+						
+					}
+					if ( zPosThreat || zNegThreat ) {
+						
+						if (zNegThreat && smallAsteroids[i].position.z > 300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.z -= (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.z) ) / 500;
+						}
+						else if (zPosThreat && smallAsteroids[i].position.z < -300) {
+							ghostSmallAsteroids[i].position.copy(smallAsteroids[i].position);
+							ghostSmallAsteroids[i].position.z += (arenaFullSize + smallAsteroidDiameter);
+							ghostSmallAsteroids[i].quaternion.copy(smallAsteroids[i].quaternion);
+							ghostSmallAsteroids[i].visible = true;
+							ghostSmallAsteroids[i].material.opacity = (Math.abs(smallAsteroids[i].position.z) ) / 500;
+						}
+						
+					}
+					
+				}//end if (smallAsteroids[i].alive)
+				
+			}//end for (var i = 0; i < numberOfSmallAsteroids; i++)
 			
 
 			//with different viewports
