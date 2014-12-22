@@ -471,78 +471,8 @@ var smlAsteroidDistanceToShip = 0;
 
 var testSphere = new THREE.Sphere();
 
-//Asteroid Materials
 var asteroidMaterials = [];
-//brown rock
-asteroidMaterials[0] = new THREE.MeshLambertMaterial({
-	color: 'rgb(100,45,15)',
-	emissive: 'rgb(30,15,5)',
-	shading: THREE.FlatShading
-});
-//dark grey rock
-asteroidMaterials[1] = new THREE.MeshLambertMaterial({
-	color: 'rgb(40,40,40)',
-	emissive: 'rgb(20,20,20)',
-	shading: THREE.FlatShading
-});
-//high-contrast, 'snowy' comet-like rock
-asteroidMaterials[2] = new THREE.MeshLambertMaterial({
-	color: 'rgb(240,240,240)',
-	emissive: 'rgb(20,20,20)',
-	shading: THREE.FlatShading
-});
-//red, mars-like rock
-asteroidMaterials[3] = new THREE.MeshLambertMaterial({
-	color: 'rgb(100,10,0)',
-	emissive: 'rgb(30,5,0)',
-	shading: THREE.FlatShading
-});
-//blue, transparent water-ice rock
-asteroidMaterials[4] = new THREE.MeshLambertMaterial({
-	transparent: true,
-	opacity: 0.85,
-	color: 'rgb(0,150,255)',
-	emissive: 'rgb(0,75,120)',
-	side: THREE.DoubleSide,
-	shading: THREE.FlatShading
-});
-
-//Asteroid Explosion Pieces
 var asteroidExplosionMaterials = [];
-//brown rock
-asteroidExplosionMaterials[0] = new THREE.MeshBasicMaterial({
-	color: 'rgb(100,45,15)',
-	emissive: 'rgb(30,15,5)'
-});
-//dark grey rock
-asteroidExplosionMaterials[1] = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 1.0,
-	color: 'rgb(40,40,40)',
-	emissive: 'rgb(20,20,20)'
-});
-//high-contrast, 'snowy' comet-like rock
-asteroidExplosionMaterials[2] = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 1.0,
-	color: 'rgb(240,240,240)',
-	emissive: 'rgb(20,20,20)'
-});
-//red, mars-like rock
-asteroidExplosionMaterials[3] = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 1.0,
-	color: 'rgb(100,10,0)',
-	emissive: 'rgb(30,5,0)'
-});
-//blue, transparent water-ice rock
-asteroidExplosionMaterials[4] = new THREE.MeshBasicMaterial({
-	transparent: true,
-	opacity: 1.0,
-	color: 'rgb(0,150,255)',
-	emissive: 'rgb(0,75,120)'
-});
-
 
 var explosionPieces = [];     //CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded )
 var explosionPiecesGeometry = new THREE.CylinderGeometry( 0, 2, 2, 2, 1, false );
