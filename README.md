@@ -25,10 +25,15 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add 'ghost' asteroids behind the grid boundaries to warn players before they warp their ship to other side and unknowingly crash into those as-yet-unseen asteroids.
 * Add 3D spatial sound FX to surround the player from all angles
 * Add buttons to turn sound on/off and adjust volume
 * Slightly increase the difficulty each level (speed of asteroids and UFO)
+
+
+December 22, 2014 Progress Note
+--------------------------------
+
+Completed 'ghost' asteroid warning system behind arena walls.  Now when the player is about to go through a wall and warp to the other side, holographic images of any threatening asteroids are displayed in an orange-red color.  Next up is to add 3D sound effects.  I am still deciding on which WebAudio API sound library to use.  Once sounds are implemented, I'll put some final touches on the game: maybe inside the left-top corner radar HUD, have the close asteroids blink red/white faster and faster as they get closer to the player's ship. Also increase difficulty slightly every level by making UFO and Asteroids a little faster.
 
 
 December 11, 2014 Progress Note
@@ -59,21 +64,3 @@ October 7, 2014 Progress Note
 --------------------------------
 
 Collision detection and collision response is now working for all sizes of asteroids.  They each have their own bounding spheres and masses so when they collide, it looks pretty realistic!  I put a link to the original game physics book in the source code comments of the html file. Next TODO is to add the UFO flying saucer that can shoot randomly (like the original Asteroids arcade).  Must implement simple path following and detect collisions between the alien craft and asteroids/player and alien bullets and asteroids/player.  Also, I am trying to avoid making players download 3d models, so I must figure out how to procedurally/geometrically generate the alien saucer. Should be fun!
-
-
-October 1, 2014 Progress Note
---------------------------------
-
-Asteroids now break apart when shot!  Following the original arcade Asteroids format, Large asteroids break apart into 2 Medium asteroids.  Medium asteroids break apart into 2 Small asteroids.  The chain ends there - once you shoot the Small asteroids, they are completely destroyed.  When all remaining Small asteroids are wiped out, the next level begins with more Large asteroids (of course!) :)  
-
-
-September 27, 2014 Progress Note
---------------------------------
-
-Now you can rapid-fire multiple shots!  I set the maximum to 30 shots on screen at one time - even the quickest of trigger fingers can't fire more than that and still have the first shot inside the arena.  Plus, this maximum places a limit on the number of loops the program has to perform in order to check for all possible collisions.  This will keep the frame rate smooth, hopefully even after I start adding many different asteroids and the enemy UFO saucer (and his shots to loop through and check for too!).  Next up is to create medium and small size asteroids when you shoot the larger ones.
-
-
-September 19, 2014 Progress Note
---------------------------------
-
-Added stars that gently move against the background when your ship accelerates.  Developed algorithm to procedurally generate asteroid vertex deformation, so that every asteroid looks slightly different from each other.  In the next update I will add the ability to rapid-fire multiple shots. 
