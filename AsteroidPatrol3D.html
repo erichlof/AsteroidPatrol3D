@@ -205,50 +205,9 @@
 			
 			//if we are on a later level or gameOver has been triggered,
 			//  first clean up all of the old asteroid objects and explosion pieces
-			if (level > 1 || gameOver) {
-				
-				//TODO remove ghostAsteroids[i] and materials
-				
-				for (var i = 0; i < numberOfLargeAsteroids; i++) {	
-					scene.remove( largeAsteroids[i] );
-					scene.remove( ghostLargeAsteroids[i] );
-					
-					radarScene.remove( radarLgAsteroids[i] );
-					radarScene.remove( largeAsteroidEdges[i] );
-					radarLgAsteroidMaterial[i].dispose();
-					ghostLgAsteroidMaterial[i].dispose();
-				}
-				for (var i = 0; i < numberOfMediumAsteroids; i++) {	
-					scene.remove( mediumAsteroids[i] );
-					scene.remove( ghostMediumAsteroids[i] );
-					
-					radarScene.remove( radarMedAsteroids[i] );
-					radarScene.remove( mediumAsteroidEdges[i] );
-					radarMedAsteroidMaterial[i].dispose();
-					ghostMedAsteroidMaterial[i].dispose();
-				}
-				for (var i = 0; i < numberOfSmallAsteroids; i++) {	
-					scene.remove( smallAsteroids[i] );
-					scene.remove( ghostSmallAsteroids[i] );
-					
-					radarScene.remove( radarSmlAsteroids[i] );
-					radarScene.remove( smallAsteroidEdges[i] );
-					radarSmlAsteroidMaterial[i].dispose();
-					ghostSmlAsteroidMaterial[i].dispose();
-				}
-				
-				for (var i = 0; i < numberOfExplosionPieces; i++) {	
-					scene.remove( explosionPieces[i] );
-					scene.remove( enemyExplosionPieces[i] );
-					scene.remove( playerExplosionPieces[i] );
-				}
-				
-				largeAsteroidGeometry.dispose();
-				mediumAsteroidGeometry.dispose();
-				smallAsteroidGeometry.dispose();
-				
+			if (level > 1 || gameOver) {	
+				cleanup();
 				gameOver = false;
-
 			}
 			
 			if (level == 1) 
@@ -275,7 +234,43 @@
 			//record the previous randomly chosen material so that the next level will look different
 			previousRandMaterialIndex = randMaterialIndex;
 			
-			//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+			//build asteroidMaterials based on the random color chosen above
+			asteroidMaterials = [];
+			
+			//brown rock
+			asteroidMaterials[0] = new THREE.MeshLambertMaterial({
+				color: 'rgb(100,45,15)',
+				emissive: 'rgb(30,15,5)',
+				shading: THREE.FlatShading
+			});
+			//dark grey rock
+			asteroidMaterials[1] = new THREE.MeshLambertMaterial({
+				color: 'rgb(40,40,40)',
+				emissive: 'rgb(20,20,20)',
+				shading: THREE.FlatShading
+			});
+			//high-contrast, 'snowy' comet-like rock
+			asteroidMaterials[2] = new THREE.MeshLambertMaterial({
+				color: 'rgb(240,240,240)',
+				emissive: 'rgb(20,20,20)',
+				shading: THREE.FlatShading
+			});
+			//red, mars-like rock
+			asteroidMaterials[3] = new THREE.MeshLambertMaterial({
+				color: 'rgb(100,10,0)',
+				emissive: 'rgb(30,5,0)',
+				shading: THREE.FlatShading
+			});
+			//blue, transparent water-ice rock
+			asteroidMaterials[4] = new THREE.MeshLambertMaterial({
+				transparent: true,
+				opacity: 0.85,
+				color: 'rgb(0,150,255)',
+				emissive: 'rgb(0,75,120)',
+				side: THREE.DoubleSide,
+				shading: THREE.FlatShading
+			});
+			
 			numberOfLargeAsteroidsCreated = 0;
 			//build large asteroids
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
@@ -287,6 +282,7 @@
 				}
 
 				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
+			
 				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
 				largeAsteroids[i].geometry.computeFaceNormals();
@@ -369,6 +365,7 @@
 				}
 
 				mediumAsteroids[i] = new THREE.Mesh(mediumAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
+				
 				mediumAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				mediumAsteroids[i].geometry.computeFaceNormals();
@@ -437,6 +434,7 @@
 				}
 
 				smallAsteroids[i] = new THREE.Mesh(smallAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
+				
 				smallAsteroids[i].scale.set( (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1, (Math.random() * 0.5 - 0.25) + 1 );
 				
 				smallAsteroids[i].geometry.computeFaceNormals();
@@ -492,6 +490,40 @@
 				smallAsteroidEdges[i].position.copy(radarSmlAsteroids[i].position);
 			}
 
+			//asteroid explosion materials match the color of the asteroid materials
+			//brown rock
+			asteroidExplosionMaterials[0] = new THREE.MeshBasicMaterial({
+				color: 'rgb(100,45,15)',
+				emissive: 'rgb(30,15,5)'
+			});
+			//dark grey rock
+			asteroidExplosionMaterials[1] = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(40,40,40)',
+				emissive: 'rgb(20,20,20)'
+			});
+			//high-contrast, 'snowy' comet-like rock
+			asteroidExplosionMaterials[2] = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(240,240,240)',
+				emissive: 'rgb(20,20,20)'
+			});
+			//red, mars-like rock
+			asteroidExplosionMaterials[3] = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(100,10,0)',
+				emissive: 'rgb(30,5,0)'
+			});
+			//blue, transparent water-ice rock
+			asteroidExplosionMaterials[4] = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(0,150,255)',
+				emissive: 'rgb(0,75,120)'
+			});
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 
@@ -507,6 +539,13 @@
 
 			}
 			//build enemy explosion pieces
+			//enemy saucer explosion pieces material
+			enemyExplosionMaterial = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(150,0,255)',
+				emissive: 'rgb(59,0,100)'
+			});
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 
 				enemyExplosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, enemyExplosionMaterial);
@@ -521,6 +560,13 @@
 
 			}
 			//build player explosion pieces
+			//Player explosion pieces material
+			playerExplosionMaterial = new THREE.MeshBasicMaterial({
+				transparent: true,
+				opacity: 1.0,
+				color: 'rgb(0,0,255)',
+				emissive: 'rgb(0,0,100)'
+			});
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 
 				playerExplosionPieces[i] = new THREE.Mesh(explosionPiecesGeometry, playerExplosionMaterial);
@@ -2848,6 +2894,57 @@
 			}//end while ( tryAgain && fTime > 0.01 )
 				
 		}//end function stepSimulation( body1, body2 )
+		
+		
+		function cleanup() {
+			
+			for (var i = 0; i < numberOfLargeAsteroids; i++) {	
+				scene.remove( largeAsteroids[i] );
+				scene.remove( ghostLargeAsteroids[i] );
+					
+				radarScene.remove( radarLgAsteroids[i] );
+				radarScene.remove( largeAsteroidEdges[i] );
+				radarLgAsteroidMaterial[i].dispose();
+				ghostLgAsteroidMaterial[i].dispose();
+			}
+			for (var i = 0; i < numberOfMediumAsteroids; i++) {	
+				scene.remove( mediumAsteroids[i] );
+				scene.remove( ghostMediumAsteroids[i] );
+					
+				radarScene.remove( radarMedAsteroids[i] );
+				radarScene.remove( mediumAsteroidEdges[i] );
+				radarMedAsteroidMaterial[i].dispose();
+				ghostMedAsteroidMaterial[i].dispose();
+			}
+			for (var i = 0; i < numberOfSmallAsteroids; i++) {	
+				scene.remove( smallAsteroids[i] );
+				scene.remove( ghostSmallAsteroids[i] );
+					
+				radarScene.remove( radarSmlAsteroids[i] );
+				radarScene.remove( smallAsteroidEdges[i] );
+				radarSmlAsteroidMaterial[i].dispose();
+				ghostSmlAsteroidMaterial[i].dispose();
+			}
+				
+			for (var i = 0; i < numberOfExplosionPieces; i++) {	
+				scene.remove( explosionPieces[i] );
+				scene.remove( enemyExplosionPieces[i] );
+				scene.remove( playerExplosionPieces[i] );
+			}
+				
+			for (var i = 0; i < 5; i++) {
+				asteroidMaterials[i].dispose;
+				asteroidExplosionMaterials[i].dispose;
+			}
+				
+			enemyExplosionMaterial.dispose();
+			playerExplosionMaterial.dispose();
+				
+			largeAsteroidGeometry.dispose();
+			mediumAsteroidGeometry.dispose();
+			smallAsteroidGeometry.dispose();
+			
+		}//end function cleanup()
 		
 		
 	
