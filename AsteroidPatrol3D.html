@@ -766,10 +766,6 @@
 									
 									initExplosion(bulletRayCollisionPoint);
 									
-									smallAsteroidsRemaining -= 1;
-									if(smallAsteroidsRemaining < 1)
-										initLevel();
-									
 									score += 100;
 									if (score >= extraLifeScore) {
 										livesRemainingSprites[livesRemaining].visible = true;
@@ -778,6 +774,10 @@
 										onWindowResize();
 									}
 									scoreText.innerHTML = score;
+									
+									smallAsteroidsRemaining -= 1;
+									if(smallAsteroidsRemaining < 1)
+										initLevel();
 									//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 								}
@@ -1230,6 +1230,23 @@
 							largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
 						}
 						
+						if (radarLgAsteroids[i].colorIndex == 2) {
+							
+							blinkCounterLrg += (3000/lgAsteroidDistanceToShip) * frameTime;
+							if (blinkCounterLrg > TWO_PI) blinkCounterLrg -= TWO_PI;
+							
+							blinkToggleLrg = Math.sin(blinkCounterLrg);
+							if (blinkToggleLrg >= 0) {
+								radarLgAsteroids[i].material.color.set('rgb(255,0,0)');
+								largeAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+							}
+							else {
+								radarLgAsteroids[i].material.color.set('rgb(255,255,255)');
+								largeAsteroidEdges[i].material.color.set('rgb(150,150,150)');
+							}
+							
+						}
+						
 						if (lgAsteroidDistanceToShip < 120) {
 							
 							largeAsteroids[i].alive = false;
@@ -1349,6 +1366,23 @@
 							mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
 						}
 						
+						if (radarMedAsteroids[i].colorIndex == 2) {
+							
+							blinkCounterMed += (3000/medAsteroidDistanceToShip) * frameTime;
+							if (blinkCounterMed > TWO_PI) blinkCounterMed -= TWO_PI;
+							
+							blinkToggleMed = Math.sin(blinkCounterMed);
+							if (blinkToggleMed >= 0) {
+								radarMedAsteroids[i].material.color.set('rgb(255,0,0)');
+								mediumAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+							}
+							else {
+								radarMedAsteroids[i].material.color.set('rgb(255,255,255)');
+								mediumAsteroidEdges[i].material.color.set('rgb(150,150,150)');
+							}
+							
+						}
+						
 						if (medAsteroidDistanceToShip < 90) {
 							
 							mediumAsteroids[i].alive = false;
@@ -1409,18 +1443,18 @@
 							radarSmlAsteroids[i].position.set(0, 0, -10000);
 							
 							initExplosion(smallAsteroids[i].position);
-							smallAsteroidsRemaining -= 1;
-							if(smallAsteroidsRemaining < 1)
-								initLevel();
-
-							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
-
 							enemyAlive = false;
 							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 							
 							initEnemyExplosion(enemy.position);
+							
+							smallAsteroidsRemaining -= 1;
+							if(smallAsteroidsRemaining < 1)
+								initLevel();
+							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
+							
 						}
 					}
 				}
@@ -1461,6 +1495,23 @@
 							radarSmlAsteroids[i].colorIndex = 0;
 							radarSmlAsteroids[i].material.color.set('rgb(0,255,0)');
 							smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
+						}
+						
+						if (radarSmlAsteroids[i].colorIndex == 2) {
+							
+							blinkCounterSml += (3000/smlAsteroidDistanceToShip) * frameTime;
+							if (blinkCounterSml > TWO_PI) blinkCounterSml -= TWO_PI;
+							
+							blinkToggleSml = Math.sin(blinkCounterSml);
+							if (blinkToggleSml >= 0) {
+								radarSmlAsteroids[i].material.color.set('rgb(255,0,0)');
+								smallAsteroidEdges[i].material.color.set('rgb(150,0,0)');
+							}
+							else {
+								radarSmlAsteroids[i].material.color.set('rgb(255,255,255)');
+								smallAsteroidEdges[i].material.color.set('rgb(150,150,150)');
+							}
+							
 						}
 						
 						if (smlAsteroidDistanceToShip < 70) {
@@ -2614,8 +2665,7 @@
 			
 		
 			//helpful real-time debug text, so we can monitor game variables
-			//debugText1.innerHTML = "xPos: " + xPosThreat + " yPos: " + yPosThreat + " zPos: " + zPosThreat +
-			//		       " xNeg: " + xNegThreat + " yNeg: " + yNegThreat + " zNeg: " + zNegThreat;	
+			//debugText1.innerHTML = blinkCounterLrg;	
 		/*
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
