@@ -468,6 +468,12 @@ var smallAsteroids = [];
 var lgAsteroidDistanceToShip = 0;
 var medAsteroidDistanceToShip = 0;
 var smlAsteroidDistanceToShip = 0;
+var blinkCounterLrg = 0;
+var blinkToggleLrg = 0;
+var blinkCounterMed = 0;
+var blinkToggleMed = 0;
+var blinkCounterSml = 0;
+var blinkToggleSml = 0;
 
 var testSphere = new THREE.Sphere();
 
