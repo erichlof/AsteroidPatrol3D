@@ -804,6 +804,8 @@ var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var canShoot = true;
+var canStartThrustSound = true;
+var canFadeThrustSound = false;
 
 //enemy bullets
 var ENEMY_MAX_BULLETS = 10;
@@ -867,8 +869,8 @@ var beginLevelTimer = new THREEx.GameTimer(6);//4
 var cutsceneCameraAngle = 0;
 var cutsceneCameraDistance = 50;//0
 var playingWarpAnimation = false;
-var fovIncrementAmount = 600;
-var aspectIncrementAmount = -8;
+var fovIncrementAmount = 400;//600
+var aspectIncrementAmount = -8;//-8
 
 var thrustVector = new THREE.Vector3(0, 0, -1);
 var frictionVector = new THREE.Vector3();
@@ -898,6 +900,72 @@ var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
 */
+
+//SOUNDS
+var soundLrgAsteroidExplode = new Howl({
+	src: ['sounds/asteroidExplode.mp3'],
+	rate: 0.8
+});
+var soundMedAsteroidExplode = new Howl({
+	src: ['sounds/asteroidExplode.mp3'],
+	rate: 1.1
+});
+var soundSmlAsteroidExplode = new Howl({
+	src: ['sounds/asteroidExplode.mp3'],
+	rate: 1.4
+});
+
+var soundAsteroidCollide = new Howl({
+	src: ['sounds/asteroidCollision.mp3'],
+	rate: 0.8
+});
+
+var soundShipExplode = new Howl({
+	src: ['sounds/shipExplosion.mp3']
+});
+var soundUfoExplode = new Howl({
+	src: ['sounds/ufoExplosion.mp3']
+});
+
+var soundShipShoot = new Howl({
+	src: ['sounds/shipLaser.mp3'],
+	volume: 0.2
+});
+var soundUfoShoot = new Howl({
+	src: ['sounds/ufoShoot.mp3'],
+	rate: 0.9
+});
+
+var soundShipWarp = new Howl({
+	src: ['sounds/shipWarp.mp3'],
+	volume: 0.5
+});
+var soundThrusters = new Howl({
+	src: ['sounds/thrustersLoop.mp3'],
+	loop: true,
+	volume: 0.8,
+	rate: 0.8,
+	onfaded: function() {
+    		this.stop();
+  	}
+});
+var soundUfoWarble = new Howl({
+	src: ['sounds/ufoHighWarble.mp3'],
+	loop: true
+});
+
+var soundWarningBeeps = new Howl({
+	src: ['sounds/warningRadarBeeps.mp3']
+});
+var soundBeginLevel = new Howl({
+	src: ['sounds/beginLevel.mp3'],
+	volume: 0.8
+});
+var soundExtraLife = new Howl({
+	src: ['sounds/oneUp.mp3'],
+	volume: 0.8
+});
+
 
 //disable clicking and selecting/highlighting text of help, score, level, 
 //   and gameOver banner texts
