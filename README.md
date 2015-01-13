@@ -25,9 +25,14 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add 3D spatial sound FX to surround the player from all angles
 * Add buttons to turn sound on/off and adjust volume
 * Slightly increase the difficulty each level (speed of asteroids and UFO)
+
+
+January 13, 2015 Progress Note
+--------------------------------
+
+Added 3D positional sound FX using WebAudio.  I ended up choosing Howler.js for the WebAudio helper library.  As of this date however, Howler.js 2.0 is under Beta development and that is the version I need (which includes WebAudio's 3D stereo panner).  I am currently using the 2.0 branch of howler.js and everything works great - the sounds surround the player (especially if you wear headphones) giving the feeling you are immersed in the action!  If Howler.js 2.0 undergoes changes before its release, I will change my source copy of howler.js here on my repo to make sure everything still works.  Next TODO will be adding a simple button to turn sounds ON/OFF and maybe adjust the volume to preset levels (low, med, high), etc..  I also might investigate capturing/locking the mouse pointer for desktop users so they don't have to look at the mouse pointer all the time while playing the game. 
 
 
 December 22, 2014 Progress Note
