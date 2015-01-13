@@ -26,6 +26,7 @@ To Do
 -----
 
 * Add buttons to turn sound on/off and adjust volume
+* Possibly capture/lock mouse pointer to hide pointer while 3D 'freeLook' is in use
 * Slightly increase the difficulty each level (speed of asteroids and UFO)
 
 
