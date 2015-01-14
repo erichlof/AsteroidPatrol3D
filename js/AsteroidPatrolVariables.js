@@ -901,44 +901,85 @@ var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
 */
 
+
 //SOUNDS
+var soundsLoaded = 0;
+var canPlayBeginLevelSound = false;
+
 var soundLrgAsteroidExplode = new Howl({
 	src: ['sounds/asteroidExplode.mp3'],
-	rate: 0.8
+	rate: 0.8,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundMedAsteroidExplode = new Howl({
 	src: ['sounds/asteroidExplode.mp3'],
-	rate: 1.1
+	rate: 1.1,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundSmlAsteroidExplode = new Howl({
 	src: ['sounds/asteroidExplode.mp3'],
-	rate: 1.4
+	rate: 1.4,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 var soundAsteroidCollide = new Howl({
 	src: ['sounds/asteroidCollision.mp3'],
-	rate: 0.8
+	rate: 0.8,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 var soundShipExplode = new Howl({
-	src: ['sounds/shipExplosion.mp3']
+	src: ['sounds/shipExplosion.mp3'],
+	volume: 0.1,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundUfoExplode = new Howl({
-	src: ['sounds/ufoExplosion.mp3']
+	src: ['sounds/ufoExplosion.mp3'],
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 var soundShipShoot = new Howl({
 	src: ['sounds/shipLaser.mp3'],
-	volume: 0.2
+	volume: 0.2,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundUfoShoot = new Howl({
 	src: ['sounds/ufoShoot.mp3'],
-	rate: 0.9
+	rate: 0.9,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 var soundShipWarp = new Howl({
 	src: ['sounds/shipWarp.mp3'],
-	volume: 0.5
+	volume: 0.2,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundThrusters = new Howl({
 	src: ['sounds/thrustersLoop.mp3'],
@@ -946,24 +987,45 @@ var soundThrusters = new Howl({
 	volume: 0.8,
 	rate: 0.8,
 	onfaded: function() {
-    		this.stop();
-  	}
+		soundThrusters.stop();
+  	},
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundUfoWarble = new Howl({
 	src: ['sounds/ufoHighWarble.mp3'],
-	loop: true
+	loop: true,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 var soundWarningBeeps = new Howl({
-	src: ['sounds/warningRadarBeeps.mp3']
+	src: ['sounds/warningRadarBeeps.mp3'],
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 var soundBeginLevel = new Howl({
 	src: ['sounds/beginLevel.mp3'],
-	volume: 0.8
+	volume: 0.6,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+		//soundBeginLevel.play();
+	}
 });
 var soundExtraLife = new Howl({
 	src: ['sounds/oneUp.mp3'],
-	volume: 0.8
+	volume: 0.8,
+	onload: function() {
+		soundsLoaded += 1;
+		if (soundsLoaded > 13) start();
+	}
 });
 
 
@@ -1000,3 +1062,9 @@ document.getElementById("gameover").style.webkitUserSelect = "none";
 document.getElementById("gameover").style.MozUserSelect = "none";
 document.getElementById("gameover").style.msUserSelect = "none";
 document.getElementById("gameover").style.userSelect = "none";
+
+
+function start () {
+	//initLevel();
+	animate();
+}
