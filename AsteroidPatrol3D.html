@@ -193,8 +193,8 @@
 	<script>
 		
 		initLevel();
-		animate();
-
+		//animate();
+			
 
 		function initLevel() {
 			
@@ -586,7 +586,8 @@
 			shipEdges.visible = true;
 			
 			playingBeginLevelIntro = true;
-			soundBeginLevel.play();
+			canPlayBeginLevelSound = true;
+			//soundBeginLevel.play();
 			
 			cutsceneCameraDistance = 600;
 			
@@ -597,6 +598,7 @@
 			
 			enemyShootTimer.reset();
 			enemyShootTimer.setAlarm( 1 );
+			
 
 		} //end function initLevel()
 		
@@ -1228,18 +1230,18 @@
 							radarLgAsteroids[i].colorIndex = 2;
 							radarLgAsteroids[i].material.color.set('rgb(255,0,0)');
 							largeAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((largeAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (largeAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (largeAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((largeAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (largeAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (largeAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarLgAsteroids[i].colorIndex == 1 && lgAsteroidDistanceToShip < 220) {
 							radarLgAsteroids[i].colorIndex = 2;
 							radarLgAsteroids[i].material.color.set('rgb(255,0,0)');
 							largeAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((largeAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (largeAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (largeAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((largeAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (largeAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (largeAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarLgAsteroids[i].colorIndex == 1 && lgAsteroidDistanceToShip > 300) {
@@ -1373,18 +1375,18 @@
 							radarMedAsteroids[i].colorIndex = 2;
 							radarMedAsteroids[i].material.color.set('rgb(255,0,0)');
 							mediumAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((mediumAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (mediumAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (mediumAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((mediumAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (mediumAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (mediumAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarMedAsteroids[i].colorIndex == 1 && medAsteroidDistanceToShip < 200) {
 							radarMedAsteroids[i].colorIndex = 2;
 							radarMedAsteroids[i].material.color.set('rgb(255,0,0)');
 							mediumAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((mediumAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (mediumAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (mediumAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((mediumAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (mediumAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (mediumAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarMedAsteroids[i].colorIndex == 1 && medAsteroidDistanceToShip > 280) {
@@ -1513,18 +1515,18 @@
 							radarSmlAsteroids[i].colorIndex = 2;
 							radarSmlAsteroids[i].material.color.set('rgb(255,0,0)');
 							smallAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((smallAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (smallAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (smallAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((smallAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (smallAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (smallAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarSmlAsteroids[i].colorIndex == 1 && smlAsteroidDistanceToShip < 200) {
 							radarSmlAsteroids[i].colorIndex = 2;
 							radarSmlAsteroids[i].material.color.set('rgb(255,0,0)');
 							smallAsteroidEdges[i].material.color.set('rgb(150,0,0)');
-							soundWarningBeeps.pos((smallAsteroids[i].position.x - ship.position.x) * 0.01, 
-						   			      (smallAsteroids[i].position.y - ship.position.y) * 0.01, 
-						   			      (smallAsteroids[i].position.z - ship.position.z) * 0.01);
+							soundWarningBeeps.pos((smallAsteroids[i].position.x - ship.position.x) * 0.05, 
+						   			      (smallAsteroids[i].position.y - ship.position.y) * 0.05, 
+						   			      (smallAsteroids[i].position.z - ship.position.z) * 0.05);
 							soundWarningBeeps.play();
 						}
 						if (radarSmlAsteroids[i].colorIndex == 1 && smlAsteroidDistanceToShip > 260) {
@@ -1901,9 +1903,9 @@
 				radarEnemy.position.copy(enemy.position);
 				enemyEdges.position.copy(enemy.position);
 				
-				soundUfoWarble.pos((enemy.position.x - ship.position.x) * 0.1, 
-						   (enemy.position.y - ship.position.y) * 0.1, 
-						   (enemy.position.z - ship.position.z) * 0.1);
+				soundUfoWarble.pos((enemy.position.x - ship.position.x) * 0.05, 
+						   (enemy.position.y - ship.position.y) * 0.05, 
+						   (enemy.position.z - ship.position.z) * 0.05);
 				
 				if (enemy.position.x > 420 || enemy.position.x < -420 || 
 				   	enemy.position.y > 420 || enemy.position.y < -420 ||
@@ -1921,6 +1923,11 @@
 			}// end if (enemyAlive && !playingBeginLevelIntro)
 			
 			if (playingBeginLevelIntro) {
+				
+				if (canPlayBeginLevelSound) {
+					soundBeginLevel.play();
+					canPlayBeginLevelSound = false;
+				}
 				
 				cutsceneCameraDistance -= frameTime * 200;//150
 				if (cutsceneCameraDistance < 0) {
@@ -2876,15 +2883,21 @@
 			isExploding = true;
 			explosionTimer.reset();
 			if (size == 0) {
-				soundSmlAsteroidExplode.pos((location.x - ship.position.x) * 0.01, (location.y - ship.position.y) * 0.01, (location.z - ship.position.z) * 0.01);
+				soundSmlAsteroidExplode.pos((location.x - ship.position.x) * 0.03, 
+							    (location.y - ship.position.y) * 0.03, 
+							    (location.z - ship.position.z) * 0.03);
 				soundSmlAsteroidExplode.play();
 			}
 			else if (size == 1) {
-				soundMedAsteroidExplode.pos((location.x - ship.position.x) * 0.01, (location.y - ship.position.y) * 0.01, (location.z - ship.position.z) * 0.01);
+				soundMedAsteroidExplode.pos((location.x - ship.position.x) * 0.03, 
+							    (location.y - ship.position.y) * 0.03, 
+							    (location.z - ship.position.z) * 0.03);
 				soundMedAsteroidExplode.play();
 			}
 			else if (size == 2) {
-				soundLrgAsteroidExplode.pos((location.x - ship.position.x) * 0.01, (location.y - ship.position.y) * 0.01, (location.z - ship.position.z) * 0.01);
+				soundLrgAsteroidExplode.pos((location.x - ship.position.x) * 0.03, 
+							    (location.y - ship.position.y) * 0.03, 
+							    (location.z - ship.position.z) * 0.03);
 				soundLrgAsteroidExplode.play();
 			}
 			
@@ -2918,7 +2931,9 @@
 			radarEnemy.position.set(0, 10000, 0);
 			
 			soundUfoWarble.stop();
-			soundUfoExplode.pos((location.x - ship.position.x) * 0.01, (location.y - ship.position.y) * 0.01, (location.z - ship.position.z) * 0.01);
+			soundUfoExplode.pos((location.x - ship.position.x) * 0.01, 
+					    (location.y - ship.position.y) * 0.01, 
+					    (location.z - ship.position.z) * 0.01);
 			soundUfoExplode.play();
 		}
 		
