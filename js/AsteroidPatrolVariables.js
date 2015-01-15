@@ -30,8 +30,11 @@ var joystick = new VirtualJoystick({
 	button1PercentLeft: b1PercentLeft,
 	button2PercentLeft: b2PercentLeft,
 });
+
 var mouseControl = false;
-var canPressM = true;
+if ( !('createTouch' in document) )
+	mouseControl = true;
+
 var controls = new THREEx.FirstPersonControls(camera);
 var lookVector = new THREE.Vector3();
 var renderer = new THREE.WebGLRenderer({
@@ -42,6 +45,16 @@ renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 document.getElementById("container").appendChild(renderer.domElement);
 window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
+
+document.getElementById("container").addEventListener("click", function() {
+	this.requestPointerLock();
+}, false);
+/*
+var evt = document.createEvent("MouseEvents");
+evt.initMouseEvent("click");
+var cb = document.getElementById("container"); 
+  cb.dispatchEvent(evt);
+*/
 
 var livesRemaining = 3;
 var livesRemainingSprites = [];
