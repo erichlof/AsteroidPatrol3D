@@ -87,10 +87,6 @@ var VirtualJoystick = function(opts) {
 	var stickNormalizedY = 0;
 	
 	//added for FirstPersonControls mouselook use
-	this.mousePosX = 0;
-	this.mousePosY = 0;
-	this.savedMousePosX = 0;
-	this.savedMousePosY = 0;
 	this.mouseDeltaX = 0;
 	this.mouseDeltaY = 0;
 	this.oldLon = 0;
@@ -395,11 +391,12 @@ VirtualJoystick.prototype._onMouseMove = function(event) {
 	x = event.clientX;
 	y = event.clientY;
 	
-	this.mousePosX = x;
-	this.mousePosY = y;
 	//added for FirstPersonControls mouselook
-	this.mouseDeltaX = this.savedMousePosX - x;
-	this.mouseDeltaY = this.savedMousePosY - y;
+	this.mouseDeltaX = event.movementX;
+	this.mouseDeltaY = event.movementY;
+	
+	this.oldLon = controls.lon;
+	this.oldLat = controls.lat;
 	//return this._onMove(x, y);
 };
 
