@@ -23,8 +23,8 @@ THREEx.FirstPersonControls = function ( object, domElement ) {
 	this.mouseX = 0;
 	this.mouseY = 0;
 
-	this.lon = 0;//-90 (left and right rotation)
-	this.lat = 0;//0 (up and down rotation)
+	this.lon = 0;//left and right rotation
+	this.lat = 0;//up and down rotation
 	this.phi = 0;
 	this.theta = 0;
 
@@ -78,19 +78,21 @@ THREEx.FirstPersonControls = function ( object, domElement ) {
 		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
+		//clamp vertical motion at north and south poles
+		if ( this.lat > 85 ) this.lat = 85;
+		if ( this.lat < -85 ) this.lat = -85;
 
-		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-		
 		this.phi = THREE.Math.degToRad( 90 - this.lat );
 		
-		this.theta = THREE.Math.degToRad( this.lon - 90);//added - 90
-
+		//added '- 90' so that on startup, camera faces down -Z axis
+		this.theta = THREE.Math.degToRad( this.lon - 90 );
+		
 		targetPosition = this.target;
 		position = this.object.position;
 
-		targetPosition.x = position.x + Math.sin( this.phi ) * Math.cos( this.theta ); //position.x + 100
-		targetPosition.y = position.y + Math.cos( this.phi );//position.y + 100
-		targetPosition.z = position.z + Math.sin( this.phi ) * Math.sin( this.theta );//position.z + 100
+		targetPosition.x = position.x + Math.sin( this.phi ) * Math.cos( this.theta );
+		targetPosition.y = position.y + Math.cos( this.phi );
+		targetPosition.z = position.z + Math.sin( this.phi ) * Math.sin( this.theta );
 		
 		this.object.lookAt( targetPosition );
 		
