@@ -32,11 +32,11 @@
 	</div>
 	
 	<div id="help1" style="position:fixed; left:2%; bottom:4%; font-family:arial; font-size:10px; color:grey;">
-		Desktop: Press 'M': MouseLook / LMouseButton: Fire / 'SPACE': Thrusters
+		Desktop: Mouse to rotate | MouseButton: Fire | SPACE: Thrusters | Esc: exit
 	</div>
 
 	<div id="help2" style="position:fixed; left:2%; bottom:1%; font-family:arial; font-size:10px; color:grey;">
-		Mobile: Swipe to rotate / OrangeButton: Fire / PurpleButton: Thrusters
+		Mobile: Swipe to rotate | OrangeButton: Fire | PurpleButton: Thrusters
 	</div>
 	
 	<div id="score" style="position:fixed; right:3%; top:4%; font-family:arial; font-type:bold; color:rgb(200,200,255);">
@@ -610,42 +610,25 @@
 			//store how much time has passed since the last animation frame
 			frameTime = clock.getDelta();
 			
+			//check if joystick Stick is being moved
+			if (playerAlive) {
+
+				if (mouseControl) {
+					controls.lon = joystick.oldLon + (joystick.mouseDeltaX * 0.25);
+					controls.lat = joystick.oldLat - (joystick.mouseDeltaY * 0.25);
+				} else {
+					//joystick left and right will turn the camera in that direction
+					controls.lon = joystick.oldLon + (joystick.deltaX() * 0.33);
+					//joystick up and down will tilt the camera up and down
+					controls.lat = joystick.oldLat - (joystick.deltaY() * 0.33);
+				}
+
+			}
+			
 			//update the controls
 			if (playerAlive) 
 				controls.update(frameTime);
 			
-			if (keyboard.pressed("M")) {
-
-				mouseControl = true;
-
-				if (canPressM) {
-					joystick.savedMousePosX = joystick.mousePosX;
-					joystick.savedMousePosY = joystick.mousePosY;
-					//joystick._onDown(joystick.mousePosX, joystick.mousePosY);
-					joystick.mouseDeltaX = 0;
-					joystick.mouseDeltaY = 0;
-					canPressM = false;
-				}
-
-			} else canPressM = true;
-
-			if (mouseControl)
-				joystick._pressed = true;
-
-			//check if joystick Stick is being moved
-			if (joystick._pressed && playerAlive) {
-
-				if (mouseControl) {
-					controls.lon = joystick.oldLon - (joystick.mouseDeltaX / 3);
-					controls.lat = joystick.oldLat + (joystick.mouseDeltaY / 3);
-				} else {
-					//joystick left and right will turn the camera in that direction
-					controls.lon = joystick.oldLon + (joystick.deltaX() / 3);
-					//joystick up and down will tilt the camera up and down
-					controls.lat = joystick.oldLat - (joystick.deltaY() / 3);//4
-				}
-
-			}
 			//if firebutton is NOT pressed, reset it so we can fire again
 			if (!joystick.button1Pressed) {
 				canShoot = true;
