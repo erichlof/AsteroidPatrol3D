@@ -49,12 +49,6 @@ var fontAspect = 0;
 document.getElementById("container").addEventListener("click", function() {
 	this.requestPointerLock();
 }, false);
-/*
-var evt = document.createEvent("MouseEvents");
-evt.initMouseEvent("click");
-var cb = document.getElementById("container"); 
-  cb.dispatchEvent(evt);
-*/
 
 var livesRemaining = 3;
 var livesRemainingSprites = [];
