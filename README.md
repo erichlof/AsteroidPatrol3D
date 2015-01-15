@@ -12,7 +12,7 @@ A First-Person 3D version of the classic game Asteroids <br>
 
 <h4>Quick instructions for AsteroidPatrol3D:</h4>
 <h6>Desktop:</h6> 
-Press 'M' to rotate your ship with Mouse <br>
+Mouse controls ship rotation <br>
 Press 'LeftMouseButton' to Fire <br>
 Press 'SPACE' to apply Thrusters <br>
 
@@ -25,8 +25,7 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add buttons to turn sound on/off and adjust volume
-* Possibly capture/lock mouse pointer to hide pointer while 3D 'freeLook' is in use
+* Add buttons to turn sound on/off
 * Slightly increase the difficulty each level (speed of asteroids and UFO)
 
 
