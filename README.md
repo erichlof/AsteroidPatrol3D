@@ -25,14 +25,14 @@ Press Purple joystick-button2 to apply Thrusters <br>
 To Do
 -----
 
-* Add buttons to turn sound on/off
 * Slightly increase the difficulty each level (speed of asteroids and UFO)
+* code cleanup and add comments where helpful
 
 
 January 20, 2015 Progress Note
 --------------------------------
 
-Sometimes you have to take a step back to move forward :) .  While getting PointerLock (mouse capture) up and running, I discovered a bug in the old camera movement code.  It started out fine, but after a couple of minutes of gameplay, the camera would lock up a little bit, and become less responsive.  This may have been due to the old camera system suffering from Gimbal Lock.  Whatever the case, I decided to rip out all the camera, radar camera, and controls code and start over.  I re-purposed mrdoob's (three.js creator) PointerLock controls code to work on mobile as well - I then renamed it to THREEx.FirstPersonControls.js.  If you have a moment, take a look at mrdoob's short and elegant solution to the problem of 3D camera rotation inside this new file (located in the 'js' directory).  Now that we're back to feature parity (and even a little more because it works great now!), I will work on getting a sound on/off button and then fine-tuning the level of difficuly as the game progresses.
+Sometimes you have to take a step back to move forward :) .  While getting PointerLock (mouse capture) up and running, I discovered a bug in the old camera movement code.  It started out fine, but after a couple of minutes of gameplay, the camera would lock up a little bit, and become less responsive.  This may have been due to the old camera system suffering from Gimbal Lock.  Whatever the case, I decided to rip out all the camera, radar camera, and controls code and start over.  I re-purposed mrdoob's (three.js creator) PointerLock controls code to work on mobile as well - I then renamed it to THREEx.FirstPersonControls.js.  If you have a moment, take a look at mrdoob's short and elegant solution to the problem of 3D camera rotation inside this new file (located in the 'js' directory).  Now that we're back to feature parity (and even a little more because it works great now!), I will work on fine-tuning the level of difficuly as the game progresses.
 
 
 January 13, 2015 Progress Note
