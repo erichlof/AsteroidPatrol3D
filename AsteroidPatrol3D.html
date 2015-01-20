@@ -62,8 +62,7 @@
 	
 
 	<!-- <script src="js/three.min.js"></script> -->
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
-	<!-- <script src="js/BoxHelper.js"></script> -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
 	<script src="js/threex.keyboardstate.js"></script>
 	<script src="js/threex.FirstPersonControls.js"></script>
 	<script src="js/virtualButtonJoystick.js"></script>
@@ -213,7 +212,10 @@
 				scoreText.innerHTML = score;
 			
 			
+			cameraControlsYawObject.rotation.set(0,0,0);
+			cameraControlsPitchObject.rotation.set(0,0,0);
 			crossHairsSprite.visible = false;
+			
 			numberOfLargeAsteroids = Math.floor( level * 2 );// + 1
 			
 			//for debugging levels progression
@@ -613,21 +615,19 @@
 			//check if joystick Stick is being moved
 			if (playerAlive) {
 
-				if (mouseControl) {
-					controls.lon = joystick.oldLon + (joystick.mouseDeltaX * 0.25);
-					controls.lat = joystick.oldLat - (joystick.mouseDeltaY * 0.25);
-				} else {
-					//joystick left and right will turn the camera in that direction
-					controls.lon = joystick.oldLon + (joystick.deltaX() * 0.33);
-					//joystick up and down will tilt the camera up and down
-					controls.lat = joystick.oldLat - (joystick.deltaY() * 0.33);
+				if (!mouseControl) {
+					
+					cameraControlsYawObject.rotation.y = joystick.previousRotationY - joystick.deltaX() * 0.005;
+					cameraControlsPitchObject.rotation.x = joystick.previousRotationX - joystick.deltaY() * 0.005;
+					cameraControlsPitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, cameraControlsPitchObject.rotation.x ) );
+				
 				}
 
 			}
 			
-			//update the controls
-			if (playerAlive) 
-				controls.update(frameTime);
+			controls.getDirection(cameraRotationVector);
+			
+			camera.getWorldQuaternion(cameraWorldQuaternion);
 			
 			//if firebutton is NOT pressed, reset it so we can fire again
 			if (!joystick.button1Pressed) {
@@ -652,7 +652,8 @@
 					canFadeThrustSound = true;
 				}
 				//get the camera's direction and copy it into thrustVector
-				camera.getWorldDirection(thrustVector);
+				//camera.getWorldDirection(thrustVector);
+				thrustVector.copy(cameraRotationVector);
 				
 				if (shipSpeed < 200) {
 					//now thrustVector has the right direction, but it needs magnitude also...
@@ -728,13 +729,13 @@
 					
 					//rotate the 'billboard' bullet object so that it always face our camera
 					bulletArray[i].worldToLocal(bulletArray[i].position);
-					bulletArray[i].lookAt(camera.position);
+					bulletArray[i].rotation.copy(radarShip.rotation);
 					spinCounter += 6 * frameTime;
 					if (spinCounter > TWO_PI) spinCounter -= TWO_PI;
 					bulletArray[i].rotateZ(spinCounter);
 					
 					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
-					bulletTexPlaneCopy[i].lookAt(camera.position);
+					bulletTexPlaneCopy[i].rotation.copy(radarShip.rotation);
 					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
 					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
 					
@@ -751,7 +752,7 @@
 							if (bulletRayCollisionPoint) {
 								//compare the distance between collision point and bullet object, vs. where the
 								//bullet is now and where the bullet will end up the next frame, and if the first 
-								//length is less, we have a collision.  Else, the collision point is too far away still.
+								//length is less, we have a collision.  Else, the collision point is too far away still.
 								if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) < 
 									newBulletSpherePos.distanceToSquared(oldBulletSpherePos)){
 
@@ -980,11 +981,11 @@
 					
 					//rotate the 'billboard' bullet object so that it always faces our camera
 					enemyBulletArray[i].worldToLocal(enemyBulletArray[i].position);
-					enemyBulletArray[i].lookAt(camera.position);
+					enemyBulletArray[i].rotation.copy(radarShip.rotation);
 					enemyBulletArray[i].rotateZ(spinCounter);
 					
 					enemyBulletTexPlaneCopy[i].position.copy(enemyBulletArray[i].position);
-					enemyBulletTexPlaneCopy[i].lookAt(camera.position);
+					enemyBulletTexPlaneCopy[i].rotation.copy(radarShip.rotation);
 					enemyBulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
 					enemyBulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
 					
@@ -1743,29 +1744,29 @@
 			}
 			//set camera position from ship position
 			if (!playingBeginLevelIntro && !playingGameOverAnimation) {
-				camera.position.copy(ship.position);
+				cameraControlsObject.position.copy(ship.position);
 					
 			}
 			//set camera2 (radar cam) position from ship position
 			if (!playingGameOverAnimation) {	
+				camera2.rotation.setFromQuaternion(cameraWorldQuaternion);
 				camera2.position.copy(ship.position);
-				camera2.quaternion.copy(camera.quaternion);
 				camera2.translateZ(500);
 				camera2.translateY(100);
 			}
 			
 			//rotate the ship inside the radar mini-cam so it is 
 			// looking where the main camera is
-			radarShip.quaternion.copy(camera.quaternion);
-			shipEdges.quaternion.copy(camera.quaternion);
+			radarShip.rotation.setFromQuaternion(cameraWorldQuaternion);
+			shipEdges.rotation.copy(radarShip.rotation);
 			radarShip.position.copy(ship.position);
 			shipEdges.position.copy(ship.position);
 			
-			skyBox.position.copy(camera.position);
+			skyBox.position.copy(ship.position);
 			
-			planet.position.copy(camera.position).addScalar(-900);
+			planet.position.copy(ship.position).addScalar(-900);
 			
-			sun.position.copy(camera.position);
+			sun.position.copy(ship.position);
 			sun.position.x -= 700;
 			sun.position.y += 700;
 			sun.position.z += 700;
@@ -1774,9 +1775,8 @@
 			//test code for rotating sprites
 			//crossHairsSprite.material.rotation += 2 * frameTime;
 			
-			camera.getWorldDirection(thrustVector);
-			Howler.orientation(thrustVector.x, thrustVector.y, thrustVector.z,
-					   camera.matrix.elements[4], camera.matrix.elements[5], camera.matrix.elements[6] );
+			Howler.orientation(cameraRotationVector.x, cameraRotationVector.y, cameraRotationVector.z,
+				cameraControlsObject.matrix.elements[4], cameraControlsObject.matrix.elements[5], cameraControlsObject.matrix.elements[6] );
 			
 			
 			//ENEMY UFO SAUCER CODE///////////
@@ -1912,12 +1912,12 @@
 					canPlayBeginLevelSound = false;
 				}
 				
-				cutsceneCameraDistance -= frameTime * 200;//150
+				cutsceneCameraDistance -= frameTime * 200;
 				if (cutsceneCameraDistance < 0) {
 					cutsceneCameraDistance = 0;
 					beginLevelTimer.alarmSounding = true;
 				}
-				cutsceneCameraAngle -= frameTime * 1.2;
+				cutsceneCameraAngle -= frameTime * 1.5;
 				if (cutsceneCameraAngle <= 0) 
 					cutsceneCameraAngle += TWO_PI;
 
@@ -1925,11 +1925,6 @@
 				camera.position.y = ship.position.y + (cutsceneCameraDistance * 0.5);
 				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.lookAt(ship.position);
-				
-				camera2.position.copy(camera.position);
-				camera2.quaternion.copy(camera.quaternion);
-				camera2.translateZ(500);
-				camera2.translateY(100);
 				
 				radarShip.rotation.x = 0;
 				radarShip.rotation.z = 0;
@@ -1943,6 +1938,11 @@
 					playingBeginLevelIntro = false;
 					cutsceneCameraAngle = 0;
 					cutsceneCameraDistance = 50;
+					cameraControlsYawObject.rotation.set(0,0,0);
+					cameraControlsPitchObject.rotation.set(0,0,0);
+					camera.position.set(0,0,0);
+					camera.rotation.set(0,0,0);
+					cameraControlsPitchObject.add(camera);
 					//just in case deathAnimation is playing because we crashed
 					//into the last small asteroid from the previous level to advance
 					//to the next level
@@ -1961,16 +1961,16 @@
 				
 			if (playingDeathAnimation && !playingBeginLevelIntro) {
 				
-				cutsceneCameraDistance += frameTime * 50;
+				cutsceneCameraDistance += frameTime * 100;
 				cutsceneCameraAngle += frameTime;
 				if (cutsceneCameraAngle >= TWO_PI) 
 					cutsceneCameraAngle -= TWO_PI;
-
+				
 				camera.position.x = ship.position.x + Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.position.y = ship.position.y + (cutsceneCameraDistance * 0.5);
 				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.lookAt(ship.position);
-			
+				
 				deathAnimationTimer.run(frameTime);
 
 				if (deathAnimationTimer.alarmSounding) {
@@ -1990,6 +1990,12 @@
 						deathAnimationTimer.reset();
 						cutsceneCameraAngle = 0;
 						cutsceneCameraDistance = 50;
+						cameraControlsYawObject.rotation.set(0,0,0);
+						cameraControlsPitchObject.rotation.set(0,0,0);
+						camera.position.set(0,0,0);
+						camera.rotation.set(0,0,0);
+						cameraControlsPitchObject.add(camera);
+						
 						playingDeathAnimation = false;
 						if(smallAsteroidsRemaining < 1) {
 							initLevel();
@@ -2014,8 +2020,6 @@
 				if(gameOverTimer.alarmSounding){
 					playingGameOverAnimation = false;
 					gameOverTimer.reset();
-					//cutsceneCameraAngle = 0;
-					//cutsceneCameraDistance = 50;
 					gameOverText.innerHTML = "";
 					level = 0;
 					score = 0;
@@ -2023,7 +2027,11 @@
 					livesRemainingSprites[0].visible = true;
 					livesRemainingSprites[1].visible = true;
 					extraLifeScore = 10000;
-					//onWindowResize();
+					cameraControlsYawObject.rotation.set(0,0,0);
+					cameraControlsPitchObject.rotation.set(0,0,0);
+					camera.position.set(0,0,0);
+					camera.rotation.set(0,0,0);
+					cameraControlsPitchObject.add(camera);
 					initLevel();
 				}
 				
@@ -2056,7 +2064,7 @@
 				
 				//update explosionBillboard
 				explosionBillboardUniforms.time.value = sunUniforms.time.value;
-				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.rotation.copy(radarShip.rotation);
 				explosionBillboard.scale.x += 1000 * frameTime;
 				explosionBillboard.scale.y += 1000 * frameTime;
 				if(explosionBillboard.scale.x > 1000)
@@ -2103,7 +2111,7 @@
 				
 				//update explosionBillboard
 				explosionBillboardUniforms.time.value = sunUniforms.time.value;
-				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.rotation.copy(radarShip.rotation);
 				explosionBillboard.scale.x += 1000 * frameTime;
 				explosionBillboard.scale.y += 1000 * frameTime;
 				if (explosionBillboard.scale.x > 1000)
@@ -2147,7 +2155,7 @@
 				
 				//update explosionBillboard
 				explosionBillboardUniforms.time.value = sunUniforms.time.value;
-				explosionBillboard.lookAt(camera.position);
+				explosionBillboard.rotation.copy(radarShip.rotation);
 				explosionBillboard.scale.x += 1000 * frameTime;
 				explosionBillboard.scale.y += 1000 * frameTime;
 				if (explosionBillboard.scale.x > 1000)
@@ -2305,11 +2313,11 @@
 			xPosThreat = yPosThreat = zPosThreat = false;
 			xNegThreat = yNegThreat = zNegThreat = false;
 			
-			camera.getWorldDirection(cameraFacingVector);
+			//camera.getWorldDirection(cameraFacingVector);
 			
-			absCameraFacingX = Math.abs(cameraFacingVector.x);
-			absCameraFacingY = Math.abs(cameraFacingVector.y);
-			absCameraFacingZ = Math.abs(cameraFacingVector.z);
+			absCameraFacingX = Math.abs(cameraRotationVector.x);
+			absCameraFacingY = Math.abs(cameraRotationVector.y);
+			absCameraFacingZ = Math.abs(cameraRotationVector.z);
 			
 			if ( absCameraFacingX > absCameraFacingY && absCameraFacingX > absCameraFacingZ )
 				xFacingThreat = true;
@@ -2781,7 +2789,8 @@
 			//reset the bullet direction vector to unit length of 1 to avoid accumulation
 			bulletArray[bulletCounter].direction.set(0, 0, 1);
 			//get our camera's direction and copy it into current bullet's direction
-			camera.getWorldDirection( bulletArray[bulletCounter].direction );
+			///camera.getWorldDirection( bulletArray[bulletCounter].direction );
+			bulletArray[bulletCounter].direction.copy(cameraRotationVector);
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
 			bulletArray[bulletCounter].direction.multiplyScalar(30);
@@ -2947,6 +2956,7 @@
 			playerExplosionTimer.reset();
 			
 			soundShipExplode.play();
+			cameraControlsPitchObject.remove(camera);
 		}
 		
 		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
