@@ -7,7 +7,6 @@ var VirtualJoystick = function(opts) {
 	this._hideJoystick = opts.hideJoystick || false;
 	this._hideButtons = opts.hideButtons || true;
 	if('createTouch' in document) this._hideButtons = false;
-	this._mouseSupport = opts.mouseSupport !== undefined ? opts.mouseSupport : false;
 	this._stationaryBase = opts.stationaryBase || false;
 	this._add1Button = opts.add1Button || false;
 	this._add2Buttons = opts.add2Buttons || false;
@@ -86,11 +85,9 @@ var VirtualJoystick = function(opts) {
 	var stickNormalizedX = 0;
 	var stickNormalizedY = 0;
 	
-	//added for FirstPersonControls mouselook use
-	this.mouseDeltaX = 0;
-	this.mouseDeltaY = 0;
-	this.oldLon = 0;
-	this.oldLat = 0;
+	//added for THREEx.FirstPersonControls use
+	this.previousRotationX = 0;
+	this.previousRotationY = 0;
 
 	if (this._stationaryBase) {
 		this._baseEl.style.display = "";
@@ -129,35 +126,7 @@ var VirtualJoystick = function(opts) {
 	
 	this._container.addEventListener('touchstart', this._$onTouchStart, false);
 	this._container.addEventListener('touchend', this._$onTouchEnd, false);
-	this._container.addEventListener('touchmove', this._$onTouchMove, false);
-	
-	if (this._mouseSupport) {
-		this._$onMouseDown = __bind(this._onMouseDown, this);
-		this._$onMouseUp = __bind(this._onMouseUp, this);
-		this._$onMouseMove = __bind(this._onMouseMove, this);
-		this._container.addEventListener('mousedown', this._$onMouseDown, false);
-		this._container.addEventListener('mouseup', this._$onMouseUp, false);
-		this._container.addEventListener('mousemove', this._$onMouseMove, false);
-		
-		if (this._add1Button) {
-			this._$onButton1MouseDown = __bind(this._onButton1MouseDown, this);
-			this._$onButton1MouseUp = __bind(this._onButton1MouseUp, this);
-			this._button1El.addEventListener('mousedown', this._$onButton1MouseDown, false);
-			this._button1El.addEventListener('mouseup', this._$onButton1MouseUp, false);
-		}
-		if (this._add2Buttons) {
-			this._$onButton1MouseDown = __bind(this._onButton1MouseDown, this);
-			this._$onButton1MouseUp = __bind(this._onButton1MouseUp, this);
-			this._button1El.addEventListener('mousedown', this._$onButton1MouseDown, false);
-			this._button1El.addEventListener('mouseup', this._$onButton1MouseUp, false);
-			
-			this._$onButton2MouseDown = __bind(this._onButton2MouseDown, this);
-			this._$onButton2MouseUp = __bind(this._onButton2MouseUp, this);
-			this._button2El.addEventListener('mousedown', this._$onButton2MouseDown, false);
-			this._button2El.addEventListener('mouseup', this._$onButton2MouseUp, false);
-		}
-	}//end if (this._mouseSupport)
-		
+	this._container.addEventListener('touchmove', this._$onTouchMove, false);	
 
 };
 
@@ -169,22 +138,6 @@ VirtualJoystick.prototype.destroy = function() {
 	this._container.removeEventListener('touchstart', this._$onTouchStart, false);
 	this._container.removeEventListener('touchend', this._$onTouchEnd, false);
 	this._container.removeEventListener('touchmove', this._$onTouchMove, false);
-	if (this._mouseSupport) {
-		this._container.removeEventListener('mouseup', this._$onMouseUp, false);
-		this._container.removeEventListener('mousedown', this._$onMouseDown, false);
-		this._container.removeEventListener('mousemove', this._$onMouseMove, false);
-		
-		if (this._add1Button) {
-			this._button1El.removeEventListener('mousedown', this._$onButton1MouseDown, false);
-			this._button1El.removeEventListener('mouseup', this._$onButton1MouseUp, false);
-		}
-		if (this._add2Buttons) {
-			this._button1El.removeEventListener('mousedown', this._$onButton1MouseDown, false);
-			this._button1El.removeEventListener('mouseup', this._$onButton1MouseUp, false);
-			this._button2El.removeEventListener('mousedown', this._$onButton2MouseDown, false);
-			this._button2El.removeEventListener('mouseup', this._$onButton2MouseUp, false);
-		}
-	}
 		
 };
 
@@ -196,7 +149,7 @@ VirtualJoystick.touchScreenAvailable = function() {
 };
 
 //////////////////////////////////////////////////////////////////////////////////
-//                                                                                //
+//                                                                                //
 //////////////////////////////////////////////////////////////////////////////////
 
 VirtualJoystick.prototype.deltaX = function() {
@@ -207,7 +160,7 @@ VirtualJoystick.prototype.deltaY = function() {
 };
 
 VirtualJoystick.prototype.up = function() {
-	if (this._pressed === false) return false;
+	if (!this._pressed) return false;
 	deltaX = this.deltaX();
 	deltaY = this.deltaY();
 	if (deltaY >= 0) return false;
@@ -215,7 +168,7 @@ VirtualJoystick.prototype.up = function() {
 	return true;
 };
 VirtualJoystick.prototype.down = function() {
-	if (this._pressed === false) return false;
+	if (!this._pressed) return false;
 	deltaX = this.deltaX();
 	deltaY = this.deltaY();
 	if (deltaY <= 0) return false;
@@ -223,7 +176,7 @@ VirtualJoystick.prototype.down = function() {
 	return true;
 };
 VirtualJoystick.prototype.right = function() {
-	if (this._pressed === false) return false;
+	if (!this._pressed) return false;
 	deltaX = this.deltaX();
 	deltaY = this.deltaY();
 	if (deltaX <= 0) return false;
@@ -231,7 +184,7 @@ VirtualJoystick.prototype.right = function() {
 	return true;
 };
 VirtualJoystick.prototype.left = function() {
-	if (this._pressed === false) return false;
+	if (!this._pressed) return false;
 	deltaX = this.deltaX();
 	deltaY = this.deltaY();
 	if (deltaX >= 0) return false;
@@ -247,7 +200,7 @@ VirtualJoystick.prototype._onUp = function() {
 	this._pressed = false;
 	this._stickEl.style.display = "none";
 
-	if (this._stationaryBase === false) {
+	if (!this._stationaryBase) {
 		this._baseEl.style.display = "none";
 
 		this._baseX = this._baseY = 0;
@@ -258,10 +211,10 @@ VirtualJoystick.prototype._onUp = function() {
 VirtualJoystick.prototype._onDown = function(x, y) {
 	
 	this._pressed = true;
-	if (this._stationaryBase === false) {
+	if (!this._stationaryBase) {
 		this._baseX = x;
 		this._baseY = y;
-		if(this._hideJoystick === false){
+		if(!this._hideJoystick){
 			this._baseEl.style.display = "";
 			this._move(this._baseEl.style, (this._baseX - this._baseEl.width / 2), (this._baseY - this._baseEl.height / 2));
 		}
@@ -270,7 +223,7 @@ VirtualJoystick.prototype._onDown = function(x, y) {
 	this._stickX = x;
 	this._stickY = y;
 
-	if (this._limitStickTravel === true) {
+	if (this._limitStickTravel) {
 		deltaX = this.deltaX();
 		deltaY = this.deltaY();
 		stickDistance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
@@ -281,7 +234,7 @@ VirtualJoystick.prototype._onDown = function(x, y) {
 			this._stickY = stickNormalizedY * this._stickRadius + this._baseY;
 		}
 	}
-	if(this._hideJoystick === false){
+	if(!this._hideJoystick){
 		this._stickEl.style.display = "";
 		this._move(this._stickEl.style, (this._stickX - this._stickEl.width / 2), (this._stickY - this._stickEl.height / 2));
 	}
@@ -291,7 +244,7 @@ VirtualJoystick.prototype._onMove = function(x, y) {
 	this._stickX = x;
 	this._stickY = y;
 
-	if (this._limitStickTravel === true) {
+	if (this._limitStickTravel) {
 		deltaX = this.deltaX();
 		deltaY = this.deltaY();
 		stickDistance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
@@ -303,7 +256,7 @@ VirtualJoystick.prototype._onMove = function(x, y) {
 			this._stickY = stickNormalizedY * this._stickRadius + this._baseY;
 		}
 	}
-	if(this._hideJoystick === false){
+	if(!this._hideJoystick){
 		this._move(this._stickEl.style, (this._stickX - this._stickEl.width / 2), (this._stickY - this._stickEl.height / 2));
 	}
 };
@@ -348,77 +301,6 @@ VirtualJoystick.prototype._onButton2Down = function() {
 	ctx.stroke();
 };
 
-//////////////////////////////////////////////////////////////////////////////////
-//		bind touch events (and mouse events for debug)			//
-//////////////////////////////////////////////////////////////////////////////////
-
-VirtualJoystick.prototype._onMouseUp = function(event) {
-	//return this._onButton1Up();
-	//or
-	this.button1Pressed = false;
-/*
-	if (this._add1Button)
-		this._onButton1Up();
-	if (this._add2Buttons){
-		this._onButton1Up();
-		this._onButton2Up();
-	}
-	return this._onUp();
-*/
-};
-
-VirtualJoystick.prototype._onMouseDown = function(event) {
-
-	event.preventDefault();
-	//return this._onButton1Down();
-	//or
-	this.button1Pressed = true;
-/*
-	if (event.target == this._button1El) return;
-	if (event.target == this._button2El) return;
-	x = event.clientX;
-	y = event.clientY;
-	return this._onDown(x, y);
-*/
-};
-
-VirtualJoystick.prototype._onMouseMove = function(event) {
-
-	//event.preventDefault();
-	
-	if (event.target == this._button1El) return;
-	if (event.target == this._button2El) return;
-	x = event.clientX;
-	y = event.clientY;
-	
-	//added for FirstPersonControls mouselook
-	this.mouseDeltaX = event.movementX;
-	this.mouseDeltaY = event.movementY;
-	
-	this.oldLon = controls.lon;
-	this.oldLat = controls.lat;
-	//return this._onMove(x, y);
-};
-
-VirtualJoystick.prototype._onButton1MouseUp = function(event) {
-	return this._onButton1Up();
-};
-
-VirtualJoystick.prototype._onButton1MouseDown = function(event) {
-	return this._onButton1Down();
-};
-
-VirtualJoystick.prototype._onButton2MouseUp = function(event) {
-	return this._onButton2Up();
-};
-
-VirtualJoystick.prototype._onButton2MouseDown = function(event) {
-	return this._onButton2Down();
-};
-
-//////////////////////////////////////////////////////////////////////////////////
-//		comment								//
-//////////////////////////////////////////////////////////////////////////////////
 
 VirtualJoystick.prototype._onTouchStart = function(event) {
 
@@ -464,8 +346,8 @@ VirtualJoystick.prototype._onTouchEnd = function(event) {
 	if (touch.target == this._button2El) 
 		return this._onButton2Up();
 	
-	this.oldLon = controls.lon;
-	this.oldLat = controls.lat;
+	this.previousRotationY = cameraControlsYawObject.rotation.y;
+	this.previousRotationX = cameraControlsPitchObject.rotation.x;
 
 	return this._onUp();
 };
@@ -574,7 +456,7 @@ VirtualJoystick.prototype._buildButton2 = function() {
 
 //////////////////////////////////////////////////////////////////////////////////
 //		move using translate3d method with fallback to translate > 'top' and 'left'		
-//      modified from https://github.com/component/translate and dependents
+//      modified from https://github.com/component/translate and dependents
 //////////////////////////////////////////////////////////////////////////////////
 
 VirtualJoystick.prototype._move = function(style, x, y)
