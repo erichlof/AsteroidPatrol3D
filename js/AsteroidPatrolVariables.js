@@ -115,7 +115,7 @@ function onWindowResize() {
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
 		livesRemainingSprites[i].position.y = livesRemainingPositionY;
 		livesRemainingSprites[i].position.z = -2.0;
-		livesRemainingSpriteScale = SCREEN_WIDTH * 0.0001;
+		livesRemainingSpriteScale = SCREEN_WIDTH * 0.0005;//0.0001
 		if (livesRemainingSpriteScale > 0.12) livesRemainingSpriteScale = 0.12;
 		livesRemainingSprites[i].scale.set(livesRemainingSpriteScale, livesRemainingSpriteScale, livesRemainingSpriteScale);
 	}
