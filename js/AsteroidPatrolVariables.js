@@ -66,9 +66,10 @@ document.getElementById("container").addEventListener("mousedown", function() {
 var livesRemaining = 3;
 var livesRemainingSprites = [];
 var livesRemainingPercentX = [];
-var livesRemainingPercentY = 83;
+var livesRemainingPercentY = 93;
 var livesRemainingPositionX = [];
 var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
+var livesRemainingSpriteScale = 0;
 
 function onWindowResize() {
 	
@@ -76,14 +77,18 @@ function onWindowResize() {
 	SCREEN_HEIGHT = window.innerHeight;
 	
 	SCREEN_WIDTH_DIVISION = SCREEN_WIDTH / 4;
-	SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;//4
+	SCREEN_HEIGHT_DIVISION = SCREEN_HEIGHT / 3;
 	
 	fontAspect = (SCREEN_WIDTH / 175) * (SCREEN_HEIGHT / 200);
-	if (fontAspect > 20) fontAspect = 20;
-	if (fontAspect < 5) fontAspect = 5;
+	if (fontAspect > 25) fontAspect = 25;
+	if (fontAspect < 4) fontAspect = 4;
+	
+	
+	document.getElementById("sound").style.fontSize = (fontAspect * 1.5) + "px";
 	
 	fontAspect *= 2;
 	document.getElementById("score").style.fontSize = fontAspect + "px";
+	
 	fontAspect *= 3;
 	document.getElementById("level").style.fontSize = fontAspect + "px";
 	document.getElementById("gameover").style.fontSize = fontAspect + "px";
@@ -110,6 +115,9 @@ function onWindowResize() {
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
 		livesRemainingSprites[i].position.y = livesRemainingPositionY;
 		livesRemainingSprites[i].position.z = -2.0;
+		livesRemainingSpriteScale = SCREEN_WIDTH * 0.0001;
+		if (livesRemainingSpriteScale > 0.12) livesRemainingSpriteScale = 0.12;
+		livesRemainingSprites[i].scale.set(livesRemainingSpriteScale, livesRemainingSpriteScale, livesRemainingSpriteScale);
 	}
 	
 	b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
@@ -118,7 +126,6 @@ function onWindowResize() {
 	joystick._button1El.style.left = b1PercentLeft + "%";
 	
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	//touchControls.handleResize();
 			
 }
 
@@ -612,8 +619,7 @@ var livesRemainingMaterial = new THREE.SpriteMaterial( {
 for (var i = 0; i < 10; i++) {
 	livesRemainingSprites[i] = new THREE.Sprite(livesRemainingMaterial);
 	livesRemainingSprites[i].scale.set(0.12, 0.12, 0.12);
-	//livesRemainingPercentX[i] = 93;//93
-	//livesRemainingPositionX[i] = (livesRemainingPercentX[i] / 100) * 2 - 1;
+
 	livesRemainingSprites[i].position.y = livesRemainingPositionY;
 	livesRemainingSprites[i].position.z = -2.0;
 	camera.add(livesRemainingSprites[i]);
@@ -925,13 +931,29 @@ var debugText4 = document.getElementById("debug4");
 //SOUNDS
 var soundsLoaded = 0;
 var canPlayBeginLevelSound = false;
+var soundMuted = true;
+Howler.mute(soundMuted);
+
+document.getElementById("sound").style.cursor = "pointer";
+document.getElementById("sound").addEventListener("click", function() {
+	soundMuted = !soundMuted;
+	if (soundMuted) {
+		this.style.color = 'rgb(70,70,110)';
+		this.innerHTML = "Sound: Off";
+	}
+	else {
+		this.style.color = 'rgb(200,200,255)';
+		this.innerHTML = "Sound: On";
+	     }
+	Howler.mute(soundMuted);
+}, false);
 
 var soundLrgAsteroidExplode = new Howl({
 	src: ['sounds/asteroidExplode.mp3'],
 	rate: 0.8,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundMedAsteroidExplode = new Howl({
@@ -939,7 +961,7 @@ var soundMedAsteroidExplode = new Howl({
 	rate: 1.1,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundSmlAsteroidExplode = new Howl({
@@ -947,7 +969,7 @@ var soundSmlAsteroidExplode = new Howl({
 	rate: 1.4,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
@@ -956,7 +978,7 @@ var soundAsteroidCollide = new Howl({
 	rate: 0.8,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
@@ -965,14 +987,14 @@ var soundShipExplode = new Howl({
 	volume: 0.4,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundUfoExplode = new Howl({
 	src: ['sounds/ufoExplosion.mp3'],
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
@@ -981,7 +1003,7 @@ var soundShipShoot = new Howl({
 	volume: 0.3,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundUfoShoot = new Howl({
@@ -989,7 +1011,7 @@ var soundUfoShoot = new Howl({
 	rate: 0.9,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
@@ -998,7 +1020,7 @@ var soundShipWarp = new Howl({
 	volume: 0.2,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundThrusters = new Howl({
@@ -1011,7 +1033,7 @@ var soundThrusters = new Howl({
   	},
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundUfoWarble = new Howl({
@@ -1019,7 +1041,7 @@ var soundUfoWarble = new Howl({
 	loop: true,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
@@ -1027,7 +1049,7 @@ var soundWarningBeeps = new Howl({
 	src: ['sounds/warningRadarBeeps.mp3'],
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 var soundBeginLevel = new Howl({
@@ -1035,7 +1057,7 @@ var soundBeginLevel = new Howl({
 	volume: 0.5,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 		//soundBeginLevel.play();
 	}
 });
@@ -1044,11 +1066,13 @@ var soundExtraLife = new Howl({
 	volume: 0.2,
 	onload: function() {
 		soundsLoaded += 1;
-		if (soundsLoaded > 13) start();
+		if (soundsLoaded > 13) startGame();
 	}
 });
 
-
+function startGame () {
+	animate();
+}
 //disable clicking and selecting/highlighting text of help, score, level, 
 //   and gameOver banner texts
 
@@ -1082,9 +1106,3 @@ document.getElementById("gameover").style.webkitUserSelect = "none";
 document.getElementById("gameover").style.MozUserSelect = "none";
 document.getElementById("gameover").style.msUserSelect = "none";
 document.getElementById("gameover").style.userSelect = "none";
-
-
-function start () {
-	//initLevel();
-	animate();
-}
