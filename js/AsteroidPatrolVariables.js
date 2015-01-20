@@ -13,6 +13,7 @@ scene.add(camera);
 var radarScene = new THREE.Scene();
 var camera2 = new THREE.PerspectiveCamera(70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);
 radarScene.add(camera2);
+var cameraWorldQuaternion = new THREE.Quaternion();
 
 var clock = new THREE.Clock();
 
@@ -23,7 +24,6 @@ var b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
 var b1PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 76 : 80;
 var joystick = new VirtualJoystick({
 	container: document.getElementById("container"),
-	mouseSupport: true,
 	add2Buttons: true,
 	hideJoystick: true,
 	hideButtons: false,
@@ -31,12 +31,20 @@ var joystick = new VirtualJoystick({
 	button2PercentLeft: b2PercentLeft,
 });
 
-var mouseControl = false;
-if ( !('createTouch' in document) )
-	mouseControl = true;
-
+var PI_2 = Math.PI / 2;
 var controls = new THREEx.FirstPersonControls(camera);
-var lookVector = new THREE.Vector3();
+scene.add( controls.getObject() );
+var mouseControl = false;
+if ( !('createTouch' in document) ) {
+	mouseControl = true;
+}
+
+var cameraRotationVector = new THREE.Vector3();
+var cameraControlsObject = controls.getObject();
+var cameraControlsYawObject = controls.getYawObject();
+var cameraControlsPitchObject = controls.getPitchObject();
+cameraControlsPitchObject.remove(camera);//we will add it back, after game intro is finished
+
 var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
@@ -47,7 +55,12 @@ window.addEventListener('resize', onWindowResize, false);
 var fontAspect = 0;
 
 document.getElementById("container").addEventListener("click", function() {
+	this.requestPointerLock = this.requestPointerLock || this.mozRequestPointerLock;
 	this.requestPointerLock();
+	controls.enabled = true;
+}, false);
+document.getElementById("container").addEventListener("mousedown", function() {
+	if (playerAlive) shootBullet();
 }, false);
 
 var livesRemaining = 3;
@@ -105,7 +118,7 @@ function onWindowResize() {
 	joystick._button1El.style.left = b1PercentLeft + "%";
 	
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	controls.handleResize();
+	//touchControls.handleResize();
 			
 }
 
@@ -949,7 +962,7 @@ var soundAsteroidCollide = new Howl({
 
 var soundShipExplode = new Howl({
 	src: ['sounds/shipExplosion.mp3'],
-	volume: 0.1,
+	volume: 0.4,
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) start();
@@ -965,7 +978,7 @@ var soundUfoExplode = new Howl({
 
 var soundShipShoot = new Howl({
 	src: ['sounds/shipLaser.mp3'],
-	volume: 0.2,
+	volume: 0.3,
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) start();
@@ -1019,7 +1032,7 @@ var soundWarningBeeps = new Howl({
 });
 var soundBeginLevel = new Howl({
 	src: ['sounds/beginLevel.mp3'],
-	volume: 0.6,
+	volume: 0.5,
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) start();
@@ -1028,7 +1041,7 @@ var soundBeginLevel = new Howl({
 });
 var soundExtraLife = new Howl({
 	src: ['sounds/oneUp.mp3'],
-	volume: 0.8,
+	volume: 0.2,
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) start();
