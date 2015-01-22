@@ -66,7 +66,7 @@ document.getElementById("container").addEventListener("mousedown", function() {
 var livesRemaining = 3;
 var livesRemainingSprites = [];
 var livesRemainingPercentX = [];
-var livesRemainingPercentY = 93;
+var livesRemainingPercentY = 92;
 var livesRemainingPositionX = [];
 var livesRemainingPositionY = (livesRemainingPercentY / 100) * 2 - 1;
 var livesRemainingSpriteScale = 0;
@@ -84,7 +84,7 @@ function onWindowResize() {
 	if (fontAspect < 4) fontAspect = 4;
 	
 	
-	document.getElementById("sound").style.fontSize = (fontAspect * 1.5) + "px";
+	document.getElementById("sound").style.fontSize = (fontAspect * 1.8) + "px";
 	
 	fontAspect *= 2;
 	document.getElementById("score").style.fontSize = fontAspect + "px";
@@ -939,11 +939,11 @@ document.getElementById("sound").addEventListener("click", function() {
 	soundMuted = !soundMuted;
 	if (soundMuted) {
 		this.style.color = 'rgb(70,70,110)';
-		this.innerHTML = "Sound: Off";
+		this.innerHTML = "Sound: Off ";
 	}
 	else {
 		this.style.color = 'rgb(200,200,255)';
-		this.innerHTML = "Sound: On";
+		this.innerHTML = "Sound: On ";
 	     }
 	Howler.mute(soundMuted);
 }, false);
@@ -1063,7 +1063,7 @@ var soundBeginLevel = new Howl({
 });
 var soundExtraLife = new Howl({
 	src: ['sounds/oneUp.mp3'],
-	volume: 0.2,
+	volume: 0.1,
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) startGame();
@@ -1073,9 +1073,9 @@ var soundExtraLife = new Howl({
 function startGame () {
 	animate();
 }
+
 //disable clicking and selecting/highlighting text of help, score, level, 
 //   and gameOver banner texts
-
 document.getElementById("help").style.cursor = "default";
 document.getElementById("help").style.webkitUserSelect = "none";
 document.getElementById("help").style.MozUserSelect = "none";
