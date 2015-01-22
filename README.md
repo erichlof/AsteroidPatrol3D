@@ -24,8 +24,6 @@ Press Purple joystick-button2 to apply Thrusters <br>
 
 To Do
 -----
-
-* Slightly increase the difficulty each level (speed of asteroids and UFO)
 * code cleanup and add comments where helpful
 
 
