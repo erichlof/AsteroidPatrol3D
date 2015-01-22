@@ -40,11 +40,11 @@
 		Mobile: Swipe to rotate | OrangeButton: Fire | PurpleButton: Thrusters
 	</div>
 	
-	<div id="score" style="position:fixed; right:3%; top:2%; font-family:arial; font-type:bold; color:rgb(255,255,255);">
+	<div id="score" style="position:fixed; right:3%; top:1%; font-family:arial; font-type:bold; color:rgb(255,255,255);">
 		0
 	</div>
 	
-	<div id="sound" style="position:fixed; right:3%; top:14%; font-family:arial; font-type:bold; color:rgb(70,70,110);">
+	<div id="sound" style="position:fixed; right:3%; top:14%; font-family:arial; font-type:bold; color:rgb(70,70,110); border:thin solid;">
 		Sound: Off
 	</div>
 
@@ -197,7 +197,6 @@
 	<script>
 		
 		initLevel();
-		//animate();
 			
 
 		function initLevel() {
@@ -206,16 +205,16 @@
 			
 			level += 1;
 			
+			if (level == 1) {
+				scoreText.innerHTML = score;
+			}
+			
 			//if we are on a later level or gameOver has been triggered,
 			//  first clean up all of the old asteroid objects and explosion pieces
 			if (level > 1 || gameOver) {	
 				cleanup();
 				gameOver = false;
 			}
-			
-			if (level == 1) 
-				scoreText.innerHTML = score;
-			
 			
 			cameraControlsYawObject.rotation.set(0,0,0);
 			cameraControlsPitchObject.rotation.set(0,0,0);
@@ -309,7 +308,7 @@
 				largeAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				largeAsteroids[i].direction.normalize();
 				largeAsteroids[i].mass = 100;
-				largeAsteroids[i].speed = Math.random() * 20 + 10;
+				largeAsteroids[i].speed = Math.random() * 20 + 10 + (level * 3);//+10
 				numberOfLargeAsteroidsCreated += 1;
 				
 				//create 'ghost' asteroids that will be used behind arena boundaries to 
@@ -396,7 +395,7 @@
 					mediumAsteroids[i].direction.copy(mediumAsteroids[i-1].direction).negate();
 				mediumAsteroids[i].direction.normalize();
 				mediumAsteroids[i].mass = 70;
-				mediumAsteroids[i].speed = Math.random() * 20 + 20;//medium is faster speed
+				mediumAsteroids[i].speed = Math.random() * 20 + 20 + (level * 4); //+20 medium is faster speed
 				mediumAsteroids[i].position.set(10000, 10000, 10000);//place outside arena for now
 				
 				ghostMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
@@ -463,7 +462,7 @@
 					smallAsteroids[i].direction.copy(smallAsteroids[i-1].direction).negate();
 				smallAsteroids[i].direction.normalize();
 				smallAsteroids[i].mass = 30;
-				smallAsteroids[i].speed = Math.random() * 20 + 30;//small is faster speed
+				smallAsteroids[i].speed = Math.random() * 20 + 30 + (level * 5);//+30 small is fastest speed asteroid
 				smallAsteroids[i].position.set(-10000, -10000, -10000);//place outside arena for now
 				
 				ghostSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
@@ -594,11 +593,13 @@
 			
 			playingBeginLevelIntro = true;
 			canPlayBeginLevelSound = true;
-			//soundBeginLevel.play();
 			
 			cutsceneCameraDistance = 600;
 			
 			levelText.innerHTML = "Level " + level;
+			
+			//increase UFO's speed each level
+			enemySpeed = 60 + (level * 10);
 			
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
@@ -1844,28 +1845,28 @@
 				if (enemyChangeDirectionTimer.alarmSounding) {
 					
 					if (whichSide == BACK_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, 1000);
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z + 50 + Math.random() * 400);//last
 					}
-					if (whichSide == FRONT_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, -1000);
+					else if (whichSide == FRONT_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z - 50 - Math.random() * 400);//-last
 					}
-					if (whichSide == LEFT_WALL) {
-						enemyMoveTargetLocation.set(1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					else if (whichSide == LEFT_WALL) {
+						enemyMoveTargetLocation.set(enemy.position.x + 50 + Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);//first
 					}
-					if (whichSide == RIGHT_WALL) {
-						enemyMoveTargetLocation.set(-1000, Math.random() * 800 - 400, Math.random() * 800 - 400);
+					else if (whichSide == RIGHT_WALL) {
+						enemyMoveTargetLocation.set(enemy.position.x - 50 - Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);//-first
 					}
-					if (whichSide == TOP_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, -1000, Math.random() * 800 - 400);
+					else if (whichSide == TOP_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y - 50 - Math.random() * 400, Math.random() * 800 - 400);//-middle
 					}
-					if (whichSide == BOTTOM_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, 1000, Math.random() * 800 - 400);
+					else if (whichSide == BOTTOM_WALL) {
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y + 50 + Math.random() * 400, Math.random() * 800 - 400);//middle
 					}
 					
 					enemyDirection.subVectors(enemyMoveTargetLocation, enemy.position);
 					enemyDirection.normalize();
 					enemyChangeDirectionTimer.reset();
-					enemyChangeDirectionTimer.setAlarm( Math.random() * (2 / level) + 0.5 );
+					enemyChangeDirectionTimer.setAlarm( Math.random() * (3 / level) + 0.5 );
 					
 				}
 				
@@ -2031,6 +2032,7 @@
 					livesRemaining = 3;
 					livesRemainingSprites[0].visible = true;
 					livesRemainingSprites[1].visible = true;
+					livesRemainingSprites[2].visible = true;
 					extraLifeScore = 10000;
 					cameraControlsYawObject.rotation.set(0,0,0);
 					cameraControlsPitchObject.rotation.set(0,0,0);
