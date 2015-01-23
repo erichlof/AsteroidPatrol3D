@@ -1,6 +1,9 @@
 /*
-// GLOBAL VARIABLES
+** GLOBAL VARIABLES and OBJECTS
 */
+
+
+// WINDOW, CAMERA, and SCENE VARIABLES ///////////////////////////////////////////////////////////////////////////////////////////
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -129,7 +132,8 @@ function onWindowResize() {
 			
 }
 
-// GAME SCENE OBJECTS ///////////////////////////////////////////////////////////////////////////////
+
+// GAME OBJECTS and MATERIALS /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // SkyBox
 var imagePrefix = "images/skybox/nebula-";
@@ -415,8 +419,6 @@ for (var i = 0; i < 17; i++) {
 	pyramid[i].updateMatrix();
 	pyramid[i].matrixAutoUpdate = false;
 }
-//var wireframe = new THREE.WireframeHelper(pyramid, 0x222222);
-//scene.add(wireframe);
 
 var boxGeometry = new THREE.BoxGeometry(800, 800, 800);
 var boxMaterial = new THREE.MeshBasicMaterial({
@@ -573,7 +575,6 @@ var zNegThreat = false;
 var xFacingThreat = false;
 var yFacingThreat = false;
 var zFacingThreat = false;
-var cameraFacingVector = new THREE.Vector3();
 var absCameraFacingX = 0;
 var absCameraFacingY = 0;
 var absCameraFacingZ = 0;
@@ -630,9 +631,9 @@ livesRemainingSprites[0].material.rotation = 0.5;
 
 //Enemy UFO Object
 var enemy = new THREE.Object3D();
-enemy.position.set(2000,2000,2000);
+///enemy.position.set(2000,2000,2000);
 scene.add(enemy);
-//enemy.visible = false;
+enemy.visible = false;
 
 //Enemy Saucer
 var enemySaucerGeometry = new THREE.SphereGeometry(50,20,4);
@@ -771,8 +772,35 @@ enemy.add(enemyBody);
 
 
 
-// GAME VARIABLES ////////////////////////////////////////////////////////////////////////////////////
+// GAMEPLAY VARIABLES ////////////////////////////////////////////////////////////////////////////////////
 
+var frameTime = 0;
+var playingDeathAnimation = false;
+var deathAnimationTimer = new THREEx.GameTimer(4);
+var playingBeginLevelIntro = false;
+var beginLevelTimer = new THREEx.GameTimer(6);
+var cutsceneCameraAngle = 0;
+var cutsceneCameraDistance = 50;
+var playingWarpAnimation = false;
+var fovIncrementAmount = 400;
+var aspectIncrementAmount = -8;
+var thrustVector = new THREE.Vector3(0, 0, -1);
+var frictionVector = new THREE.Vector3();
+var ship = new THREE.Object3D();
+var shipSpeed = 0;
+var shipVelocity = new THREE.Vector3(0, 0, 0);
+var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
+var fTime = 0;
+var tryAgain = false;
+var check = 0;
+var impulseAmount = 0;
+var numOfAsteroidCollisions = 0;
+var score = 0;
+var extraLifeScore = 10000;
+var gameOver = false;
+var playingGameOverAnimation = false;
+var gameOverTimer = new THREEx.GameTimer(4);
+var tempPercent = 0;
 var TWO_PI = Math.PI * 2;
 var enemyDirection = new THREE.Vector3();
 var enemySpeed = 70;
@@ -790,9 +818,10 @@ var RIGHT_WALL = 3; var LEFT_WALL = 4;
 var TOP_WALL = 5; var BOTTOM_WALL = 6;
 var randMaterialIndex = 0;
 var previousRandMaterialIndex = 0;
+
 //bullets
 var MAX_BULLETS = 20;
-var bulletSpeed = 400;//400
+var bulletSpeed = 400;
 var bulletCounter = 0;
 var spinCounter = 0;
 //bullet 'billboards' (always facing player)
@@ -809,7 +838,7 @@ var bulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var bulletGeometry = new THREE.PlaneBufferGeometry(80, 80);//50,50
+var bulletGeometry = new THREE.PlaneBufferGeometry(80, 80);
 
 var bulletArray = [];
 var bulletTexPlaneCopy = [];
@@ -822,7 +851,6 @@ for (var i = 0; i < MAX_BULLETS; i++) {
 	bulletArray[i].direction = new THREE.Vector3();
 	scene.add(bulletTexPlaneCopy[i]);
 	bulletTexPlaneCopy[i].visible = false;
-	//bulletTexPlaneCopy[i].direction = new THREE.Vector3();
 }
 var bulletFlipper = true;
 var bulletRay = new THREE.Ray();
@@ -830,12 +858,10 @@ var bulletRayCollisionPoint = new THREE.Vector3();
 var oldBulletSpherePos = new THREE.Vector3();
 var newBulletSpherePos = new THREE.Vector3();
 var canShoot = true;
-var canStartThrustSound = true;
-var canFadeThrustSound = false;
 
 //enemy bullets
 var ENEMY_MAX_BULLETS = 10;
-var enemyBulletSpeed = 300;//300
+var enemyBulletSpeed = 300;
 var enemyBulletCounter = 0;
 var enemyBulletMaterial = new THREE.MeshBasicMaterial({
 	color: 'rgb(150,0,255)',
@@ -849,7 +875,7 @@ var enemyBulletCopyMaterial = new THREE.MeshBasicMaterial({
 	opacity: 1.0,
 	map: bulletTexture
 });
-var enemyBulletGeometry = new THREE.PlaneBufferGeometry(80, 80);//50,50
+var enemyBulletGeometry = new THREE.PlaneBufferGeometry(80, 80);
 
 var enemyBulletArray = [];
 var enemyBulletTexPlaneCopy = [];
@@ -862,7 +888,6 @@ for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
 	enemyBulletArray[i].direction = new THREE.Vector3();
 	scene.add(enemyBulletTexPlaneCopy[i]);
 	enemyBulletTexPlaneCopy[i].visible = false;
-	//enemyBulletTexPlaneCopy[i].direction = new THREE.Vector3();
 }
 var enemyBulletRay = new THREE.Ray();
 var enemyBulletRayCollisionPoint = new THREE.Vector3();
@@ -887,51 +912,29 @@ asteroidCopy2.direction = new THREE.Vector3();
 asteroidCopy1.speed = 0;
 asteroidCopy2.speed = 0;
 
-var frameTime = 0;
-var playingDeathAnimation = false;
-var deathAnimationTimer = new THREEx.GameTimer(4);
-var playingBeginLevelIntro = false;
-var beginLevelTimer = new THREEx.GameTimer(6);//4
-var cutsceneCameraAngle = 0;
-var cutsceneCameraDistance = 50;//0
-var playingWarpAnimation = false;
-var fovIncrementAmount = 400;//600
-var aspectIncrementAmount = -8;//-8
-
-var thrustVector = new THREE.Vector3(0, 0, -1);
-var frictionVector = new THREE.Vector3();
-var ship = new THREE.Object3D();
-var shipSpeed = 0;
-var shipVelocity = new THREE.Vector3(0, 0, 0);
-var normalizedShipDirection = new THREE.Vector3(0, 0, 0);
-var fTime = 0;
-var tryAgain = false;
-var check = 0;
-var impulseAmount = 0;
-var numOfAsteroidCollisions = 0;
-var score = 0;
-var extraLifeScore = 10000;
-var gameOver = false;
-var playingGameOverAnimation = false;
-var gameOverTimer = new THREEx.GameTimer(4);
-
-var tempPercent = 0;
+//HUD text elements
 var scoreText = document.getElementById("score");
 var levelText = document.getElementById("level");
 var gameOverText = document.getElementById("gameover");
-
-var debugText1 = document.getElementById("debug1");
 /*
+var debugText1 = document.getElementById("debug1");
 var debugText2 = document.getElementById("debug2");
 var debugText3 = document.getElementById("debug3");
 var debugText4 = document.getElementById("debug4");
 */
 
 
-//SOUNDS
+// SOUNDS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 var soundsLoaded = 0;
 var canPlayBeginLevelSound = false;
 var soundMuted = true;
+var thrustersSoundShouldStop = false;
+var ufoSoundShouldStop = false;
+var canStartThrustSound = true;
+var canFadeThrustSound = false;
+//load the game with the sound already muted - no loud surprises!
+// (players must turn sounds on with the button)
 Howler.mute(soundMuted);
 
 document.getElementById("sound").style.cursor = "pointer";
@@ -1029,7 +1032,10 @@ var soundThrusters = new Howl({
 	volume: 0.8,
 	rate: 0.8,
 	onfaded: function() {
-		soundThrusters.stop();
+		if (thrustersSoundShouldStop) {
+			this.stop();
+			thrustersSoundShouldStop = false;
+		}
   	},
 	onload: function() {
 		soundsLoaded += 1;
@@ -1039,6 +1045,12 @@ var soundThrusters = new Howl({
 var soundUfoWarble = new Howl({
 	src: ['sounds/ufoHighWarble.mp3'],
 	loop: true,
+	onfaded: function() {
+		if (ufoSoundShouldStop) {
+			this.stop();
+			ufoSoundShouldStop = false;
+		}
+  	},
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) startGame();
@@ -1058,7 +1070,6 @@ var soundBeginLevel = new Howl({
 	onload: function() {
 		soundsLoaded += 1;
 		if (soundsLoaded > 13) startGame();
-		//soundBeginLevel.play();
 	}
 });
 var soundExtraLife = new Howl({
@@ -1070,12 +1081,15 @@ var soundExtraLife = new Howl({
 	}
 });
 
+// when all sounds have loaded, the game animation loop is started
 function startGame () {
 	animate();
 }
 
-//disable clicking and selecting/highlighting text of help, score, level, 
-//   and gameOver banner texts
+
+// Misc. Elements
+
+//disable clicking and selecting/highlighting text of help, score, level, and gameOver banner texts
 document.getElementById("help").style.cursor = "default";
 document.getElementById("help").style.webkitUserSelect = "none";
 document.getElementById("help").style.MozUserSelect = "none";
