@@ -24,7 +24,7 @@ Press Purple joystick-button2 to apply Thrusters <br>
 
 To Do
 -----
-* code cleanup and add comments where helpful
+* add code comments where helpful
 
 
 January 20, 2015 Progress Note
