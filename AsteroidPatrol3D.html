@@ -47,11 +47,11 @@
 	<div id="sound" style="position:fixed; right:3%; top:14%; font-family:arial; font-type:bold; color:rgb(70,70,110); border:thin solid;">
 		Sound: Off
 	</div>
-
+<!--
 	<div id="debug1" style="position:fixed; left:20%; top:1%; color:grey;">
 		
 	</div>
-<!--
+
 	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
 	
 	</div>
@@ -220,9 +220,8 @@
 			cameraControlsPitchObject.rotation.set(0,0,0);
 			crossHairsSprite.visible = false;
 			
-			numberOfLargeAsteroids = Math.floor( level * 2 );// + 1
-			
-			//for debugging levels progression
+			numberOfLargeAsteroids = Math.floor( level * 2 );
+			//for debugging levels progression, the following line will allow the player to quickly advance
 			//numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
@@ -317,11 +316,6 @@
 					transparent: true,
 				});
 				ghostLgAsteroidMaterial[i].color.set('rgb(255,50,0)');
-				//if (randMaterialIndex == 0) ghostLgAsteroidMaterial[i].color.set('rgb(255,50,0)');
-				//else if (randMaterialIndex == 1) ghostLgAsteroidMaterial[i].color.set('rgb(40,40,40)');
-				//else if (randMaterialIndex == 2) ghostLgAsteroidMaterial[i].color.set('rgb(240,240,240)');
-				//else if (randMaterialIndex == 3) ghostLgAsteroidMaterial[i].color.set('rgb(100,10,0)');
-				//else if (randMaterialIndex == 4) ghostLgAsteroidMaterial[i].color.set('rgb(0,150,255)');
 				
 				ghostLargeAsteroids[i] = new THREE.Mesh(largeAsteroids[i].geometry, ghostLgAsteroidMaterial[i]);
 				ghostLargeAsteroids[i].scale.copy(largeAsteroids[i].scale);
@@ -396,7 +390,6 @@
 				mediumAsteroids[i].direction.normalize();
 				mediumAsteroids[i].mass = 70;
 				mediumAsteroids[i].speed = Math.random() * 20 + 20 + (level * 4); //+20 medium is faster speed
-				mediumAsteroids[i].position.set(10000, 10000, 10000);//place outside arena for now
 				
 				ghostMedAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					transparent: true,
@@ -418,15 +411,12 @@
 				radarMedAsteroids[i].scale.set(1, 0.8, 1);
 				radarMedAsteroids[i].colorIndex = 0;
 				radarScene.add(radarMedAsteroids[i]);
+				radarMedAsteroids[i].visible = false;
 				mediumAsteroidEdges[i] = new THREE.EdgesHelper(radarMedAsteroids[i]);
 				mediumAsteroidEdges[i].material.color.set('rgb(0,150,0)');
 				radarScene.add(mediumAsteroidEdges[i]);
+				mediumAsteroidEdges[i].visible = false;
 				
-			}
-			
-			for (var i = 0; i < numberOfMediumAsteroids; i++) {
-				radarMedAsteroids[i].position.copy(mediumAsteroids[i].position);
-				mediumAsteroidEdges[i].position.copy(radarMedAsteroids[i].position);
 			}
 			
 			//build small asteroids
@@ -463,7 +453,6 @@
 				smallAsteroids[i].direction.normalize();
 				smallAsteroids[i].mass = 30;
 				smallAsteroids[i].speed = Math.random() * 20 + 30 + (level * 5);//+30 small is fastest speed asteroid
-				smallAsteroids[i].position.set(-10000, -10000, -10000);//place outside arena for now
 				
 				ghostSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					transparent: true,
@@ -484,15 +473,12 @@
 				radarSmlAsteroids[i].scale.set(1, 0.8, 1);
 				radarSmlAsteroids[i].colorIndex = 0;
 				radarScene.add(radarSmlAsteroids[i]);
+				radarSmlAsteroids[i].visible = false;
 				smallAsteroidEdges[i] = new THREE.EdgesHelper(radarSmlAsteroids[i]);
 				smallAsteroidEdges[i].material.color.set('rgb(0,150,0)');
 				radarScene.add(smallAsteroidEdges[i]);
+				smallAsteroidEdges[i].visible = false;
 				
-			}
-			
-			for (var i = 0; i < numberOfSmallAsteroids; i++) {
-				radarSmlAsteroids[i].position.copy(smallAsteroids[i].position);
-				smallAsteroidEdges[i].position.copy(radarSmlAsteroids[i].position);
 			}
 
 			//asteroid explosion materials match the color of the asteroid materials
@@ -607,6 +593,10 @@
 			enemyShootTimer.reset();
 			enemyShootTimer.setAlarm( 1 );
 			
+			//load and run explosion shader so it doesn't stall when we need it on 1st real explosion
+			//pass in a bogus number (3) so it doesn't actually trigger an explosion sound 
+			initExplosion( planet.position, 3);
+			
 
 		} //end function initLevel()
 		
@@ -651,14 +641,13 @@
 			if ( playerAlive && (joystick.button2Pressed || keyboard.pressed('space')) ) {
 				
 				if (canStartThrustSound) {
-					soundThrusters.stop();
-					soundThrusters.volume(0.8);
 					soundThrusters.play();
+					thrustersSoundShouldStop = false;
+					soundThrusters.fade(0.0, 0.8, 10);
 					canStartThrustSound = false;
 					canFadeThrustSound = true;
 				}
 				//get the camera's direction and copy it into thrustVector
-				//camera.getWorldDirection(thrustVector);
 				thrustVector.copy(cameraRotationVector);
 				
 				if (shipSpeed < 200) {
@@ -682,6 +671,7 @@
 				//Although no air drag friction exists in space, this makes handling the ship easier
 				
 				if (canFadeThrustSound) {
+					thrustersSoundShouldStop = true;
 					soundThrusters.fade(0.8, 0.0, 10);
 					canFadeThrustSound = false;
 				}
@@ -765,12 +755,12 @@
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
 									bulletTexPlaneCopy[i].visible = false;
-									//place it right where the collision occurred
-									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									ghostSmallAsteroids[c].visible = false;
-									radarSmlAsteroids[c].position.set(0, 0, -10000);
+									radarSmlAsteroids[c].visible = false;
+									smallAsteroidEdges[c].visible = false;
 									
 									initExplosion(bulletRayCollisionPoint, 0);
 									
@@ -787,8 +777,6 @@
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
-									//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
-							
 								}
 
 							}//end if (bulletRayCollisionPoint) {
@@ -814,21 +802,26 @@
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
 									bulletTexPlaneCopy[i].visible = false;
-									//place it right where the collision occurred
-									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									
 									mediumAsteroids[c].alive = false;
 									mediumAsteroids[c].visible = false;
 									ghostMediumAsteroids[c].visible = false;
-									radarMedAsteroids[c].position.set(0, 0, 10000);
+									radarMedAsteroids[c].visible = false;
+									mediumAsteroidEdges[c].visible = false;
 									
 									//spawn 2 new small asteroids
 									//small asteroid #1
+									radarSmlAsteroids[c*2].visible = true;
+									smallAsteroidEdges[c*2].visible = true;
 									smallAsteroids[c*2].alive = true;
 									smallAsteroids[c*2].visible = true;
 									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2].translateOnAxis(smallAsteroids[c*2].direction, smallAsteroids[c*2].geometry.boundingSphere.radius);
+									
 									//small asteroid #2
+									radarSmlAsteroids[c*2+1].visible = true;
+									smallAsteroidEdges[c*2+1].visible = true;
 									smallAsteroids[c*2+1].alive = true;
 									smallAsteroids[c*2+1].visible = true;
 									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
@@ -871,18 +864,23 @@
 									bulletArray[i].alive = false;
 									bulletArray[i].visible = false;
 									bulletTexPlaneCopy[i].visible = false;
-									//place it right where the collision occurred
-									//bulletArray[i].position.copy(bulletRayCollisionPoint);
+									
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
 									ghostLargeAsteroids[c].visible = false;
-									radarLgAsteroids[c].position.set(10000, 0, 0);
+									radarLgAsteroids[c].visible = false;
+									largeAsteroidEdges[c].visible = false;
 									
 									//spawn 2 new medium asteroids
+									radarMedAsteroids[c*2].visible = true;
+									mediumAsteroidEdges[c*2].visible = true;
 									mediumAsteroids[c*2].alive = true;
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2].translateOnAxis(mediumAsteroids[c*2].direction, mediumAsteroids[c*2].geometry.boundingSphere.radius);
+									
+									radarMedAsteroids[c*2+1].visible = true;
+									mediumAsteroidEdges[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].alive = true;
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
@@ -899,16 +897,7 @@
 									}
 									scoreText.innerHTML = score;
 									
-									/*	
-									//the following is optional:
-									//get the collisionNormal so we can bounce the bullet off the sphere
-									collisionNormal.subVectors(largeAsteroids[i].position, bulletRayCollisionPoint);
-									collisionNormal.normalize();
-									// the following will send the bullet projectile on its new path
-									//bulletArray[i].direction.reflect(collisionNormal);
-									//bulletArray[i].alive = true;
-									*/
-								}
+								}//end if (bulletRayCollisionPoint.distanceToSquared(bulletArray[i].position) <
 
 							}//end if (bulletRayCollisionPoint) {
 							
@@ -931,13 +920,11 @@
 								bulletArray[i].alive = false;
 								bulletArray[i].visible = false;
 								bulletTexPlaneCopy[i].visible = false;
-									
+								/*	
 								enemyAlive = false;
-								//enemy.visible = false;
-								enemy.position.set(0, -10000, 0);
 								enemySpawnTimer.reset();
 								enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-									
+								*/	
 								initEnemyExplosion(bulletRayCollisionPoint);
 								score += 500;
 								if (score >= extraLifeScore) {
@@ -1013,6 +1000,7 @@
 									enemyBulletTexPlaneCopy[i].visible = false;
 									
 									initPlayerExplosion(ship.position);
+									/*
 									playerAlive = false;
 									ship.visible = false;
 									shipSpeed = 0;
@@ -1027,6 +1015,7 @@
 									onWindowResize();
 									
 									playingDeathAnimation = true;
+									*/
 								
 							
 							}
@@ -1056,16 +1045,14 @@
 									smallAsteroids[c].alive = false;
 									smallAsteroids[c].visible = false;
 									ghostSmallAsteroids[c].visible = false;
-									radarSmlAsteroids[c].position.set(0, 0, -10000);
+									radarSmlAsteroids[c].visible = false;
+									smallAsteroidEdges[c].visible = false;
 									
 									initExplosion(enemyBulletRayCollisionPoint, 0);
 									
 									smallAsteroidsRemaining -= 1;
 									if(smallAsteroidsRemaining < 1)
 										initLevel();
-									
-									//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
-							
 								}
 
 							}//end if (enemyBulletRayCollisionPoint) {
@@ -1095,16 +1082,21 @@
 									mediumAsteroids[c].alive = false;
 									mediumAsteroids[c].visible = false;
 									ghostMediumAsteroids[c].visible = false;
-									radarMedAsteroids[c].position.set(0, 0, 10000);
+									radarMedAsteroids[c].visible = false;
+									mediumAsteroidEdges[c].visible = false;
 									
 									//spawn 2 new small asteroids
 									//small asteroid #1
+									radarSmlAsteroids[c*2].visible = true;
+									smallAsteroidEdges[c*2].visible = true;
 									smallAsteroids[c*2].alive = true;
 									smallAsteroids[c*2].visible = true;
 									smallAsteroids[c*2].position.copy(mediumAsteroids[c].position);
 									//move the new neighbooring asteroids away so they don't spawn on top of each other
 									smallAsteroids[c*2].translateOnAxis(smallAsteroids[c*2].direction, smallAsteroids[c*2].geometry.boundingSphere.radius);
 									//small asteroid #2
+									radarSmlAsteroids[c*2+1].visible = true;
+									smallAsteroidEdges[c*2+1].visible = true;
 									smallAsteroids[c*2+1].alive = true;
 									smallAsteroids[c*2+1].visible = true;
 									smallAsteroids[c*2+1].position.copy(mediumAsteroids[c].position);
@@ -1142,13 +1134,18 @@
 									largeAsteroids[c].alive = false;
 									largeAsteroids[c].visible = false;
 									ghostLargeAsteroids[c].visible = false;
-									radarLgAsteroids[c].position.set(10000, 0, 0);
+									radarLgAsteroids[c].visible = false;
+									largeAsteroidEdges[c].visible = false;
 									
 									//spawn 2 new medium asteroids
+									radarMedAsteroids[c*2].visible = true;
+									mediumAsteroidEdges[c*2].visible = true;
 									mediumAsteroids[c*2].alive = true;
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2].translateOnAxis(mediumAsteroids[c*2].direction, mediumAsteroids[c*2].geometry.boundingSphere.radius);
+									radarMedAsteroids[c*2+1].visible = true;
+									mediumAsteroidEdges[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].alive = true;
 									mediumAsteroids[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].position.copy(largeAsteroids[c].position);
@@ -1181,24 +1178,29 @@
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
 							ghostLargeAsteroids[i].visible = false;
-							radarLgAsteroids[i].position.set(10000, 0, 0);
+							radarLgAsteroids[i].visible = false;
+							largeAsteroidEdges[i].visible = false;
 							
 							initExplosion(largeAsteroids[i].position, 2);
 							//spawn 2 new medium asteroids
+							radarMedAsteroids[i*2].visible = true;
+							mediumAsteroidEdges[i*2].visible = true;
 							mediumAsteroids[i*2].alive = true;
 							mediumAsteroids[i*2].visible = true;
 							mediumAsteroids[i*2].position.copy(largeAsteroids[i].position);
 							mediumAsteroids[i*2].translateOnAxis(mediumAsteroids[i*2].direction, mediumAsteroids[i*2].geometry.boundingSphere.radius);
+							radarMedAsteroids[i*2+1].visible = true;
+							mediumAsteroidEdges[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].alive = true;
 							mediumAsteroids[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
 							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
-									
+							/*		
 							enemyAlive = false;
 							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-									
+							*/		
 							initEnemyExplosion(enemy.position);
 						}
 					}
@@ -1272,14 +1274,19 @@
 							largeAsteroids[i].alive = false;
 							largeAsteroids[i].visible = false;
 							ghostLargeAsteroids[i].visible = false;
-							radarLgAsteroids[i].position.set(10000, 0, 0);
+							radarLgAsteroids[i].visible = false;
+							largeAsteroidEdges[i].visible = false;
 							
 							initExplosion(largeAsteroids[i].position, 2);
 							//spawn 2 new medium asteroids
+							radarMedAsteroids[i*2].visible = true;
+							mediumAsteroidEdges[i*2].visible = true;
 							mediumAsteroids[i*2].alive = true;
 							mediumAsteroids[i*2].visible = true;
 							mediumAsteroids[i*2].position.copy(largeAsteroids[i].position);
 							mediumAsteroids[i*2].translateOnAxis(mediumAsteroids[i*2].direction, mediumAsteroids[i*2].geometry.boundingSphere.radius);
+							radarMedAsteroids[i*2+1].visible = true;
+							mediumAsteroidEdges[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].alive = true;
 							mediumAsteroids[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
@@ -1298,6 +1305,7 @@
 							}
 							scoreText.innerHTML = score;
 					
+							/*
 							livesRemaining -= 1;
 							if(livesRemaining < 0){
 								livesRemaining = 0;
@@ -1306,9 +1314,9 @@
 							livesRemainingSprites[livesRemaining].visible = false;
 							crossHairsSprite.visible = false;
 							onWindowResize();
+							*/
 							
 							initPlayerExplosion(ship.position);
-							playingDeathAnimation = true;
 						
 						}
 					}
@@ -1326,24 +1334,29 @@
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
 							ghostMediumAsteroids[i].visible = false;
-							radarMedAsteroids[i].position.set(0, 0, 10000);
+							radarMedAsteroids[i].visible = false;
+							mediumAsteroidEdges[i].visible = false;
 							
 							initExplosion(mediumAsteroids[i].position, 1);
 							//spawn 2 new small asteroids
+							radarSmlAsteroids[i*2].visible = true;
+							smallAsteroidEdges[i*2].visible = true;
 							smallAsteroids[i*2].alive = true;
 							smallAsteroids[i*2].visible = true;
 							smallAsteroids[i*2].position.copy(mediumAsteroids[i].position);
 							smallAsteroids[i*2].translateOnAxis(smallAsteroids[i*2].direction, smallAsteroids[i*2].geometry.boundingSphere.radius);
+							radarSmlAsteroids[i*2+1].visible = true;
+							smallAsteroidEdges[i*2+1].visible = true;
 							smallAsteroids[i*2+1].alive = true;
 							smallAsteroids[i*2+1].visible = true;
 							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
 							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
-									
+							/*		
 							enemyAlive = false;
 							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-									
+							*/		
 							initEnemyExplosion(enemy.position);
 						}
 					}
@@ -1417,14 +1430,19 @@
 							mediumAsteroids[i].alive = false;
 							mediumAsteroids[i].visible = false;
 							ghostMediumAsteroids[i].visible = false;
-							radarMedAsteroids[i].position.set(0, 0, 10000);
+							radarMedAsteroids[i].visible = false;
+							mediumAsteroidEdges[i].visible = false;
 							
 							initExplosion(mediumAsteroids[i].position, 1);
 							//spawn 2 new small asteroids
+							radarSmlAsteroids[i*2].visible = true;
+							smallAsteroidEdges[i*2].visible = true;
 							smallAsteroids[i*2].alive = true;
 							smallAsteroids[i*2].visible = true;
 							smallAsteroids[i*2].position.copy(mediumAsteroids[i].position);
 							smallAsteroids[i*2].translateOnAxis(smallAsteroids[i*2].direction, smallAsteroids[i*2].geometry.boundingSphere.radius);
+							radarSmlAsteroids[i*2+1].visible = true;
+							smallAsteroidEdges[i*2+1].visible = true;
 							smallAsteroids[i*2+1].alive = true;
 							smallAsteroids[i*2+1].visible = true;
 							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
@@ -1442,7 +1460,7 @@
 								soundExtraLife.play();
 							}
 							scoreText.innerHTML = score;
-					
+							/*
 							livesRemaining -= 1;
 							if(livesRemaining < 0){
 								livesRemaining = 0;
@@ -1451,9 +1469,8 @@
 							livesRemainingSprites[livesRemaining].visible = false;
 							crossHairsSprite.visible = false;
 							onWindowResize();
-							
+							*/
 							initPlayerExplosion(ship.position);
-							playingDeathAnimation = true;
 						}
 					}
 				}
@@ -1470,20 +1487,21 @@
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
 							ghostSmallAsteroids[i].visible = false;
-							radarSmlAsteroids[i].position.set(0, 0, -10000);
+							radarSmlAsteroids[i].visible = false;
+							smallAsteroidEdges[i].visible = false;
 							
 							initExplosion(smallAsteroids[i].position, 0);
+							/*
 							enemyAlive = false;
 							//enemy.visible = false;
 							enemySpawnTimer.reset();
 							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-							
+							*/
 							initEnemyExplosion(enemy.position);
 							
 							smallAsteroidsRemaining -= 1;
 							if(smallAsteroidsRemaining < 1)
 								initLevel();
-							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 							
 						}
 					}
@@ -1557,11 +1575,11 @@
 							smallAsteroids[i].alive = false;
 							smallAsteroids[i].visible = false;
 							ghostSmallAsteroids[i].visible = false;
-							radarSmlAsteroids[i].position.set(0, 0, -10000);
+							radarSmlAsteroids[i].visible = false;
+							smallAsteroidEdges[i].visible = false;
 							
 							initExplosion(smallAsteroids[i].position, 0);
 							smallAsteroidsRemaining -= 1;
-							//debugText4.innerHTML = "smallAsteroids remaining: " + Math.floor(smallAsteroidsRemaining);
 
 							playerAlive = false;
 							ship.visible = false;
@@ -1575,7 +1593,7 @@
 								soundExtraLife.play();
 							}
 							scoreText.innerHTML = score;
-					
+							/*
 							livesRemaining -= 1;
 							if(livesRemaining < 0){
 								livesRemaining = 0;
@@ -1584,9 +1602,8 @@
 							livesRemainingSprites[livesRemaining].visible = false;
 							crossHairsSprite.visible = false;
 							onWindowResize();
-							
+							*/
 							initPlayerExplosion(ship.position);
-							playingDeathAnimation = true;
 						}
 					}
 				}
@@ -1596,15 +1613,13 @@
 			//only check if both ships are alive
 			if (enemyAlive && playerAlive) {
 				if ( enemy.position.distanceTo(ship.position) < 100 ) {
-				
+					/*
 					enemyAlive = false;
 					//enemy.visible = false;
 					enemySpawnTimer.reset();
 					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
+					*/
 					initEnemyExplosion(enemy.position);
-					playerAlive = false;
-					ship.visible = false;
-					shipSpeed = 0;
 					
 					score += 500;
 					if (score >= extraLifeScore) {
@@ -1614,7 +1629,7 @@
 						soundExtraLife.play();
 					}
 					scoreText.innerHTML = score;
-					
+					/*
 					livesRemaining -= 1;
 					if(livesRemaining < 0){
 						livesRemaining = 0;
@@ -1623,10 +1638,8 @@
 					livesRemainingSprites[livesRemaining].visible = false;
 					crossHairsSprite.visible = false;
 					onWindowResize();
-					
+					*/
 					initPlayerExplosion(ship.position);
-					playingDeathAnimation = true;
-					
 				}
 			}
 			
@@ -1778,9 +1791,6 @@
 			sun.position.z += 700;
 			sunUniforms.time.value = performance.now() * 0.001;
 			
-			//test code for rotating sprites
-			//crossHairsSprite.material.rotation += 2 * frameTime;
-			
 			Howler.orientation(cameraRotationVector.x, cameraRotationVector.y, cameraRotationVector.z,
 				cameraControlsObject.matrix.elements[4], cameraControlsObject.matrix.elements[5], cameraControlsObject.matrix.elements[6] );
 			
@@ -1792,9 +1802,14 @@
 				enemySpawnTimer.run(frameTime);
 				// if the target alarm time has been reached,
 				if (enemySpawnTimer.alarmSounding) {
+					
 					enemyAlive = true;
 					soundUfoWarble.play();
-					//enemy.visible = true;
+					ufoSoundShouldStop = false;
+					soundUfoWarble.fade(0.0, 1.0, 20);
+					enemy.visible = true;
+					radarEnemy.visible = true;
+					enemyEdges.visible = true;
 					randomPick = Math.floor(Math.random() * 6 + 1);
 					if (randomPick == 1) {
 						enemy.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, -399);
@@ -1833,6 +1848,7 @@
 					enemySpawnTimer.reset();
 					enemyChangeDirectionTimer.reset();
 					enemyChangeDirectionTimer.setAlarm( 1 );
+					
 				}
 					
 			}//end if (!enemyAlive)
@@ -1901,10 +1917,11 @@
 				    	enemy.position.z > 420 || enemy.position.z < -420 ) {
 					
 					enemyAlive = false;
-					soundUfoWarble.stop();
-					//enemy.visible = false;
-					enemy.position.set(0, -10000, 0);
-					radarEnemy.position.set(0, 10000, 0);
+					ufoSoundShouldStop = true;
+					soundUfoWarble.fade(1.0, 0.0, 20);
+					enemy.visible = false;
+					radarEnemy.visible = false;
+					enemyEdges.visible = false;
 					enemySpawnTimer.reset();
 					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 				}
@@ -1992,7 +2009,6 @@
 					}
 					else if (!gameOver) {
 						ship.visible = true;
-						//crossHairsSprite.visible = true;
 						deathAnimationTimer.reset();
 						cutsceneCameraAngle = 0;
 						cutsceneCameraDistance = 50;
@@ -2098,17 +2114,14 @@
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						explosionPieces[i].visible = false;
 					}
-					//explosionBillboard.scale.set(1, 1, 1);
-					//explosionBillboard.visible = false;
-					//explosionBillboardUniforms.explosionTransparency.value = 1.0;
-					
+					/*
 					explosionScale = 1.0;
 					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
 					explosionSphere.visible = false;
 					explosionSphere.material.opacity = 0.3;
 					
 					explosionPieces[0].material.opacity = 1.0;
-					
+					*/
 					isExploding = false;
 				}
 				
@@ -2144,15 +2157,14 @@
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						enemyExplosionPieces[i].visible = false;
 					}
-					//explosionBillboard.scale.set(1, 1, 1);
-					//explosionBillboard.visible = false;
-					
+					/*
 					explosionScale = 1.0;
 					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
 					explosionSphere.visible = false;
 					explosionSphere.material.opacity = 0.3;
 					
 					enemyExplosionPieces[0].material.opacity = 1.0;
+					*/
 					enemyIsExploding = false;
 				}
 				
@@ -2186,15 +2198,14 @@
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						playerExplosionPieces[i].visible = false;
 					}
-					//explosionBillboard.visible = false;
-					//explosionBillboard.scale.set(1,1,1);
-					
+					/*
 					explosionScale = 1.0;
 					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
 					explosionSphere.visible = false;
 					explosionSphere.material.opacity = 0.3;
 					
 					playerExplosionPieces[0].material.opacity = 1.0;
+					*/
 					playerIsExploding = false;
 				}
 				
@@ -2319,8 +2330,6 @@
 			xFacingThreat = yFacingThreat = zFacingThreat = false;
 			xPosThreat = yPosThreat = zPosThreat = false;
 			xNegThreat = yNegThreat = zNegThreat = false;
-			
-			//camera.getWorldDirection(cameraFacingVector);
 			
 			absCameraFacingX = Math.abs(cameraRotationVector.x);
 			absCameraFacingY = Math.abs(cameraRotationVector.y);
@@ -2704,9 +2713,6 @@
 				
 			}//end for (var i = 0; i < numberOfSmallAsteroids; i++)
 			
-
-			//with different viewports
-			
 			//set up the main viewport over the entire area of the webpage
 			renderer.setViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 			
@@ -2727,15 +2733,13 @@
 			//reset scissor test (disable it)
 			renderer.enableScissorTest( false );
 			
-		
 			//helpful real-time debug text, so we can monitor game variables
-			//debugText1.innerHTML = blinkCounterLrg;	
-		/*
+			/*
+			debugText1.innerHTML = blinkCounterLrg;
 			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
 			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
 			debugText4.innerHTML = "randMaterialIndex: " + randMaterialIndex;
-		*/
-			
+			*/
 
 		} //end function animate()
 		
@@ -2773,9 +2777,6 @@
 			frictionVector.set(0,0,0);
 			shipVelocity.set(0,0,0);
 			
-			//crossHairsSprite.visible = true;
-			//playerAlive = true;
-			
 			//reset explosions so they don't hang over stuck mid-animation 
 			// from previous level / previous life
 			isExploding = false;
@@ -2796,7 +2797,6 @@
 			//reset the bullet direction vector to unit length of 1 to avoid accumulation
 			bulletArray[bulletCounter].direction.set(0, 0, 1);
 			//get our camera's direction and copy it into current bullet's direction
-			///camera.getWorldDirection( bulletArray[bulletCounter].direction );
 			bulletArray[bulletCounter].direction.copy(cameraRotationVector);
 			//now the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
@@ -2868,12 +2868,13 @@
 			explosionSphere.position.copy(location);
 			explosionScale = 1.0;
 			explosionSphere.scale.set(explosionScale, explosionScale, explosionScale)
-			explosionSphere.visible = true;//true
+			explosionSphere.visible = true;
 			explosionSphere.material.opacity = 0.3;
 			
 			//setup explosionPieces
 			//only need to update 1 piece's material - they all share the same material
 			explosionPieces[0].material.opacity = 1.0;
+			
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 				explosionPieces[i].position.copy(location);
 				explosionPieces[i].visible = true;
@@ -2926,14 +2927,21 @@
 			enemyIsExploding = true;
 			enemyExplosionTimer.reset();
 			
-			enemy.position.set(0, -10000, 0);
-			radarEnemy.position.set(0, 10000, 0);
+			enemySpawnTimer.reset();
+			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
 			
-			soundUfoWarble.stop();
+			enemyAlive = false;
+			enemy.visible = false;
+			radarEnemy.visible = false;
+			enemyEdges.visible = false;
+			
+			ufoSoundShouldStop = true;
+			soundUfoWarble.fade(1.0, 0.0, 20);
 			soundUfoExplode.pos((location.x - ship.position.x) * 0.01, 
 					    (location.y - ship.position.y) * 0.01, 
 					    (location.z - ship.position.z) * 0.01);
 			soundUfoExplode.play();
+			
 		}
 		
 		function initPlayerExplosion ( location ) {
@@ -2957,13 +2965,28 @@
 				playerExplosionPieces[i].visible = true;
 			}
 			
+			shipSpeed = 0;
+			playerAlive = false;
+			ship.visible = false;
+			crossHairsSprite.visible = false;
+								
 			radarShip.visible = false;
 			shipEdges.visible = false;
 			playerIsExploding = true;
 			playerExplosionTimer.reset();
+			playingDeathAnimation = true;
+			
+			livesRemaining -= 1;
+			if(livesRemaining < 0){
+				livesRemaining = 0;
+				gameOver = true;
+			}
+			livesRemainingSprites[livesRemaining].visible = false;
 			
 			soundShipExplode.play();
 			cameraControlsPitchObject.remove(camera);
+			
+			onWindowResize();
 		}
 		
 		//the following physics code for 'function stepSimulation(body1, body2)' is a port from the original C++ code
@@ -3036,7 +3059,7 @@
 					
 					body1.hasCollided = true;
 					body2.hasCollided = true;
-					numOfAsteroidCollisions += 1;
+					//numOfAsteroidCollisions += 1;
 					//debugText2.innerHTML = "numOfAsteroidCollisions: " + Math.floor(numOfAsteroidCollisions);
 					
 					soundAsteroidCollide.pos((body1.position.x - ship.position.x) * 0.05, (body1.position.y - ship.position.y) * 0.05, (body1.position.z - ship.position.z) * 0.05);
