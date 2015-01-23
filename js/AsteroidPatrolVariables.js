@@ -772,7 +772,7 @@ enemy.add(enemyBody);
 
 
 
-// GAMEPLAY VARIABLES ////////////////////////////////////////////////////////////////////////////////////
+// GAMEPLAY VARIABLES /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var frameTime = 0;
 var playingDeathAnimation = false;
@@ -911,17 +911,6 @@ asteroidCopy1.direction = new THREE.Vector3();
 asteroidCopy2.direction = new THREE.Vector3();
 asteroidCopy1.speed = 0;
 asteroidCopy2.speed = 0;
-
-//HUD text elements
-var scoreText = document.getElementById("score");
-var levelText = document.getElementById("level");
-var gameOverText = document.getElementById("gameover");
-/*
-var debugText1 = document.getElementById("debug1");
-var debugText2 = document.getElementById("debug2");
-var debugText3 = document.getElementById("debug3");
-var debugText4 = document.getElementById("debug4");
-*/
 
 
 // SOUNDS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1086,6 +1075,17 @@ function startGame () {
 	animate();
 }
 
+
+// HUD html text elements
+var scoreText = document.getElementById("score");
+var levelText = document.getElementById("level");
+var gameOverText = document.getElementById("gameover");
+/*
+var debugText1 = document.getElementById("debug1");
+var debugText2 = document.getElementById("debug2");
+var debugText3 = document.getElementById("debug3");
+var debugText4 = document.getElementById("debug4");
+*/
 
 // Misc. Elements
 
