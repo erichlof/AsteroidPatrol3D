@@ -46,25 +46,7 @@
 	
 	<div id="sound" style="position:fixed; right:3%; top:14%; font-family:arial; font-type:bold; color:rgb(70,70,110); border:thin solid;">
 		Sound: Off
-	</div>
-<!--
-	<div id="debug1" style="position:fixed; left:20%; top:1%; color:grey;">
-		
-	</div>
-
-	<div id="debug2" style="position:fixed; left:5%; top:6%; color:grey;">
-	
-	</div>
-
-	<div id="debug3" style="position:fixed; left:5%; bottom:6%; color:grey;">
-
-	</div>
-
-	<div id="debug4" style="position:fixed; left:5%; bottom:3%; color:grey;">
-		
-	</div>
--->	
-	
+	</div>	
 
 	<!-- <script src="js/three.min.js"></script> -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
@@ -89,6 +71,9 @@
 		
 	<script id="SunFragmentShader" type="x-shader/x-fragment">
 
+		// the following fragment shader was copied from www.glslsandbox.com and
+		// edited ( through trial and error :-) ) by me for this game.
+		
 		uniform float time;
 		uniform vec2 resolution;
 		
@@ -139,6 +124,9 @@
 	</script>
 		
 	<script id="ExplosionFragmentShader" type="x-shader/x-fragment">
+	
+		//the following fragment shader was copied from www.glslsandbox.com and
+		// edited ( through trial and error :-) ) by me for this game.
 
 		uniform float time;
 		uniform vec2 resolution;
@@ -201,13 +189,12 @@
 
 		function initLevel() {
 			
+			//gets the current browser window dimensions and positions/scales HUD elements accordingly
 			onWindowResize();
 			
 			level += 1;
 			
-			if (level == 1) {
-				scoreText.innerHTML = score;
-			}
+			scoreText.innerHTML = score;
 			
 			//if we are on a later level or gameOver has been triggered,
 			//  first clean up all of the old asteroid objects and explosion pieces
@@ -216,13 +203,16 @@
 				gameOver = false;
 			}
 			
+			//reset the camera's rotation
 			cameraControlsYawObject.rotation.set(0,0,0);
 			cameraControlsPitchObject.rotation.set(0,0,0);
+			//crosshairs sprite is not visible during beginLevel cutscene
 			crossHairsSprite.visible = false;
 			
+			//as levels progress, the number of large asteroids increases
 			numberOfLargeAsteroids = Math.floor( level * 2 );
 			//for debugging levels progression, the following line will allow the player to quickly advance
-			//numberOfLargeAsteroids = 1;
+			///numberOfLargeAsteroids = 1;
 			
 			numberOfMediumAsteroids = numberOfLargeAsteroids * 2;
 			numberOfSmallAsteroids = numberOfMediumAsteroids * 2;
@@ -233,13 +223,15 @@
 			while (randMaterialIndex == previousRandMaterialIndex) {
 				randMaterialIndex = Math.floor( Math.random() * 5 );
 			}
-			//always set beginning level to basic asteroidMaterial
+			//always set beginning level to basic brown asteroidMaterial
 			if (level == 1) randMaterialIndex = 0;
 			//record the previous randomly chosen material so that the next level will look different
 			previousRandMaterialIndex = randMaterialIndex;
 			
-			//build asteroidMaterials based on the random color chosen above
-			asteroidMaterials = [];
+			//now set asteroidMaterials based on the random color chosen above
+			
+			//materials array
+			///asteroidMaterials = [];
 			
 			//brown rock
 			asteroidMaterials[0] = new THREE.MeshLambertMaterial({
@@ -275,20 +267,26 @@
 				shading: THREE.FlatShading
 			});
 			
+			//reset an index to be used in a later loop
 			numberOfLargeAsteroidsCreated = 0;
+			
 			//build large asteroids
+			//loop through how many asteroids we need for the current level
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
-				
+				//an Icosahedron is a good starting shape for the asteroids
 				largeAsteroidGeometry = new THREE.IcosahedronGeometry(largeAsteroidRadius, 2);
+				//but a regular Icosahedron looks too perfect, so we loop through its vertices and deform them a bit
 				for (var v = 0; v < lvLength; v++) {	
 					deformVec.set(Math.random() * 7, Math.random() * 7, Math.random() * 7);
 					largeAsteroidGeometry.vertices[v].add(deformVec);
 				}
-
+				//a three.js mesh object is created using the newly deformed geometry and the randomly chosen material
 				largeAsteroids[i] = new THREE.Mesh(largeAsteroidGeometry, asteroidMaterials[randMaterialIndex]);
-			
+				//the following scale change will make the overall asteroid shape more irregular and realistic
 				largeAsteroids[i].scale.set( (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1, (Math.random() * 0.4 - 0.25) + 1 );
 				
+				//now that we have messed around with the Icosahedron's geometry, we need to re-compute its face and vertex normals
+				// as well as re-center its geometry and re-compute its bounding sphere for more accurate collision detection later
 				largeAsteroids[i].geometry.computeFaceNormals();
 				largeAsteroids[i].geometry.computeVertexNormals();
 				largeAsteroids[i].geometry.verticesNeedUpdate = true;
@@ -296,21 +294,25 @@
 				largeAsteroids[i].geometry.center();
 				largeAsteroids[i].geometry.computeBoundingSphere();
 				
+				//the next line makes the asteroid mesh become part of our game world
 				scene.add(largeAsteroids[i]);
 
-				largeAsteroids[i].alive = true;
-				largeAsteroids[i].visible = true;
-				largeAsteroids[i].hasCollided = false;
+				//each asteroid has certain properties and flags that are used and updated by the game logic
+				largeAsteroids[i].alive = true;//this is used to see if we need to check it or not during the game
+				largeAsteroids[i].visible = true;//if the asteroid gets shot, don't render it anymore
+				largeAsteroids[i].hasCollided = false;//used during the physics simulation update function
 				largeAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-				largeAsteroids[i].rotationAxis.normalize();
-				largeAsteroids[i].rotationAmount = Math.random() * 0.3 + 0.1;//large spins slowest
+				largeAsteroids[i].rotationAxis.normalize();//a random spin axis is chosen and normalized to unit length
+				largeAsteroids[i].rotationAmount = Math.random() * 0.3 + 0.1;//random rotation speed is chosen - large asteroids spin slowest
 				largeAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-				largeAsteroids[i].direction.normalize();
-				largeAsteroids[i].mass = 100;
-				largeAsteroids[i].speed = Math.random() * 20 + 10 + (level * 3);//+10
+				largeAsteroids[i].direction.normalize();//a random initial direction of travel is chosen and normalized to unit length
+				largeAsteroids[i].mass = 100;//large asteroids have the most mass - this is used during collisions
+				largeAsteroids[i].speed = Math.random() * 20 + 10 + (level * 3);//random speed of travel is chosen. Every level it becomes greater
+				
+				//update the index counter for the 'j' loop coming up in 30 or so lines
 				numberOfLargeAsteroidsCreated += 1;
 				
-				//create 'ghost' asteroids that will be used behind arena boundaries to 
+				//create orange-red 'ghost' asteroids that will be used behind arena boundaries to 
 				//warn players before warping their ship to the other side
 				ghostLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					transparent: true,
@@ -322,7 +324,8 @@
 				ghostLargeAsteroids[i].visible = false;
 				scene.add(ghostLargeAsteroids[i]);
 				
-				//create radar mini-cam representations of each asteroid
+				//create radar mini-cam representations of each asteroid.
+				// To keep the triangle poly-count low, these radar asteroids are simplified spherical objects
 				radarLgAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					depthTest: false,
 					transparent: true,
@@ -332,11 +335,14 @@
 				radarLgAsteroids[i] = new THREE.Mesh(radarLgAsteroidGeometry, radarLgAsteroidMaterial[i]);
 				radarLgAsteroids[i].scale.set(1, 0.9, 1);
 				radarLgAsteroids[i].colorIndex = 0;
-				radarScene.add(radarLgAsteroids[i]);
+				radarScene.add(radarLgAsteroids[i]);//radarScene is an independant view and displayed in the top-left corner of the screen
+				//the radar asteroids are plain transparent green, so we add a light outline to help define their shape better
 				largeAsteroidEdges[i] = new THREE.EdgesHelper(radarLgAsteroids[i]);
 				largeAsteroidEdges[i].material.color.set('rgb(0,150,0)');
 				radarScene.add(largeAsteroidEdges[i]);
 				
+				//this next loop waits until all asteroids have been randomly placed a minimum distance from each other.
+				// That way, they don't start possibly inside each other
 				placingLargeAsteroids = true;
 				while (placingLargeAsteroids) {
 					placingLargeAsteroids = false;
@@ -348,12 +354,13 @@
 				}
 				
 			}
-			
+			//Finally we set the radar Asteroids and their outline edges to match the real asteroids in the main window
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				radarLgAsteroids[i].position.copy(largeAsteroids[i].position);
 				largeAsteroidEdges[i].position.copy(radarLgAsteroids[i].position);
 			}
 			
+			// The techniques above are applied now to the medium asteroids, then finally to the small asteroids
 			//build medium asteroids
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
 				
@@ -381,7 +388,6 @@
 				mediumAsteroids[i].rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				mediumAsteroids[i].rotationAxis.normalize();
 				mediumAsteroids[i].rotationAmount = Math.random() * 0.5 + 0.7;//medium spins faster
-				//give it a random direction
 				mediumAsteroids[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 				//if i index is odd, copy the direction created one iteration earlier, and negate it,
 				//so it travels opposite its neighbor during large parent asteroid's explosion and its own(and partner's) creation
@@ -452,7 +458,7 @@
 					smallAsteroids[i].direction.copy(smallAsteroids[i-1].direction).negate();
 				smallAsteroids[i].direction.normalize();
 				smallAsteroids[i].mass = 30;
-				smallAsteroids[i].speed = Math.random() * 20 + 30 + (level * 5);//+30 small is fastest speed asteroid
+				smallAsteroids[i].speed = Math.random() * 20 + 30 + (level * 5);//+30 small asteroids have the fastest speed
 				
 				ghostSmlAsteroidMaterial[i] = new THREE.MeshBasicMaterial({
 					transparent: true,
@@ -515,6 +521,7 @@
 				color: 'rgb(0,150,255)',
 				emissive: 'rgb(0,75,120)'
 			});
+			
 			//build explosion pieces
 			for (var i = 0; i < numberOfExplosionPieces; i++) {
 
@@ -524,12 +531,13 @@
 				explosionPieces[i].direction.normalize();
 				explosionPieces[i].speed = Math.random() * 400 + 200;
 				explosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
-				explosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				explosionPieces[i].visible = false;
 				scene.add(explosionPieces[i]);
 
 			}
+			
 			//build enemy explosion pieces
+			
 			//enemy saucer explosion pieces material
 			enemyExplosionMaterial = new THREE.MeshBasicMaterial({
 				transparent: true,
@@ -545,12 +553,13 @@
 				enemyExplosionPieces[i].direction.normalize();
 				enemyExplosionPieces[i].speed = Math.random() * 400 + 200;
 				enemyExplosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
-				enemyExplosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				enemyExplosionPieces[i].visible = false;
 				scene.add(enemyExplosionPieces[i]);
 
 			}
+			
 			//build player explosion pieces
+			
 			//Player explosion pieces material
 			playerExplosionMaterial = new THREE.MeshBasicMaterial({
 				transparent: true,
@@ -566,35 +575,34 @@
 				playerExplosionPieces[i].direction.normalize();
 				playerExplosionPieces[i].speed = Math.random() * 400 + 200;
 				playerExplosionPieces[i].rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
-				playerExplosionPieces[i].position.set(500, 500, 500);//place outside arena for now
 				playerExplosionPieces[i].visible = false;
 				scene.add(playerExplosionPieces[i]);
 
 			}
 	
-			playerAlive = false;
-			placeShip();
-			radarShip.visible = true;
-			shipEdges.visible = true;
+			playerAlive = false;//the beginLevel cutscene plays first, then the player is set to alive=true
+			placeShip();//this waits until a fair spot is found to start the player, not too close to any asteroids
+			radarShip.visible = true;//the radar-cam ship representation is turned on,
+			shipEdges.visible = true;// so are its edges outline
 			
-			playingBeginLevelIntro = true;
-			canPlayBeginLevelSound = true;
+			playingBeginLevelIntro = true;//this starts the short beginLevel cutscene
+			canPlayBeginLevelSound = true;//turn on the swoosh warp sound to throw the player into the action
+			cutsceneCameraDistance = 600;//this starts the camera far from the ship and then quickly swoops in
 			
-			cutsceneCameraDistance = 600;
-			
-			levelText.innerHTML = "Level " + level;
+			if (level >= 2)
+				levelText.innerHTML = "Level " + level;
 			
 			//increase UFO's speed each level
 			enemySpeed = 60 + (level * 10);
 			
+			//reset the enemy UFO timers that signal when it should appear and when it shoots
 			enemySpawnTimer.reset();
 			enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-			
 			enemyShootTimer.reset();
 			enemyShootTimer.setAlarm( 1 );
 			
-			//load and run explosion shader so it doesn't stall when we need it on 1st real explosion
-			//pass in a bogus number (3) so it doesn't actually trigger an explosion sound 
+			//load and run explosion shader so it doesn't stall when we need it on 1st real explosion.
+			// Pass in a bogus number(3) so it doesn't actually trigger an explosion sound 
 			initExplosion( planet.position, 3);
 			
 
@@ -610,19 +618,24 @@
 			
 			//check if joystick Stick is being moved
 			if (playerAlive) {
-
+				//if not playing on desktop, get the rotation from the mobile-touch virtual Joystick
 				if (!mouseControl) {
 					
 					cameraControlsYawObject.rotation.y = joystick.previousRotationY - joystick.deltaX() * 0.005;
 					cameraControlsPitchObject.rotation.x = joystick.previousRotationX - joystick.deltaY() * 0.005;
+					//clamp the camera's vertical movement (around the x-axis) to the 'ceiling' and 'floor',
+					// so you can't accidentally flip the camera upside down
 					cameraControlsPitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, cameraControlsPitchObject.rotation.x ) );
 				
 				}
 
 			}
 			
+			//this gives us a vector in the direction that the camera is pointing,
+			// which will be useful for moving the camera 'forward' and shooting lasers in that direction
 			controls.getDirection(cameraRotationVector);
-			
+			//this gives us a rotation quaternion (4D vector),
+			// which will be useful for later rotating the ship's blue radar representation to match the camera's rotation
 			camera.getWorldQuaternion(cameraWorldQuaternion);
 			
 			//if firebutton is NOT pressed, reset it so we can fire again
@@ -643,8 +656,9 @@
 				if (canStartThrustSound) {
 					soundThrusters.play();
 					thrustersSoundShouldStop = false;
-					soundThrusters.fade(0.0, 0.8, 10);
-					canStartThrustSound = false;
+					//contrary to its usual definition, the 'fade' function can also fade up in volume, as in this case, 0.0 to 0.8 volume
+					soundThrusters.fade(0.0, 0.8, 10);//10 is the number of milliseconds in which to complete the transition
+					canStartThrustSound = false;//don't keep triggering the start of the thrusters sound
 					canFadeThrustSound = true;
 				}
 				//get the camera's direction and copy it into thrustVector
@@ -672,9 +686,10 @@
 				
 				if (canFadeThrustSound) {
 					thrustersSoundShouldStop = true;
-					soundThrusters.fade(0.8, 0.0, 10);
+					soundThrusters.fade(0.8, 0.0, 10);//fade out from 0.8 down to 0.0 over 10 milliseconds
 					canFadeThrustSound = false;
 				}
+				//reset the can start sound flag
 				canStartThrustSound = true;
 				
 				if (shipSpeed > 1 && playerAlive) {
@@ -689,7 +704,7 @@
 					shipSpeed = shipVelocity.length();
 				}
 				else if (shipSpeed <= 1 || !playerAlive) 
-					shipSpeed = 0;
+					shipSpeed = 0;//if shipSpeed is below a threshold, just stop it altogether
 			}
 			
 			//flip back and forth so bullets go from white to blue very fast
@@ -711,11 +726,11 @@
 				}
 				//if bullet is alive, update it
 				if (bulletArray[i].alive){
-					//keep updating the bullet ray to equal the bulletSphere's position and direction vectors,
-					//so this ray can be used for ray-boundingSphere collision detection.
+					//keep updating the bulletRay to equal the bulletSphere's position and direction vectors,
+					// so this ray can be used for ray-boundingSphere collision detection.
 					bulletRay.set(bulletArray[i].position, bulletArray[i].direction);
 					
-					bulletArray[i].localToWorld(bulletArray[i].position);
+					bulletArray[i].localToWorld(bulletArray[i].position);//position movement is performed in world space
 					//record the current bullet location
 					oldBulletSpherePos.copy(bulletArray[i].position);
 					//move bullet along bullet direction vector, at the rate of bulletSpeed times the framerate
@@ -723,17 +738,17 @@
 					//now that we have moved it, record the new bullet location
 					newBulletSpherePos.copy(bulletArray[i].position);
 					
-					//rotate the 'billboard' bullet object so that it always face our camera
-					bulletArray[i].worldToLocal(bulletArray[i].position);
+					//rotate the 'billboard' bullet object so that it always faces our camera
+					bulletArray[i].worldToLocal(bulletArray[i].position);//rotation is performed in object's local space
 					bulletArray[i].rotation.copy(radarShip.rotation);
 					spinCounter += 6 * frameTime;
 					if (spinCounter > TWO_PI) spinCounter -= TWO_PI;
 					bulletArray[i].rotateZ(spinCounter);
-					
+					//this is a different color copy of the bullet texture that quickly flips in front and behind of the main bullet billboard
 					bulletTexPlaneCopy[i].position.copy(bulletArray[i].position);
 					bulletTexPlaneCopy[i].rotation.copy(radarShip.rotation);
 					bulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
-					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
+					bulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2);//in front or behind
 					
 					//loop through smallAsteroids and check for collisions with our bullets
 					for (var c = 0; c < numberOfSmallAsteroids; c++) {
@@ -920,11 +935,7 @@
 								bulletArray[i].alive = false;
 								bulletArray[i].visible = false;
 								bulletTexPlaneCopy[i].visible = false;
-								/*	
-								enemyAlive = false;
-								enemySpawnTimer.reset();
-								enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-								*/	
+									
 								initEnemyExplosion(bulletRayCollisionPoint);
 								score += 500;
 								if (score >= extraLifeScore) {
@@ -945,6 +956,7 @@
 				
 			}//end for (var i = 0; i < MAX_BULLETS; i++)
 			
+			//Now do the same checks for enemy's bullets that we did above for the player's bullets
 			//loop through enemyBulletArray, update enemyBullet positions, update collisions
 			for (var i = 0; i < ENEMY_MAX_BULLETS; i++) {
 				
@@ -963,16 +975,11 @@
 				if (enemyBulletArray[i].alive){
 					
 					enemyBulletRay.set(enemyBulletArray[i].position, enemyBulletArray[i].direction);
-					
 					enemyBulletArray[i].localToWorld(enemyBulletArray[i].position);
-					//record the current bullet location
 					oldEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
-					//move bullet along bullet direction vector, at the rate of bulletSpeed times the framerate
 					enemyBulletArray[i].translateOnAxis(enemyBulletArray[i].direction, enemyBulletSpeed * frameTime);
-					//now that we have moved it, record the new bullet location
 					newEnemyBulletSpherePos.copy(enemyBulletArray[i].position);
 					
-					//rotate the 'billboard' bullet object so that it always faces our camera
 					enemyBulletArray[i].worldToLocal(enemyBulletArray[i].position);
 					enemyBulletArray[i].rotation.copy(radarShip.rotation);
 					enemyBulletArray[i].rotateZ(spinCounter);
@@ -980,7 +987,7 @@
 					enemyBulletTexPlaneCopy[i].position.copy(enemyBulletArray[i].position);
 					enemyBulletTexPlaneCopy[i].rotation.copy(radarShip.rotation);
 					enemyBulletTexPlaneCopy[i].rotateZ(Math.abs(Math.random()) * TWO_PI);
-					enemyBulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2); //2
+					enemyBulletTexPlaneCopy[i].translateZ(bulletFlipper ? 2 : -2);
 					
 					//first check if enemy's bullets have hit player
 					//only check if player is alive
@@ -1000,24 +1007,6 @@
 									enemyBulletTexPlaneCopy[i].visible = false;
 									
 									initPlayerExplosion(ship.position);
-									/*
-									playerAlive = false;
-									ship.visible = false;
-									shipSpeed = 0;
-								
-									livesRemaining -= 1;
-									if(livesRemaining < 0){
-										livesRemaining = 0;
-										gameOver = true;
-									}
-									livesRemainingSprites[livesRemaining].visible = false;
-									crossHairsSprite.visible = false;
-									onWindowResize();
-									
-									playingDeathAnimation = true;
-									*/
-								
-							
 							}
 
 						}
@@ -1144,6 +1133,7 @@
 									mediumAsteroids[c*2].visible = true;
 									mediumAsteroids[c*2].position.copy(largeAsteroids[c].position);
 									mediumAsteroids[c*2].translateOnAxis(mediumAsteroids[c*2].direction, mediumAsteroids[c*2].geometry.boundingSphere.radius);
+									
 									radarMedAsteroids[c*2+1].visible = true;
 									mediumAsteroidEdges[c*2+1].visible = true;
 									mediumAsteroids[c*2+1].alive = true;
@@ -1166,7 +1156,6 @@
 			}//end for (var i = 0; i < ENEMY_MAX_BULLETS; i++)
 			
 			
-			//L radius = 75, M radius = 45, S radius = 23, enemy radius = 50
 			//loop through largeAsteroids and check for collisions with Enemy UFO and also with Player
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				//only check for collisions if enemy UFO is alive
@@ -1195,12 +1184,7 @@
 							mediumAsteroids[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
 							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
-							/*		
-							enemyAlive = false;
-							//enemy.visible = false;
-							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-							*/		
+								
 							initEnemyExplosion(enemy.position);
 						}
 					}
@@ -1213,6 +1197,7 @@
 						
 						lgAsteroidDistanceToShip = largeAsteroids[i].position.distanceTo(ship.position);
 						
+						//the following code makes asteroids blink faster as they get closer to your ship
 						if (radarLgAsteroids[i].colorIndex == 0 && lgAsteroidDistanceToShip < 300) {
 							radarLgAsteroids[i].colorIndex = 1;
 							radarLgAsteroids[i].material.color.set('rgb(255,255,0)');
@@ -1269,6 +1254,7 @@
 							
 						}
 						
+						//check if the large asteroid has collided with the player's ship
 						if (lgAsteroidDistanceToShip < 120) {
 							
 							largeAsteroids[i].alive = false;
@@ -1291,10 +1277,6 @@
 							mediumAsteroids[i*2+1].visible = true;
 							mediumAsteroids[i*2+1].position.copy(largeAsteroids[i].position);
 							mediumAsteroids[i*2+1].translateOnAxis(mediumAsteroids[i*2+1].direction, mediumAsteroids[i*2+1].geometry.boundingSphere.radius);
-									
-							playerAlive = false;
-							ship.visible = false;
-							shipSpeed = 0;
 							
 							score += 20;
 							if (score >= extraLifeScore) {
@@ -1304,17 +1286,6 @@
 								soundExtraLife.play();
 							}
 							scoreText.innerHTML = score;
-					
-							/*
-							livesRemaining -= 1;
-							if(livesRemaining < 0){
-								livesRemaining = 0;
-								gameOver = true;
-							}
-							livesRemainingSprites[livesRemaining].visible = false;
-							crossHairsSprite.visible = false;
-							onWindowResize();
-							*/
 							
 							initPlayerExplosion(ship.position);
 						
@@ -1351,12 +1322,7 @@
 							smallAsteroids[i*2+1].visible = true;
 							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
 							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
-							/*		
-							enemyAlive = false;
-							//enemy.visible = false;
-							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-							*/		
+								
 							initEnemyExplosion(enemy.position);
 						}
 					}
@@ -1447,10 +1413,6 @@
 							smallAsteroids[i*2+1].visible = true;
 							smallAsteroids[i*2+1].position.copy(mediumAsteroids[i].position);
 							smallAsteroids[i*2+1].translateOnAxis(smallAsteroids[i*2+1].direction, smallAsteroids[i*2+1].geometry.boundingSphere.radius);
-									
-							playerAlive = false;
-							ship.visible = false;
-							shipSpeed = 0;
 							
 							score += 50;
 							if (score >= extraLifeScore) {
@@ -1460,16 +1422,7 @@
 								soundExtraLife.play();
 							}
 							scoreText.innerHTML = score;
-							/*
-							livesRemaining -= 1;
-							if(livesRemaining < 0){
-								livesRemaining = 0;
-								gameOver = true;
-							}
-							livesRemainingSprites[livesRemaining].visible = false;
-							crossHairsSprite.visible = false;
-							onWindowResize();
-							*/
+							
 							initPlayerExplosion(ship.position);
 						}
 					}
@@ -1491,12 +1444,7 @@
 							smallAsteroidEdges[i].visible = false;
 							
 							initExplosion(smallAsteroids[i].position, 0);
-							/*
-							enemyAlive = false;
-							//enemy.visible = false;
-							enemySpawnTimer.reset();
-							enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-							*/
+							
 							initEnemyExplosion(enemy.position);
 							
 							smallAsteroidsRemaining -= 1;
@@ -1580,10 +1528,6 @@
 							
 							initExplosion(smallAsteroids[i].position, 0);
 							smallAsteroidsRemaining -= 1;
-
-							playerAlive = false;
-							ship.visible = false;
-							shipSpeed = 0;
 							
 							score += 100;
 							if (score >= extraLifeScore) {
@@ -1593,16 +1537,7 @@
 								soundExtraLife.play();
 							}
 							scoreText.innerHTML = score;
-							/*
-							livesRemaining -= 1;
-							if(livesRemaining < 0){
-								livesRemaining = 0;
-								gameOver = true;
-							}
-							livesRemainingSprites[livesRemaining].visible = false;
-							crossHairsSprite.visible = false;
-							onWindowResize();
-							*/
+							
 							initPlayerExplosion(ship.position);
 						}
 					}
@@ -1613,12 +1548,7 @@
 			//only check if both ships are alive
 			if (enemyAlive && playerAlive) {
 				if ( enemy.position.distanceTo(ship.position) < 100 ) {
-					/*
-					enemyAlive = false;
-					//enemy.visible = false;
-					enemySpawnTimer.reset();
-					enemySpawnTimer.setAlarm( Math.random() * 5 + 10 );
-					*/
+					
 					initEnemyExplosion(enemy.position);
 					
 					score += 500;
@@ -1629,16 +1559,7 @@
 						soundExtraLife.play();
 					}
 					scoreText.innerHTML = score;
-					/*
-					livesRemaining -= 1;
-					if(livesRemaining < 0){
-						livesRemaining = 0;
-						gameOver = true;
-					}
-					livesRemainingSprites[livesRemaining].visible = false;
-					crossHairsSprite.visible = false;
-					onWindowResize();
-					*/
+					
 					initPlayerExplosion(ship.position);
 				}
 			}
@@ -1650,7 +1571,7 @@
 					//loop through other largeAsteroids
 					for (var iL = 0; iL < numberOfLargeAsteroids; iL++) {
 						//if other asteroid is not alive, or if we are checking against self, 
-						//then skip and continue to next loop
+						//then skip and continue to next loop iteration
 						if (!largeAsteroids[iL].alive || i==iL || largeAsteroids[iL].hasCollided) 
 							continue;
 						stepSimulation(largeAsteroids[i],largeAsteroids[iL]);
@@ -1713,15 +1634,15 @@
 				}
 			}
 			
-			//reset largeAsteroids[i].hasCollided flag back to 'false' for next animation frame
+			//reset all largeAsteroids[i].hasCollided flags back to 'false' for next animation frame
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {
 				largeAsteroids[i].hasCollided = false;
 			}
-			//reset mediumAsteroids[i].hasCollided flag back to 'false' for next animation frame
+			//reset all mediumAsteroids[i].hasCollided flags back to 'false' for next animation frame
 			for (var i = 0; i < numberOfMediumAsteroids; i++) {
 				mediumAsteroids[i].hasCollided = false;
 			}
-			//reset smallAsteroids[i].hasCollided flag back to 'false' for next animation frame
+			//reset all smallAsteroids[i].hasCollided flags back to 'false' for next animation frame
 			for (var i = 0; i < numberOfSmallAsteroids; i++) {
 				smallAsteroids[i].hasCollided = false;
 			}
@@ -1761,36 +1682,39 @@
 				playingWarpAnimation = true;
 				soundShipWarp.play();
 			}
-			//set camera position from ship position
+			// if not doing a cutscene, set camera position from ship position
 			if (!playingBeginLevelIntro && !playingGameOverAnimation) {
 				cameraControlsObject.position.copy(ship.position);
 					
 			}
 			//set camera2 (radar cam) position from ship position
-			if (!playingGameOverAnimation) {	
+			if (!playingGameOverAnimation) {
+				//rotate the radar camera so it is looking where the main camera is
 				camera2.rotation.setFromQuaternion(cameraWorldQuaternion);
 				camera2.position.copy(ship.position);
-				camera2.translateZ(500);
-				camera2.translateY(100);
+				camera2.translateZ(500);//this moves the radar camera back (3rd-person perspective), so we can see the back of the ship
+				camera2.translateY(100);//this moves the radar camera a little higher so we can also see the top of the ship
 			}
 			
-			//rotate the ship inside the radar mini-cam so it is 
-			// looking where the main camera is
+			//rotate the ship inside the radar mini-cam so it is looking where the main camera is
 			radarShip.rotation.setFromQuaternion(cameraWorldQuaternion);
 			shipEdges.rotation.copy(radarShip.rotation);
 			radarShip.position.copy(ship.position);
 			shipEdges.position.copy(ship.position);
-			
+			//the skybox doesn't move relative to the player - this makes the background seem very far away
 			skyBox.position.copy(ship.position);
-			
+			//same for the planet
 			planet.position.copy(ship.position).addScalar(-900);
-			
+			//same for the sun billboard
 			sun.position.copy(ship.position);
 			sun.position.x -= 700;
 			sun.position.y += 700;
 			sun.position.z += 700;
 			sunUniforms.time.value = performance.now() * 0.001;
 			
+			//this orients the 'listener' to match the direction that the player's camera is facing
+			// WebAudio API's 3D Panner node requires an 'up' vector for the listener also,
+			// and those can be obtained directly from the camera's matrix elements [4],[5], and [6]
 			Howler.orientation(cameraRotationVector.x, cameraRotationVector.y, cameraRotationVector.z,
 				cameraControlsObject.matrix.elements[4], cameraControlsObject.matrix.elements[5], cameraControlsObject.matrix.elements[6] );
 			
@@ -1800,7 +1724,7 @@
 			if (!enemyAlive) {
 				// count timer to a random number of seconds
 				enemySpawnTimer.run(frameTime);
-				// if the target alarm time has been reached,
+				// if the target alarm time has been reached, spawn the UFO
 				if (enemySpawnTimer.alarmSounding) {
 					
 					enemyAlive = true;
@@ -1810,6 +1734,7 @@
 					enemy.visible = true;
 					radarEnemy.visible = true;
 					enemyEdges.visible = true;
+					//randomly pick which wall to spawn from
 					randomPick = Math.floor(Math.random() * 6 + 1);
 					if (randomPick == 1) {
 						enemy.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, -399);
@@ -1859,29 +1784,30 @@
 				enemyChangeDirectionTimer.run(frameTime);
 				
 				if (enemyChangeDirectionTimer.alarmSounding) {
-					
+					//find out which wall it came from, then move it towards the opposite wall
 					if (whichSide == BACK_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z + 50 + Math.random() * 400);//last
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z + 50 + Math.random() * 400);
 					}
 					else if (whichSide == FRONT_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z - 50 - Math.random() * 400);//-last
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, Math.random() * 800 - 400, enemy.position.z - 50 - Math.random() * 400);
 					}
 					else if (whichSide == LEFT_WALL) {
-						enemyMoveTargetLocation.set(enemy.position.x + 50 + Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);//first
+						enemyMoveTargetLocation.set(enemy.position.x + 50 + Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
 					}
 					else if (whichSide == RIGHT_WALL) {
-						enemyMoveTargetLocation.set(enemy.position.x - 50 - Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);//-first
+						enemyMoveTargetLocation.set(enemy.position.x - 50 - Math.random() * 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
 					}
 					else if (whichSide == TOP_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y - 50 - Math.random() * 400, Math.random() * 800 - 400);//-middle
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y - 50 - Math.random() * 400, Math.random() * 800 - 400);
 					}
 					else if (whichSide == BOTTOM_WALL) {
-						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y + 50 + Math.random() * 400, Math.random() * 800 - 400);//middle
+						enemyMoveTargetLocation.set(Math.random() * 800 - 400, enemy.position.y + 50 + Math.random() * 400, Math.random() * 800 - 400);
 					}
 					
 					enemyDirection.subVectors(enemyMoveTargetLocation, enemy.position);
 					enemyDirection.normalize();
 					enemyChangeDirectionTimer.reset();
+					//as levels progress, the UFO changes direction more frequently, making it a harder target to hit
 					enemyChangeDirectionTimer.setAlarm( Math.random() * (3 / level) + 0.5 );
 					
 				}
@@ -1892,7 +1818,7 @@
 					
 					enemyShootBullet();
 					enemyShootTimer.reset();
-					//as the levels progress, the resulting alarm number below will get smaller and smaller, 
+					//as the levels progress, the randomly-chosen alarm number below will get smaller and smaller, 
 					//resulting in faster rapid-fire from the enemy
 					enemyShootTimer.setAlarm( Math.random() * (2 / level) + 0.5 );
 					
@@ -1902,16 +1828,20 @@
 				enemy.translateOnAxis(enemyDirection, enemySpeed * frameTime);
 				
 				enemy.worldToLocal(enemy.position);
-				enemy.rotateY(2 * frameTime);
+				enemy.rotateY(2 * frameTime);//this spins the saucer
 				
 				//copy Enemy's position to the radar screen
 				radarEnemy.position.copy(enemy.position);
 				enemyEdges.position.copy(enemy.position);
 				
+				//this gets the direction that the UFO sound is coming from
+				// the '0.05' is the distance and how loud it will come out on the speakers, higher number = farther away and softer
+				// smaller number = closer and louder.  I set the distance to a smaller number so it can be heard most of the time
 				soundUfoWarble.pos((enemy.position.x - ship.position.x) * 0.05, 
 						   (enemy.position.y - ship.position.y) * 0.05, 
 						   (enemy.position.z - ship.position.z) * 0.05);
 				
+				//if the enemy leaves the arena, disable it temporarily
 				if (enemy.position.x > 420 || enemy.position.x < -420 || 
 				   	enemy.position.y > 420 || enemy.position.y < -420 ||
 				    	enemy.position.z > 420 || enemy.position.z < -420 ) {
@@ -1928,13 +1858,14 @@
 				
 			}// end if (enemyAlive && !playingBeginLevelIntro)
 			
+			// The begin level cutscene
 			if (playingBeginLevelIntro) {
 				
 				if (canPlayBeginLevelSound) {
 					soundBeginLevel.play();
 					canPlayBeginLevelSound = false;
 				}
-				
+				// camera swoops in towards the player's ship
 				cutsceneCameraDistance -= frameTime * 200;
 				if (cutsceneCameraDistance < 0) {
 					cutsceneCameraDistance = 0;
@@ -1943,7 +1874,7 @@
 				cutsceneCameraAngle -= frameTime * 1.5;
 				if (cutsceneCameraAngle <= 0) 
 					cutsceneCameraAngle += TWO_PI;
-
+				//the following code produces a circular camera path around the ship
 				camera.position.x = ship.position.x + Math.sin(cutsceneCameraAngle) * cutsceneCameraDistance;
 				camera.position.y = ship.position.y + (cutsceneCameraDistance * 0.5);
 				camera.position.z = ship.position.z + Math.cos(cutsceneCameraAngle) * cutsceneCameraDistance;
@@ -1966,9 +1897,9 @@
 					camera.position.set(0,0,0);
 					camera.rotation.set(0,0,0);
 					cameraControlsPitchObject.add(camera);
-					//just in case deathAnimation is playing because we crashed
-					//into the last small asteroid from the previous level to advance
-					//to the next level
+					//just in case deathAnimation is playing because we crashed into the last
+					// small asteroid from the previous level in order to advance to the next level.
+					// A rare occurence, but one that must be handled regardless
 					if (playingDeathAnimation) {
 						ship.visible = true;
 						crossHairsSprite.visible = true;
@@ -1981,10 +1912,11 @@
 
 				}
 			}
-				
+			
+			// the player 'dies', a camera-spinning death cutscene is played
 			if (playingDeathAnimation && !playingBeginLevelIntro) {
 				
-				cutsceneCameraDistance += frameTime * 100;
+				cutsceneCameraDistance += frameTime * 100;//camera backs away from where the player crashed
 				cutsceneCameraAngle += frameTime;
 				if (cutsceneCameraAngle >= TWO_PI) 
 					cutsceneCameraAngle -= TWO_PI;
@@ -2035,10 +1967,12 @@
 				
 			}
 			
+			// when the game is over, the camera is positioned outside the arena so the whole game world can be observed
 			if (playingGameOverAnimation) {
-				
+				//give the player a couple of seconds to read the 'Game Over' banner and view the whole scene from afar
 				gameOverTimer.run(frameTime);
 				
+				//when time is up, reset all the game-state flags
 				if(gameOverTimer.alarmSounding){
 					playingGameOverAnimation = false;
 					gameOverTimer.reset();
@@ -2059,17 +1993,18 @@
 				}
 				
 			}
-			
+			//this camera FOV animation is played when the player's ship crosses an arena boundary 
 			if (playingWarpAnimation) {
 				
-				camera.fov += fovIncrementAmount * frameTime;
-				camera.aspect -= aspectIncrementAmount * frameTime;
-				
+				camera.fov += fovIncrementAmount * frameTime;// this gives tunnel vision
+				camera.aspect -= aspectIncrementAmount * frameTime;// this also stretches the view
+				//when the FOV reaches a certain size, flip it and animate backwards
 				if(camera.fov > 179){
 					camera.fov = 179;
 					fovIncrementAmount = -fovIncrementAmount;
 					aspectIncrementAmount = -aspectIncrementAmount;
 				}
+				//when the FOV is back to normal, terminate the warp animation
 				if(camera.fov < 55){
 					camera.fov = 55;
 					camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
@@ -2077,7 +2012,7 @@
 					aspectIncrementAmount = -aspectIncrementAmount;
 					playingWarpAnimation = false;
 				}
-				
+				//the following is necessary when changing camera properties like aspect and FOV
 				camera.updateProjectionMatrix();
 				
 			}
@@ -2094,6 +2029,7 @@
 					explosionBillboard.scale.x = 1000;
 				if(explosionBillboard.scale.y > 1000)
 					explosionBillboard.scale.y = 1000;
+				//this makes the explosion shader texture fade away
 				explosionBillboardUniforms.explosionTransparency.value -= 2.0 * frameTime;
 				
 				//update explosionSphere
@@ -2102,8 +2038,9 @@
 				explosionSphere.material.opacity -= 1.5 * frameTime;
 				
 				//only need to update 1 of the pieces' material, in order to change them all, 
-				//because they all share same material
+				//because they all share the same material
 				explosionPieces[0].material.opacity -= 0.8 * frameTime;
+				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {
 					explosionPieces[i].translateOnAxis(explosionPieces[i].direction, explosionPieces[i].speed * frameTime);
 				}
@@ -2114,14 +2051,7 @@
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						explosionPieces[i].visible = false;
 					}
-					/*
-					explosionScale = 1.0;
-					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
-					explosionSphere.visible = false;
-					explosionSphere.material.opacity = 0.3;
 					
-					explosionPieces[0].material.opacity = 1.0;
-					*/
 					isExploding = false;
 				}
 				
@@ -2147,6 +2077,7 @@
 				//only need to update 1 of the pieces' material, in order to change them all, 
 				//because they all share same material
 				enemyExplosionPieces[0].material.opacity -= 0.8 * frameTime;
+				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {
 					enemyExplosionPieces[i].translateOnAxis(enemyExplosionPieces[i].direction, enemyExplosionPieces[i].speed * frameTime);
 				}
@@ -2154,17 +2085,11 @@
 				enemyExplosionTimer.run(frameTime);
 				
 				if (enemyExplosionTimer.alarmSounding) {
+					
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						enemyExplosionPieces[i].visible = false;
 					}
-					/*
-					explosionScale = 1.0;
-					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
-					explosionSphere.visible = false;
-					explosionSphere.material.opacity = 0.3;
 					
-					enemyExplosionPieces[0].material.opacity = 1.0;
-					*/
 					enemyIsExploding = false;
 				}
 				
@@ -2188,6 +2113,7 @@
 				explosionSphere.material.opacity -= 1.5 * frameTime;
 				
 				playerExplosionPieces[0].material.opacity -= 0.8 * frameTime;
+				
 				for (var i = 0; i < numberOfExplosionPieces; i++) {
 					playerExplosionPieces[i].translateOnAxis(playerExplosionPieces[i].direction, playerExplosionPieces[i].speed * frameTime);
 				}
@@ -2195,17 +2121,11 @@
 				playerExplosionTimer.run(frameTime);
 				
 				if (playerExplosionTimer.alarmSounding) {
+					
 					for (var i = 0; i < numberOfExplosionPieces; i++) {
 						playerExplosionPieces[i].visible = false;
 					}
-					/*
-					explosionScale = 1.0;
-					explosionSphere.scale.set(explosionScale, explosionScale, explosionScale);
-					explosionSphere.visible = false;
-					explosionSphere.material.opacity = 0.3;
 					
-					playerExplosionPieces[0].material.opacity = 1.0;
-					*/
 					playerIsExploding = false;
 				}
 				
@@ -2243,6 +2163,7 @@
 						//now rotate the asteroid on its initial randomly-picked axis, by the randomly-picked rotation amount
 						largeAsteroids[i].rotateOnAxis(largeAsteroids[i].rotationAxis, largeAsteroids[i].rotationAmount * frameTime);
 					
+						//make the asteroids' radar representations match the originals
 						radarLgAsteroids[i].position.copy(largeAsteroids[i].position);
 						largeAsteroidEdges[i].position.copy(radarLgAsteroids[i].position);
 						
@@ -2733,13 +2654,6 @@
 			//reset scissor test (disable it)
 			renderer.enableScissorTest( false );
 			
-			//helpful real-time debug text, so we can monitor game variables
-			/*
-			debugText1.innerHTML = blinkCounterLrg;
-			debugText2.innerHTML = "collisionPointY: " + bulletRayCollisionPoint.y.toFixed(1);
-			debugText3.innerHTML = "collisionPointZ: " + bulletRayCollisionPoint.z.toFixed(1);	
-			debugText4.innerHTML = "randMaterialIndex: " + randMaterialIndex;
-			*/
 
 		} //end function animate()
 		
@@ -2747,14 +2661,14 @@
 		function placeShip() {
 			
 			placingShip = true;
-			
+			//the following loop waits until a suitable position has been found to relocate the player's ship
 			while ( placingShip ) {
 				
 				placingShip = false;
-				if (level == 1)
+				if (level == 1)//if we're on the 1st level, keep the ship in the positive-Z area so the player can see more of the entire arena
 					ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 300 + 50);
 				else ship.position.set(Math.random() * 700 - 350, Math.random() * 700 - 350, Math.random() * 700 - 350);
-				
+				//check for ship being too close to a live asteroid or the UFO - if it is, flag placingShip=true to pick again
 				for (var i = 0; i < numberOfLargeAsteroids; i++) {
 					if (largeAsteroids[i].alive && ship.position.distanceTo(largeAsteroids[i].position) < 200)
 						placingShip = true;
@@ -2771,18 +2685,23 @@
 						placingShip = true;
 				
 			}
-			
+			//reset ship velocity
 			shipSpeed = 0;
 			thrustVector.set(0,0,0);
 			frictionVector.set(0,0,0);
 			shipVelocity.set(0,0,0);
 			
-			//reset explosions so they don't hang over stuck mid-animation 
-			// from previous level / previous life
+			//reset explosions so they don't hang over stuck mid-animation from previous level / previous life
 			isExploding = false;
 			enemyIsExploding = false;
 			playerIsExploding = false;
 			explosionSphere.visible = false;
+			//turn off all explosion pieces
+			for (var i = 0; i < numberOfExplosionPieces; i++) {
+				explosionPieces[i].visible = false;
+				playerExplosionPieces[i].visible = false;
+				enemyExplosionPieces[i].visible = false;
+			}
 			
 		}
 		
@@ -2794,15 +2713,13 @@
 			bulletTexPlaneCopy[bulletCounter].visible = true;
 			//spawn bullet at player's location
 			bulletArray[bulletCounter].position.copy(ship.position);	
-			//reset the bullet direction vector to unit length of 1 to avoid accumulation
-			bulletArray[bulletCounter].direction.set(0, 0, 1);
-			//get our camera's direction and copy it into current bullet's direction
+			//the bullet's direction is set to match the camera's facing direction
 			bulletArray[bulletCounter].direction.copy(cameraRotationVector);
-			//now the bullet is pointing in the right direction, move it out away from the ship a little,
+			//now that the bullet is pointing in the right direction, move it out away from the ship a little,
 			//so it doesn't start right inside the ship
 			bulletArray[bulletCounter].direction.multiplyScalar(30);
 			bulletArray[bulletCounter].position.add(bulletArray[bulletCounter].direction);
-			//bulletArray[bulletCounter].direction.divideScalar(30);
+			//reset direction vector to unit length
 			bulletArray[bulletCounter].direction.normalize();
 			
 			//get the white 'flipboard' texture plane's position from the newly spawned Bullet
@@ -2813,7 +2730,7 @@
 			//bulletArray[] index size (bulletCounter) can't exceed MAX_BULLETS
 			if(bulletCounter >= MAX_BULLETS)
 				bulletCounter = 0;
-			
+			//this makes the bullet always start out as the same color
 			bulletFlipper = true;
 			
 			soundShipShoot.play();
@@ -2829,14 +2746,13 @@
 			//spawn enemyBullet at enemy's location
 			enemyBulletArray[enemyBulletCounter].position.copy(enemy.position);
 			//enemy picks a random direction to fire in
-			//enemyBulletArray[enemyBulletCounter].direction.set(0, 0, 1);
 			enemyBulletArray[enemyBulletCounter].direction.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 			enemyBulletArray[enemyBulletCounter].direction.normalize();
 			//now the enemyBullet is pointing in the right direction, move it out away from the enemy a little,
 			//so it doesn't start right inside the enemy's saucer
 			enemyBulletArray[enemyBulletCounter].direction.multiplyScalar(15);
 			enemyBulletArray[enemyBulletCounter].position.add(enemyBulletArray[enemyBulletCounter].direction);
-			//enemyBulletArray[enemyBulletCounter].direction.divideScalar(15);
+			//reset the direction vector to unit length
 			enemyBulletArray[enemyBulletCounter].direction.normalize();
 			
 			//get the white 'flipboard' texture plane's position from the newly spawned enemyBullet
@@ -2847,7 +2763,7 @@
 			//enemyBulletArray[] index size (enemyBulletCounter) can't exceed ENEMY_MAX_BULLETS
 			if(enemyBulletCounter >= ENEMY_MAX_BULLETS)
 				enemyBulletCounter = 0;
-			
+			//get the 3D position of the UFO bullets relative to the player's ship
 			soundUfoShoot.pos((enemy.position.x - ship.position.x) * 0.05, 
 					   (enemy.position.y - ship.position.y) * 0.05, 
 					   (enemy.position.z - ship.position.z) * 0.05);
@@ -2984,8 +2900,10 @@
 			livesRemainingSprites[livesRemaining].visible = false;
 			
 			soundShipExplode.play();
+			//remove our camera as the child of the camera controls rotational pitch object,
+			//so that we can directly manipulate its movements and rotation during the short death cutscene
 			cameraControlsPitchObject.remove(camera);
-			
+			//this updates the livesRemaining icons/sprites at the upper right corner of the HUD
 			onWindowResize();
 		}
 		
@@ -2996,18 +2914,19 @@
 		//is located at:  http://examples.oreilly.com/9780596000066/
 		function stepSimulation( body1, body2 ) {
 			
-			fTime = frameTime;
-			tryAgain = true;
-			check = 0;
-			combinedRadii = body1.geometry.boundingSphere.radius + body2.geometry.boundingSphere.radius;
+			fTime = frameTime;//make a copy of frameTime, because the copy fTime will be altered during physics calculations
+			tryAgain = true;//flag used for backing up the simulation step time to find the right moment of contact
+			check = 0;//this number tells us what the collision result is
+			combinedRadii = body1.geometry.boundingSphere.radius + body2.geometry.boundingSphere.radius;//min. separating distance
 			
 			while ( tryAgain && (fTime > 0.00001) ) {
 				
 				tryAgain = false;
-				
+				//these are references to the original positions of the 2 bodies in question
 				asteroidCopy1.position.copy(body1.position);
 				asteroidCopy2.position.copy(body2.position);
-				
+				//if tryAgain is true, fTime was halved and we start from the original body1/body2 positions and 
+				//step forward again - but this time only half the distance
 				asteroidCopy1.translateOnAxis(body1.direction, body1.speed * fTime);
 				asteroidCopy2.translateOnAxis(body2.direction, body2.speed * fTime);
 				
@@ -3024,32 +2943,34 @@
 				relativeDotNormal = relativeVelocity.dot(collisionNormal);
 				
 				if ( Math.abs(separation) <= 1 && relativeDotNormal < 0.0 ) {
-					check = 1;//collision
+					check = 1;//objects have collided and are not penetrating - time to apply impulse next
 				} else if (separation < -1) {
-					check = -1;//penetrating
+					check = -1;//penetrating - need to step back, halve the timeStep, and run simulation again
 				} else {
-					check = 0;//no collision
-					//howManyTries = 0;
+					check = 0;//no collision - do nothing
+					//howManyTries = 0; //this was for debugging physics code
 				}
 	
-				if (check == -1) { //penetrating
+				if (check == -1) { //objects are still penetrating
 					
-					tryAgain = true;
-					fTime /= 2;
-					//howManyTries += 1;
+					tryAgain = true;//run the simulation again,
+					fTime /= 2;//but this time with the timeStep cut in half
+					//howManyTries += 1; //this was for debugging physics code
 				
-				} else if (check == 1) { //collision
+				} else if (check == 1) { //objects have collided and are not penetrating - time to apply impulse
 					
-					//debugText3.innerHTML = "howManyTries: " + Math.floor(howManyTries);
-					//apply impulse
+					//calculate and apply impulse to both bodies after collision to send them on their new paths
 					combinedMass = body1.mass + body2.mass;
 					impulseAmount = -0.4 * ( relativeVelocity.dot(collisionNormal) / (collisionNormal.dot(collisionNormal) * (1/combinedMass) ) );
 
 					collisionNormal.multiplyScalar(impulseAmount);
-					Vcn1.copy(collisionNormal); Vcn1.divideScalar(body1.mass);
-					Vcn2.copy(collisionNormal); Vcn2.divideScalar(body2.mass);
+					Vcn1.copy(collisionNormal); 
+					Vcn1.divideScalar(body1.mass);
+					Vcn2.copy(collisionNormal); 
+					Vcn2.divideScalar(body2.mass);
 					velocity1.add(Vcn1);
 					velocity2.sub(Vcn2);
+					
 					body1.speed = velocity1.length();
 					velocity1.normalize();
 					body1.direction.copy(velocity1);
@@ -3059,18 +2980,21 @@
 					
 					body1.hasCollided = true;
 					body2.hasCollided = true;
-					//numOfAsteroidCollisions += 1;
-					//debugText2.innerHTML = "numOfAsteroidCollisions: " + Math.floor(numOfAsteroidCollisions);
 					
-					soundAsteroidCollide.pos((body1.position.x - ship.position.x) * 0.05, (body1.position.y - ship.position.y) * 0.05, (body1.position.z - ship.position.z) * 0.05);
+					soundAsteroidCollide.pos((body1.position.x - ship.position.x) * 0.05, 
+								 (body1.position.y - ship.position.y) * 0.05, 
+								 (body1.position.z - ship.position.z) * 0.05);
 					soundAsteroidCollide.play();
+				
 				}//end else if (check == 1) { //collision
 				
 			}//end while ( tryAgain && fTime > 0.01 )
 				
 		}//end function stepSimulation( body1, body2 )
 		
-		
+		//This function is called at the beginning of every new level.
+		// Objects and geometries are removed and materials are disposed. Shortly afterwards in the initLevel() function, 
+		// asteroids, explosion pieces, and materials are created from scratch so each level is somewhat unique
 		function cleanup() {
 			
 			for (var i = 0; i < numberOfLargeAsteroids; i++) {	
