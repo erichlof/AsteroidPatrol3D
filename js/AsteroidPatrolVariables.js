@@ -16,11 +16,10 @@ scene.add(camera);
 var radarScene = new THREE.Scene();
 var camera2 = new THREE.PerspectiveCamera(70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000);
 radarScene.add(camera2);
-var cameraWorldQuaternion = new THREE.Quaternion();
 
 var clock = new THREE.Clock();
-
 var keyboard = new THREEx.KeyboardState();
+
 //are we in portrait mobile view? if so, move the buttons over to the left a little..
 // if not and we are in landscape mode, they can safely be moved farther right without running into each other
 var b2PercentLeft = SCREEN_WIDTH < SCREEN_HEIGHT ? 50 : 65;
@@ -38,15 +37,21 @@ var PI_2 = Math.PI / 2;
 var controls = new THREEx.FirstPersonControls(camera);
 scene.add( controls.getObject() );
 var mouseControl = false;
+//if not on a mobile device, enable mouse control 
 if ( !('createTouch' in document) ) {
 	mouseControl = true;
 }
 
+//the following variables will be used to calculate rotations and directions from the camera, 
+// such as when shooting, which direction do we shoot in?
 var cameraRotationVector = new THREE.Vector3();
+var cameraWorldQuaternion = new THREE.Quaternion();
 var cameraControlsObject = controls.getObject();
 var cameraControlsYawObject = controls.getYawObject();
 var cameraControlsPitchObject = controls.getPitchObject();
-cameraControlsPitchObject.remove(camera);//we will add it back, after game intro is finished
+// for the game's cutscenes, we remove the camera (child of controls), so we can animate it
+// freely without user interaction. When the cutscene ends, we will re-attach it as a child of controls
+cameraControlsPitchObject.remove(camera);
 
 var renderer = new THREE.WebGLRenderer({
 	antialias: true
@@ -62,6 +67,7 @@ document.getElementById("container").addEventListener("click", function() {
 	this.requestPointerLock();
 	controls.enabled = true;
 }, false);
+
 document.getElementById("container").addEventListener("mousedown", function() {
 	if (playerAlive) shootBullet();
 }, false);
@@ -96,6 +102,7 @@ function onWindowResize() {
 	document.getElementById("level").style.fontSize = fontAspect + "px";
 	document.getElementById("gameover").style.fontSize = fontAspect + "px";
 	
+	// the following allows the billboards to remain in proportion
 	sunUniforms.resolution.value.x = SCREEN_WIDTH;
 	sunUniforms.resolution.value.y = SCREEN_HEIGHT;
 	explosionBillboardUniforms.resolution.value.x = SCREEN_WIDTH;
@@ -118,7 +125,7 @@ function onWindowResize() {
 		livesRemainingSprites[i].position.x = livesRemainingPositionX[i] * camera.aspect;
 		livesRemainingSprites[i].position.y = livesRemainingPositionY;
 		livesRemainingSprites[i].position.z = -2.0;
-		livesRemainingSpriteScale = SCREEN_WIDTH * 0.0005;//0.0001
+		livesRemainingSpriteScale = SCREEN_WIDTH * 0.0005;
 		if (livesRemainingSpriteScale > 0.12) livesRemainingSpriteScale = 0.12;
 		livesRemainingSprites[i].scale.set(livesRemainingSpriteScale, livesRemainingSpriteScale, livesRemainingSpriteScale);
 	}
@@ -168,7 +175,7 @@ for (var i = 0; i < 1500; i ++ ) {
 	if(Math.abs(vertex.x) < 1000 && Math.abs(vertex.y) < 1000 && Math.abs(vertex.z) < 1000)
 		continue;
 	
-	else starsGeometry.vertices.push( vertex ); //else
+	else starsGeometry.vertices.push( vertex );
 
 }
 
@@ -207,8 +214,8 @@ var planetMaterial = new THREE.MeshBasicMaterial({
 });
 var planetGeometry = new THREE.PlaneBufferGeometry(800, 800);
 var planet = new THREE.Mesh(planetGeometry, planetMaterial);
-planet.position.copy(camera.position).addScalar(-900);
-planet.lookAt(camera.position);
+planet.position.copy(scene.position).addScalar(-900);
+planet.lookAt(scene.position);
 scene.add(planet);
 
 // Sun
@@ -247,7 +254,7 @@ scene.add(explosionBillboard);
 
 var arenaFullSize = 800;
 var arenaHalfSize = Math.floor(arenaFullSize / 2);
-var arenaEdgeWarningSize = 100;//150
+var arenaEdgeWarningSize = 100;
 var shipEdgeWarningSize = 300;
 
 var gridLineSpacing = 50;
@@ -291,6 +298,10 @@ var pyramidLeftGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
 var pyramidRightGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
 var pyramidDownGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
 var pyramidUpGeometry = new THREE.CylinderGeometry(0,8,24,3,1,false);
+
+//the following section changes the actual geometry of the generator pyramids so that
+// we can just make some simple rotations and they will all line up with the arena walls
+
 //facing towards us
 pyramidTowardsGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2) );
 pyramidTowardsGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI ) );
@@ -1072,6 +1083,7 @@ var soundExtraLife = new Howl({
 
 // when all sounds have loaded, the game animation loop is started
 function startGame () {
+	levelText.innerHTML = "Level 1";
 	animate();
 }
 
@@ -1080,12 +1092,6 @@ function startGame () {
 var scoreText = document.getElementById("score");
 var levelText = document.getElementById("level");
 var gameOverText = document.getElementById("gameover");
-/*
-var debugText1 = document.getElementById("debug1");
-var debugText2 = document.getElementById("debug2");
-var debugText3 = document.getElementById("debug3");
-var debugText4 = document.getElementById("debug4");
-*/
 
 // Misc. Elements
 
