@@ -22,9 +22,10 @@ Press Orange joystick-button1 to Fire <br>
 Press Purple joystick-button2 to apply Thrusters <br>
 
 
-To Do
------
-* add code comments where helpful
+January 29, 2015 Progress Note
+--------------------------------
+
+All TODOs are done!  I cleaned up and compressed the source code, as well as added some comments where I thought they might be helpful.  I may revisit this game from time to time in the future if there is a change to one of the game's dependency libraries or if Chrome/Firefox browser support changes.  But other than that, I'm happy with the outcome.  It has been a great learning experience putting all the pieces of this game together.  What excites me most is that I wrote this source code once and the game should work on almost all devices that have a modern browser and WebGL support (the number of which is climbing every day!): Desktop, Tablet, Smartphones, maybe even consoles in the future, etc...  As for the immediate future, I am already thinking about what the next game will be. When I have something concrete, I will start a new repository here on GitHub and link to it from this page.  In the meantime, please enjoy this game on all your devices and I hope you gain something from looking at the source code.  :)
 
 
 January 20, 2015 Progress Note
@@ -67,9 +68,3 @@ October 17, 2014 Progress Note
 --------------------------------
 
 Now when asteroids are shot there is a cool explosion effect!  Also, added enemy UFO saucer with a little green alien inside. :) I created the saucer and alien from basic THREE.js primitives such as spheres and cylinders.  Then I sized and scaled these basic shapes to make the end result look right.  Procedurally generating the objects in this way means a faster load time for the game's web page, since the end user doesn't have to download any game models.  For the next update I will give the enemy some simple AI, enough to shoot and navigate a random path through the asteroid arena.  The game will have to test for collisions between the UFO and asteroids/player ship (if he slips up) and the UFO's bullets and asteroids/player (if he aims well enough).
-
-
-October 7, 2014 Progress Note
---------------------------------
-
-Collision detection and collision response is now working for all sizes of asteroids.  They each have their own bounding spheres and masses so when they collide, it looks pretty realistic!  I put a link to the original game physics book in the source code comments of the html file. Next TODO is to add the UFO flying saucer that can shoot randomly (like the original Asteroids arcade).  Must implement simple path following and detect collisions between the alien craft and asteroids/player and alien bullets and asteroids/player.  Also, I am trying to avoid making players download 3d models, so I must figure out how to procedurally/geometrically generate the alien saucer. Should be fun!
