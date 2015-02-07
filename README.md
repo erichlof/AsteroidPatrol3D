@@ -8,6 +8,7 @@ A First-Person 3D version of the classic game Asteroids <br>
 
 <h5>Be sure to check out my other 3D games!</h5>
 * [SpacePong3D](https://github.com/erichlof/SpacePong3D)
+* [3dLightCycles](https://github.com/erichlof/3dLightCycles)
 
 
 <h4>Quick instructions for AsteroidPatrol3D:</h4>
