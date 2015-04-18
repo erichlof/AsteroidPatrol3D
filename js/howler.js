@@ -497,9 +497,9 @@
 
           // Play the sound using the supported method.
           if (typeof node.bufferSource.start === 'undefined') {
-            node.bufferSource.noteGrainOn(0, seek, duration);
+            sound._loop ? node.bufferSource.noteGrainOn(0, seek, 2592000) : node.bufferSource.noteGrainOn(0, seek, duration);
           } else {
-            node.bufferSource.start(0, seek, duration);
+            sound._loop ? node.bufferSource.start(0, seek, 2592000) : node.bufferSource.start(0, seek, duration);
           }
 
           // Start a new timer if none is present.
@@ -1720,18 +1720,19 @@
     if (!self.ctx || !self.ctx.listener) {
       return self;
     }
-
+	  
     // Set the defaults for optional 'y' & 'z'.
     var or = self._orientation;
+    
     y = (typeof y !== 'number') ? or[1] : y;
     z = (typeof z !== 'number') ? or[2] : z;
     xUp = (typeof xUp !== 'number') ? or[3] : xUp;
     yUp = (typeof yUp !== 'number') ? or[4] : yUp;
     zUp = (typeof zUp !== 'number') ? or[5] : zUp;
-
+	  
     if (typeof x === 'number') {
       self._orientation = [x, y, z, xUp, yUp, zUp];
-      self.ctx.listener.setOrientation(x, y, z, xUp, yUp, zUp);
+      self.ctx.listener.setOrientation(x,y,z,xUp,yUp,zUp);
     } else {
       return or;
     }
@@ -1934,7 +1935,7 @@
 
     // Set the defaults for optional 'y' & 'z'.
     y = (typeof y !== 'number') ? self._orientation[1] : y;
-    z = (typeof z !== 'number') ? self._orientation[1] : z;//added by me - should be [2]?
+    z = (typeof z !== 'number') ? self._orientation[2] : z;//added by me - should be [2]?
 
     // Setup the group's spatial orientation if no ID is passed.
     if (typeof id === 'undefined') {
@@ -2002,7 +2003,7 @@
 
     // Set the defaults for optional 'y' & 'z'.
     y = (typeof y !== 'number') ? self._velocity[1] : y;
-    z = (typeof z !== 'number') ? self._velocity[1] : z;//added by me - should be [2]?
+    z = (typeof z !== 'number') ? self._velocity[2] : z;//added by me - should be [2]?
 
     // Setup the group's spatial velocity if no ID is passed.
     if (typeof id === 'undefined') {
